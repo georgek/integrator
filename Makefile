@@ -12,7 +12,7 @@ lex.yy.o:	lex.yy.c y.tab.h
 
 y.tab.o:	
 
-y.tab.c y.tab.h:	int.y tree.h
+y.tab.c y.tab.h:	int.y tree.h simplify.h
 			$(YACC) int.y
 
 lex.yy.c:	int.l tree.h
