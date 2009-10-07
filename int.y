@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <limits.h>
 
+#include "bignum.h"
 #include "tree.h"
 #include "simplify.h"
 
@@ -122,6 +123,12 @@ expression:     expression '+' expression
 
 int main (int argc, char *argv[])
 {
+     BigNum big = make_bignum("123456789249", 12);
+     print_bignum(big);
+     printf("\n");
+     free_bignum(big);
+     big = NULL;
+
      yyparse();
      return 0;
 }

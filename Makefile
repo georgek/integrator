@@ -3,7 +3,7 @@ YACC = bison -y -d
 
 CC = gcc -g -Wall -ansi -pedantic
 
-objects = tree.o simplify.o
+objects = tree.o simplify.o bignum.o
 
 integrator:	$(objects) y.tab.o lex.yy.o
 		$(CC) -o integrator $(objects) y.tab.o lex.yy.o -ly -ll -lm
@@ -12,7 +12,7 @@ lex.yy.o:	lex.yy.c y.tab.h
 
 y.tab.o:	
 
-y.tab.c y.tab.h:	int.y tree.h simplify.h
+y.tab.c y.tab.h:	int.y tree.h simplify.h bignum.h
 			$(YACC) int.y
 
 lex.yy.c:	int.l tree.h
@@ -21,6 +21,8 @@ lex.yy.c:	int.l tree.h
 tree.o:		tree.h y.tab.h
 
 simplify.o:	simplify.h tree.h y.tab.h
+
+bignum.o:	bignum.h
 
 .PHONY: clean
 clean:	
