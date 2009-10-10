@@ -26,8 +26,25 @@ typedef SHORT_INT_T *BigNum;
 
 /* makes a new bignum from a string, returns pointer to array */
 BigNum make_bignum(char *string, int length);
+/* makes a new bignum of a given length initialised to 0 */
+BigNum make_zero_bignum(int length);
+
 void free_bignum(BigNum p);
 
 void print_bignum(BigNum p);
+
+/* logical operations */
+int is_neg(BigNum p);
+int bignum_equal(BigNum left, BigNum right);
+int bignum_lt(BigNum left, BigNum right);
+int bignum_gt(BigNum left, BigNum right);
+int bignum_lte(BigNum left, BigNum right);
+int bignum_gte(BigNum left, BigNum right);
+
+/* arithmetic */
+BigNum negate_bignum(BigNum p);
+BigNum add_bignums(BigNum left, BigNum right);
+BigNum sub_bignums(BigNum left, BigNum right);
+
 
 #endif /* _BIGNUM_H_ */

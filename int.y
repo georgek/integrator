@@ -123,11 +123,20 @@ expression:     expression '+' expression
 
 int main (int argc, char *argv[])
 {
-     BigNum big = make_bignum("123456789249", 12);
+     BigNum big = make_bignum ("-9847569234923456789123456789123456789123456789", 47);
+     BigNum big2 = make_bignum("756789123456789123456789123456789123", 36);
+     BigNum big3 = sub_bignums(big, big2);
      print_bignum(big);
      printf("\n");
+     print_bignum(big2);
+     printf("\n");
+     print_bignum(big3);
+     printf("\n");
+     printf("%d\n", bignum_lte(big, big2));
      free_bignum(big);
-     big = NULL;
+     free_bignum(big2);
+     free_bignum(big3);
+     big = big2 = big3 = NULL;
 
      yyparse();
      return 0;

@@ -12,7 +12,7 @@ UINT 0|[1-9][0-9]*
 %%
 
 {UINT} {
-     yylval.ival = atoi(yytext);
+     yylval.ival = strtoul(yytext, (char**)NULL, 10);
      return INTEGER;
 }
 
