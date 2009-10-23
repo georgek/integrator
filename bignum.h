@@ -45,7 +45,7 @@ int bignum_gte(BigNum left, BigNum right);
 BigNum negate_bignum(BigNum p);
 BigNum add_bignums(BigNum left, BigNum right);
 BigNum sub_bignums(BigNum left, BigNum right);
-
 BigNum mul_bignums(BigNum left, BigNum right);
+int div_bignums(BigNum left, BigNum right, BigNum *q, BigNum *r);
 
 #endif /* _BIGNUM_H_ */

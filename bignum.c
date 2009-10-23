@@ -10,6 +10,7 @@ static SHORT_INT_T get_dig(BigNum, int);
 static BigNum add(BigNum, BigNum);
 static BigNum sub(BigNum, BigNum);
 static BigNum mul(BigNum, BigNum);
+static int dyv(BigNum, BigNum, BigNum*, BigNum*); /* div is a function in stdlib */
 static int lt(BigNum, BigNum);
 /* static BigNum trim_bignum(BigNum); */
 
@@ -294,6 +295,27 @@ BigNum mul_bignums(BigNum left, BigNum right)
           }
      }
 }
+
+int div_bignums(BigNum left, BigNum right, BigNum *q, BigNum *r)
+{
+     if (!is_neg(left)) {
+          if (!is_neg(right)) {
+               /*  */
+          }
+          else {
+
+          }
+     }
+     else {
+          if (!is_neg(right)) {
+               
+          }
+          else {
+               
+          }
+     }
+}
+
 /* negates a bignum, returns p */
 BigNum negate_bignum(BigNum p)
 {
@@ -400,6 +422,12 @@ static BigNum mul(BigNum left, BigNum right)
      }
      return result;
 }
+
+static int dyv(BigNum left, BigNum right, BigNum *q, BigNum *r)
+{
+     
+}
+
 /* less than, ignores sign */
 static int lt(BigNum left, BigNum right)
 {
