@@ -336,8 +336,8 @@ static BigNum add(BigNum left, BigNum right)
 
      while (j < (length(result)-1)) {
           result_dig = (LONG_INT_T) get_dig(left, j) + get_dig(right, j) + k;
-          *(result+j+1) = (SHORT_INT_T) result_dig % RADIX;
-          k = (SHORT_INT_T) result_dig / RADIX;
+          *(result+j+1) = (SHORT_INT_T) (result_dig % RADIX);
+          k = (SHORT_INT_T) (result_dig / RADIX);
           ++j;
      }
      *(result+j+1) = k;
@@ -351,7 +351,7 @@ static BigNum sub(BigNum left, BigNum right)
      /* result length could be as long as the longest operand */
      int result_length = (length(left) > length(right)) ? length(left) :
           length(right);
-     LONG_INT_T result_dig;
+     SHORT_INT_T result_dig;
      int j = 0;                 /* j runs through digit positions */
      SHORT_INT_T k = 1;                 /* k holds carry+1 */
      BigNum result;
@@ -359,10 +359,9 @@ static BigNum sub(BigNum left, BigNum right)
      result = make_zero_bignum(result_length);
 
      while (j < (length(result))) {
-          result_dig = (LONG_INT_T) RADIX + get_dig(left, j) -
-               get_dig(right, j) + k - 1;
-          *(result+j+1) = (SHORT_INT_T) result_dig % RADIX;
-          k = (SHORT_INT_T) result_dig / RADIX;
+          result_dig = RADIX + get_dig(left, j) - get_dig(right, j) + k - 1;
+          *(result+j+1) = result_dig % RADIX;
+          k = result_dig / RADIX;
           ++j;
      }
      *(result+j+1) = k;
