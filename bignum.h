@@ -46,5 +46,6 @@ BigNum negate_bignum(BigNum p);
 BigNum add_bignums(BigNum left, BigNum right);
 BigNum sub_bignums(BigNum left, BigNum right);
 
+BigNum mul_bignums(BigNum left, BigNum right);
 
 #endif /* _BIGNUM_H_ */

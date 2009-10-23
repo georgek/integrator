@@ -9,6 +9,7 @@ static int length(BigNum);
 static SHORT_INT_T get_dig(BigNum, int);
 static BigNum add(BigNum, BigNum);
 static BigNum sub(BigNum, BigNum);
+static BigNum mul(BigNum, BigNum);
 static int lt(BigNum, BigNum);
 /* static BigNum trim_bignum(BigNum); */
 
@@ -274,6 +275,25 @@ BigNum sub_bignums(BigNum left, BigNum right)
      }
 }
 
+BigNum mul_bignums(BigNum left, BigNum right)
+{
+     if (!is_neg(left)) {
+          if (!is_neg(right)) {
+               return mul(left, right); /* a*b */
+          }
+          else {
+               return negate_bignum(mul(left, right)); /* -(a*b) */
+          }
+     }
+     else {
+          if (!is_neg(right)) {
+               return negate_bignum(mul(left, right)); /* -(a*b) */
+          }
+          else {
+               return mul(left, right); /* a*b */
+          }
+     }
+}
 /* negates a bignum, returns p */
 BigNum negate_bignum(BigNum p)
 {
@@ -298,6 +318,8 @@ static SHORT_INT_T get_dig(BigNum p, int i)
 /* these static functions always ignore the sign and assume both
  * bignums are positive, negative numbers can be dealt with in terms
  * of positive numbers and the negate */
+
+/* the classical algorithms */
 
 /* does an actual addition of two nonnegative bignums */
 static BigNum add(BigNum left, BigNum right) 
@@ -348,6 +370,37 @@ static BigNum sub(BigNum left, BigNum right)
      return result;     
 }
 
+static BigNum mul(BigNum left, BigNum right)
+{
+     int result_length = length(left) + length(right);
+     LONG_INT_T t;
+     SHORT_INT_T k;
+     int i, j;
+     BigNum result;
+
+     result = make_zero_bignum(result_length);
+
+     j = 0;
+     while (j < length(right)) {
+          if (get_dig(right, j) == 0) {
+               *(result+j+length(left)+1) = 0;
+               ++j;
+               continue;
+          }
+          i = 0;
+          k = 0;
+          while (i < length(left)) {
+               t = (LONG_INT_T) get_dig(left, i) * get_dig(right, j) +
+                    get_dig(result, i+j) + k;
+               *(result+i+j+1) = (SHORT_INT_T) (t % RADIX);
+               k = (SHORT_INT_T) (t / RADIX);
+               ++i;
+          }
+          *(result+j+length(left)+1) = k;
+          ++j;
+     }
+     return result;
+}
 /* less than, ignores sign */
 static int lt(BigNum left, BigNum right)
 {
