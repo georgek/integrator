@@ -42,10 +42,10 @@ int bignum_lte(BigNum left, BigNum right);
 int bignum_gte(BigNum left, BigNum right);
 
 /* arithmetic */
-BigNum negate_bignum(BigNum p);
-BigNum add_bignums(BigNum left, BigNum right);
-BigNum sub_bignums(BigNum left, BigNum right);
-BigNum mul_bignums(BigNum left, BigNum right);
-int div_bignums(BigNum left, BigNum right, BigNum *q, BigNum *r);
+void negate_bignum(BigNum p);
+void add_bignums(BigNum *res, BigNum left, BigNum right);
+void sub_bignums(BigNum *res, BigNum left, BigNum right);
+void mul_bignums(BigNum *res, BigNum left, BigNum right);
+void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right);
 
 #endif /* _BIGNUM_H_ */

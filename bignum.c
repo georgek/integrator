@@ -212,19 +212,21 @@ int bignum_gte(BigNum left, BigNum right)
      }     
 }
 
-BigNum add_bignums(BigNum left, BigNum right)
+void add_bignums(BigNum *res, BigNum left, BigNum right)
 {
+     BigNum old_res = *res;
      if (!is_neg(left)) {
           if (!is_neg(right)) {
-               return add(left, right); /* a+b */
+               *res = add(left, right); /* a+b */
           }
           else {                            /* a-b */
                if (lt(left,right)) {        /* make sure lhs is
                                              * greater than rhs */
-                    return negate_bignum(sub(right, left));
+                    *res = sub(right, left);
+                    negate_bignum(*res);
                }
                else {
-                    return sub(left, right);
+                    *res = sub(left, right);
                }
           }
      }
@@ -232,71 +234,86 @@ BigNum add_bignums(BigNum left, BigNum right)
           if (!is_neg(right)) {             /* b-a */
                if (lt(right,left)) {        /* make sure lhs is
                                              * greater than rhs */
-                    return negate_bignum(sub(left, right));
+                    *res = sub(left, right);
+                    negate_bignum(*res);
                }
                else {
-                    return sub(right, left);
+                    *res = sub(right, left);
                }
           }
           else {
-               return negate_bignum(add(left, right)); /* -(a+b) */
+               *res = add(left, right); /* -(a+b) */
+               negate_bignum(*res);
           }
      }
+     /* free old result */
+     free_bignum(old_res);
 }
 
-BigNum sub_bignums(BigNum left, BigNum right)
+void sub_bignums(BigNum *res, BigNum left, BigNum right)
 {
+     BigNum old_res = *res;
      if (!is_neg(left)) {
           if (!is_neg(right)) {             /* a-b */
                if (lt(left,right)) {        /* make sure lhs is
                                              * greater than rhs */
-                    return negate_bignum(sub(right, left));
+                    *res = sub(right, left);
+                    negate_bignum(*res);
                }
                else {
-                    return sub(left, right);
+                    *res = sub(left, right);
                }
           }
           else {
-               return add(left, right); /* a+b */
+               *res = add(left, right); /* a+b */
           }
      }
      else {
           if (!is_neg(right)) {
-               return negate_bignum(add(left, right)); /* -(a+b) */
+               *res = add(left, right); /* -(a+b) */
+               negate_bignum(*res);
           }
           else {                            /* b-a */
                if (lt(right,left)) {        /* make sure lhs is
                                              * greater than rhs */
-                    return negate_bignum(sub(left, right));
+                    *res = sub(left, right);
+                    negate_bignum(*res);
                }
                else {
-                    return sub(right, left);
+                    *res = sub(right, left);
                }
           }
      }
+     /* free old result */
+     free_bignum(old_res);
 }
 
-BigNum mul_bignums(BigNum left, BigNum right)
+void mul_bignums(BigNum *res, BigNum left, BigNum right)
 {
+     BigNum old_res = *res;
      if (!is_neg(left)) {
           if (!is_neg(right)) {
-               return mul(left, right); /* a*b */
+               *res = mul(left, right); /* a*b */
           }
           else {
-               return negate_bignum(mul(left, right)); /* -(a*b) */
+               *res = mul(left, right); /* -(a*b) */
+               negate_bignum(*res);
           }
      }
      else {
           if (!is_neg(right)) {
-               return negate_bignum(mul(left, right)); /* -(a*b) */
+               *res = mul(left, right); /* -(a*b) */
+               negate_bignum(*res);
           }
           else {
-               return mul(left, right); /* a*b */
+               *res = mul(left, right); /* a*b */
           }
      }
+     /* free old result */
+     free_bignum(old_res);
 }
 
-int div_bignums(BigNum left, BigNum right, BigNum *q, BigNum *r)
+void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 {
      if (!is_neg(left)) {
           if (!is_neg(right)) {
@@ -317,10 +334,9 @@ int div_bignums(BigNum left, BigNum right, BigNum *q, BigNum *r)
 }
 
 /* negates a bignum, returns p */
-BigNum negate_bignum(BigNum p)
+void negate_bignum(BigNum p)
 {
      *p = -(*p);
-     return p;
 }
 
 /* returns length of bignum */
