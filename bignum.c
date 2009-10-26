@@ -6,12 +6,17 @@
 
 /* utility functions */
 static int length(BigNum);
+static int real_length(BigNum);
 static SHORT_INT_T get_dig(BigNum, int);
+static SHORT_INT_T get_dig2(BigNum, int);
 static BigNum add(BigNum, BigNum);
 static BigNum sub(BigNum, BigNum);
 static BigNum mul(BigNum, BigNum);
-static int dyv(BigNum, BigNum, BigNum*, BigNum*); /* div is a function in stdlib */
+static BigNum mul2(BigNum, SHORT_INT_T);
+static void dyv(BigNum*, BigNum*, BigNum, BigNum); /* div is a function in stdlib */
 static int lt(BigNum, BigNum);
+static void copy(BigNum*, BigNum);
+static int zero(BigNum);
 /* static BigNum trim_bignum(BigNum); */
 
 BigNum make_bignum(char *string, int length)
@@ -62,6 +67,14 @@ BigNum make_bignum(char *string, int length)
      return bignum;
 }
 
+BigNum make_bignum2(SHORT_INT_T n)
+{
+     BigNum bignum = malloc(sizeof(SHORT_INT_T)*2);
+     *bignum = 1;
+     *(bignum+1) = n;
+     return bignum;
+}
+
 BigNum make_zero_bignum(int length)
 {
      BigNum new = calloc(length+1, sizeof(BigNum));
@@ -78,22 +91,20 @@ void free_bignum(BigNum p)
 
 void print_bignum(BigNum p)
 {
-     int length = abs(*p);
-     BigNum i;
+     int i = length(p);
      int negative = is_neg(p);
 
-     i = p + length;
      if (negative) {
           printf("%c", '-');    /* print sign */
      }
      /* skip zero digits */
-     while (*i == 0) {
+     while (*(p+i) == 0 && i > 1) {
           --i;
      }
-     printf("%u", *i);          /* first digit is not padded */
+     printf("%u", *(p+i));      /* first digit is not padded */
      --i;
-     while(i != p) {
-          printf("%09u", *i);
+     while(i > 0) {
+          printf("%09u", *(p+i));
           --i;
      }
 }
@@ -313,24 +324,47 @@ void mul_bignums(BigNum *res, BigNum left, BigNum right)
      free_bignum(old_res);
 }
 
+void mul_bignums2(BigNum *res, BigNum left, SHORT_INT_T right)
+{
+     BigNum old_res = *res;
+     if (!is_neg(left)) {
+          *res = mul2(left, right); /* a*b */
+     }
+     else {
+          *res = mul2(left, right); /* -(a*b) */
+          negate_bignum(*res);
+     }
+     /* free old result */
+     free_bignum(old_res);
+}
+
 void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 {
+     BigNum old_q = *q;
+     BigNum old_r = *r;
      if (!is_neg(left)) {
           if (!is_neg(right)) {
-               /*  */
+               dyv(q, r, left, right); /* a/b */
           }
           else {
-
+               dyv(q,r, left, right); /* -(a/b) */
+               negate_bignum(*q);
+               negate_bignum(*r);
           }
      }
      else {
           if (!is_neg(right)) {
-               
+               dyv(q,r, left, right); /* -(a/b) */
+               negate_bignum(*q);
+               negate_bignum(*r);
           }
           else {
-               
+               dyv(q, r, left, right); /* a/b */
           }
      }
+     /* free old result */
+     free_bignum(old_q);
+     free_bignum(old_r);
 }
 
 /* negates a bignum, returns p */
@@ -339,16 +373,131 @@ void negate_bignum(BigNum p)
      *p = -(*p);
 }
 
+/* halves a bignum, using a right shift */
+void half_bignum(BigNum *res, BigNum u)
+{
+     BigNum old_res = *res;
+     int i = length(u);
+     SHORT_INT_T lsb = 0;
+     *res = make_zero_bignum(real_length(u));
+     if (is_neg(u)) negate_bignum(*res);
+     /* now do the right shift on res */
+     while (i > 0) {
+          /* add least significant bit from last digit */
+          if (lsb) *(*res+i) += RADIX/2;
+          /* get least significant bit from this digit */
+          lsb = *(u+i) & 1;
+          /* do right shift */
+          *(*res+i) += *(u+i) >> 1;
+          --i;
+     }
+     free_bignum(old_res);
+}
+
+/* doubles a bignum, using a left shift */
+void double_bignum(BigNum *res, BigNum u)
+{
+     BigNum old_res = *res;
+     int i = 1;
+     SHORT_INT_T msb = 0;
+
+     *res = make_zero_bignum(real_length(u)+1);
+
+     if (is_neg(u)) negate_bignum(*res);
+     /* now do the left shift on res */
+     while (i < length(*res)+1) {
+          /* add msb from last digit */
+          if (msb) *(*res+i) += 1;
+          /* get most significant bit from this digit */
+          msb = *(u+i) / (RADIX/2);
+          /* do right shift */
+          *(*res+i) += (*(u+i)%(RADIX/2)) << 1;
+          ++i;
+     }
+     free_bignum(old_res);
+}
+
+/* greatest common divisor
+ * implements binary GCD algorithm */
+void gcd(BigNum *gcd, BigNum u, BigNum v) 
+{
+     BigNum nu, nv, t;
+     int k = 0;
+     int i;
+     /* copy u and v */
+     nu = make_zero_bignum(1);
+     nv = make_zero_bignum(1);
+     copy(&nu, u);
+     copy(&nv, v);
+
+     t = make_zero_bignum(1);
+     /* find power of 2, keep dividing both until at least one is
+      * odd */
+     while (!((get_dig(nu, 0)&1) || (get_dig(nv, 0)&1))) { /* while both even */
+          ++k;
+          half_bignum(&nu, nu);
+          half_bignum(&nv, nv);
+     }
+     if (get_dig(nu, 0)&1) {
+          copy(&t, nv);
+          negate_bignum(t);
+     }
+     else {
+          copy(&t, nu);
+     }
+     do {
+          /* halve t until it is odd */
+          while (!(get_dig(t,0)&1)) {
+               half_bignum(&t, t);
+          }
+          /* reset max(u,v) */
+          if (!is_neg(t) && !zero(t)) {
+               copy(&nu, t);
+          }
+          else {
+               copy(&nv, t);
+               negate_bignum(nv);
+          }
+          sub_bignums(&t, nu, nv);
+     } while (!zero(t));
+     /* answer is u left shifted k times */
+     for (i = 0; i < k; ++i) {
+          double_bignum(&nu, nu);
+     }
+     copy(gcd, nu);
+}
+
 /* returns length of bignum */
 static int length(BigNum p)
 {
      return abs((int) *p);
 }
 
+/* returns real length, excluding leading zero digits */
+static int real_length(BigNum p)
+{
+     int i = length(p);
+     
+     /* skip leading zeros */
+     while (*(p+i) == 0 && i > 1) {
+          --i;
+     }
+     return i;
+}
+
+/* digits are numbered from 0 starting from least significant */
 static SHORT_INT_T get_dig(BigNum p, int i)
 {
      if (i < length(p)) {
           return *(p+i+1);
+     }
+     else return 0;
+}
+
+static SHORT_INT_T get_dig2(BigNum p, int i)
+{
+     if (i < length(p)) {
+          return *(p + length(p) - i);
      }
      else return 0;
 }
@@ -439,9 +588,67 @@ static BigNum mul(BigNum left, BigNum right)
      return result;
 }
 
-static int dyv(BigNum left, BigNum right, BigNum *q, BigNum *r)
+static BigNum mul2(BigNum left, SHORT_INT_T right)
 {
+     int result_length = length(left) + 1;
+     LONG_INT_T t;
+     SHORT_INT_T k;
+     int i;
+     BigNum result;
+
+     if (right == 0) {
+          result = make_zero_bignum(1);
+          return result;
+     }
      
+     result = make_zero_bignum(result_length);
+     i = 0;
+     k = 0;
+     while (i < length(left)) {
+          t = (LONG_INT_T) get_dig(left, i) * right + k;
+          *(result+i+1) = (SHORT_INT_T) (t % RADIX);
+          k = (SHORT_INT_T) (t / RADIX);
+          ++i;
+     }
+     *(result+length(left)+1) = k;
+
+     return result;
+}
+
+static void dyv(BigNum *q, BigNum *r, BigNum u, BigNum v)
+{
+     BigNum n_u, n_v, d;
+     SHORT_INT_T j, qd, rd;
+     SHORT_INT_T m = length(u) - length(v);
+     SHORT_INT_T n = length(v);
+
+     /* allocate bignums for answer */
+     *q = make_zero_bignum(m+1);
+     *r = make_zero_bignum(n);
+
+     /* normalise */
+     d = make_bignum2(RADIX/(get_dig2(v, n-1)+1));
+     mul_bignums(&n_u, u, d);
+     mul_bignums(&n_v, v, d);
+
+     j = m;
+     while (j >= 0) {
+          qd = (get_dig2(u, j+n)*RADIX + get_dig2(u, j+n-1))/get_dig2(v, n-1);
+          rd = (get_dig2(u, j+m)*RADIX + get_dig2(u, j+n-1))%get_dig2(v, n-1);
+          /* test trial qd */
+          while (qd >= RADIX ||
+                 qd*get_dig2(v, n-2) > (RADIX*rd + get_dig2(u, j+n-2))) {
+               --qd;
+               rd += get_dig2(v, n-1);
+               if (rd < RADIX) {
+                    continue;
+               }
+               else {
+                    break;
+               }
+          }
+          
+     }
 }
 
 /* less than, ignores sign */
@@ -481,10 +688,26 @@ static int lt(BigNum left, BigNum right)
      return 0;
 }
 
-/* shortens array by copying, if necessary */
-/* static BigNum trim_bignum(BigNum p) */
-/* { */
-/*      int i = length(p); */
-/* } */
+static void copy(BigNum *res, BigNum u)
+{
+     BigNum old_res = *res;
+     int i;
+     *res = malloc(sizeof(SHORT_INT_T) * (length(u)+1));
+     for (i = 0; i < (length(u)+1); ++i) {
+          *(*res+i) = *(u+i);
+     }
+     free_bignum(old_res);
+}
 
+static int zero(BigNum u)
+{
+     int i = 0;
+     while (i < length(u)) {
+          if (get_dig(u, i)) {
+               return 0;
+          }
+          ++i;
+     }
+     return 1;
+}
 

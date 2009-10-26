@@ -9,3 +9,6 @@ y.tab.h
 
 #emacs autosaves
 *~
+/TAGS
+/gmon.out
+/gprof.out

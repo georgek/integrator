@@ -18,14 +18,24 @@
 /* and its argument for printf */
 #define PRINT_SI(var) printf("%u", var)
 
-/* find good value for radix, this is good for 32 bit short int */
+/* find good value for radix,
+ * this is good for 32 bit short int (for 64 bit system) */
 #define RADIX 1000000000
+/* this is good for a 16 bit short int (for 32 bit system) */
+/* #define RADIX 10000 */
 #define DIGPERWORD 9
+/* word length is the actual length of words in bits */
+#define WORD_LENGTH 30
+
+/* some masks */
+#define MSB (1 << (WORD_LENGTH-1))
 
 typedef SHORT_INT_T *BigNum;
 
 /* makes a new bignum from a string, returns pointer to array */
 BigNum make_bignum(char *string, int length);
+/* make new bignum from integer */
+BigNum make_bignum2(SHORT_INT_T n);
 /* makes a new bignum of a given length initialised to 0 */
 BigNum make_zero_bignum(int length);
 
@@ -46,6 +56,13 @@ void negate_bignum(BigNum p);
 void add_bignums(BigNum *res, BigNum left, BigNum right);
 void sub_bignums(BigNum *res, BigNum left, BigNum right);
 void mul_bignums(BigNum *res, BigNum left, BigNum right);
+void mul_bignums2(BigNum *res, BigNum left, SHORT_INT_T right);
 void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right);
+
+void half_bignum(BigNum *res, BigNum u);
+void double_bignum(BigNum *res, BigNum u);
+
+/* greatest common divisor */
+void gcd(BigNum *gcd, BigNum u, BigNum v);
 
 #endif /* _BIGNUM_H_ */

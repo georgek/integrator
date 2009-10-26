@@ -123,21 +123,41 @@ expression:     expression '+' expression
 
 int main (int argc, char *argv[])
 {
-     BigNum big = make_bignum ("-9847569234923456789123456789123456789123456789", 47);
-     BigNum big2 = make_bignum("756789123456789123456789123456789123", 36);
-     BigNum big3 = sub_bignums(big, big2);
+     int i;
+     BigNum big = make_bignum ("38475839289824928", 17);
+     BigNum big2 = make_bignum("39580306804398530", 17);
+     BigNum big3 = make_bignum("986356", 6);
+
+     for (i=0; i < 1000; ++i) {
+          mul_bignums(&big, big, big2);
+     }
+
+     add_bignums(&big2, big2, big3);
+
+     for (i=0; i < 10; ++i) {
+          mul_bignums(&big2, big2, big2);
+     }
+
      print_bignum(big);
      printf("\n");
      print_bignum(big2);
      printf("\n");
-     print_bignum(big3);
+
+     gcd(&big2, big, big2);
+
+     print_bignum(big2);
      printf("\n");
-     printf("%d\n", bignum_lte(big, big2));
+
+     /* BigNum big3 = make_bignum("8888", 4); */
+     /* gcd(&big3, big, big2); */
+     /* print_bignum(big3); */
+     /* printf("\n"); */
+     /* printf("%d\n", bignum_lte(big, big2)); */
      free_bignum(big);
      free_bignum(big2);
-     free_bignum(big3);
-     big = big2 = big3 = NULL;
+     /* free_bignum(big3); */
+     /* big = big2 = big3 = NULL; */
 
-     yyparse();
+     /* yyparse(); */
      return 0;
 }
