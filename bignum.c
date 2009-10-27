@@ -370,7 +370,7 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 /* negates a bignum, returns p */
 void negate_bignum(BigNum p)
 {
-     *p = -(*p);
+     *p = (int) -(*p);
 }
 
 /* halves a bignum, using a right shift */
