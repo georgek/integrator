@@ -617,7 +617,8 @@ static BigNum mul2(BigNum left, SHORT_INT_T right)
 
 static void dyv(BigNum *q, BigNum *r, BigNum u, BigNum v)
 {
-     BigNum n_u, n_v, d;
+     BigNum nu, nv, tv;
+     SHORT_INT_T d;
      SHORT_INT_T j, qd, rd;
      SHORT_INT_T m = length(u) - length(v);
      SHORT_INT_T n = length(v);
@@ -626,20 +627,22 @@ static void dyv(BigNum *q, BigNum *r, BigNum u, BigNum v)
      *q = make_zero_bignum(m+1);
      *r = make_zero_bignum(n);
 
+     tv = make_zero_bignum(1);
+
      /* normalise */
-     d = make_bignum2(RADIX/(get_dig2(v, n-1)+1));
-     mul_bignums(&n_u, u, d);
-     mul_bignums(&n_v, v, d);
+     d = RADIX/(get_dig2(v, n-1)+1);
+     mul_bignums2(&nu, u, d);
+     mul_bignums2(&nv, v, d);
 
      j = m;
      while (j >= 0) {
-          qd = (get_dig2(u, j+n)*RADIX + get_dig2(u, j+n-1))/get_dig2(v, n-1);
-          rd = (get_dig2(u, j+m)*RADIX + get_dig2(u, j+n-1))%get_dig2(v, n-1);
+          qd = (get_dig2(nu, j+n)*RADIX + get_dig2(nu, j+n-1))/get_dig2(nv, n-1);
+          rd = (get_dig2(nu, j+m)*RADIX + get_dig2(nu, j+n-1))%get_dig2(nv, n-1);
           /* test trial qd */
           while (qd >= RADIX ||
-                 qd*get_dig2(v, n-2) > (RADIX*rd + get_dig2(u, j+n-2))) {
+                 qd*get_dig2(nv, n-2) > (RADIX*rd + get_dig2(nu, j+n-2))) {
                --qd;
-               rd += get_dig2(v, n-1);
+               rd += get_dig2(nv, n-1);
                if (rd < RADIX) {
                     continue;
                }
@@ -647,6 +650,8 @@ static void dyv(BigNum *q, BigNum *r, BigNum u, BigNum v)
                     break;
                }
           }
+          /* multiply and subtract */
+          mul_bignums2(&tv, nv, qd);
           
      }
 }

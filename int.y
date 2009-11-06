@@ -148,6 +148,11 @@ int main (int argc, char *argv[])
      print_bignum(big2);
      printf("\n");
 
+     mul_bignums2(&big2, big2, 95738);
+     
+     print_bignum(big2);
+     printf("\n");
+
      /* BigNum big3 = make_bignum("8888", 4); */
      /* gcd(&big3, big, big2); */
      /* print_bignum(big3); */
