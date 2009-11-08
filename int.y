@@ -143,10 +143,10 @@ int main (int argc, char *argv[])
      print_bignum(big2);
      printf("\n");
 
-     /* gcd(&big2, big, big2); */
+     gcd(&big2, big, big2);
 
-     /* print_bignum(big2); */
-     /* printf("\n"); */
+     print_bignum(big2);
+     printf("\n");
 
      /* mul_bignums2(&big2, big2, 95738); */
      
