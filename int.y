@@ -126,32 +126,32 @@ int main (int argc, char *argv[])
      int i;
      BigNum big = make_bignum ("38475839289824928", 17);
      BigNum big2 = make_bignum("39580306804398530", 17);
-     BigNum big3 = make_bignum("986356", 6);
+     /* BigNum big3 = make_bignum("986356", 6); */
 
      for (i=0; i < 1000; ++i) {
           mul_bignums(&big, big, big2);
      }
 
-     add_bignums(&big2, big2, big3);
+     /* add_bignums(&big2, big2, big3); */
 
-     for (i=0; i < 10; ++i) {
-          mul_bignums(&big2, big2, big2);
-     }
+     /* for (i=0; i < 10; ++i) { */
+     /*      mul_bignums(&big2, big2, big2); */
+     /* } */
 
      print_bignum(big);
      printf("\n");
      print_bignum(big2);
      printf("\n");
 
-     gcd(&big2, big, big2);
+     /* gcd(&big2, big, big2); */
 
-     print_bignum(big2);
-     printf("\n");
+     /* print_bignum(big2); */
+     /* printf("\n"); */
 
-     mul_bignums2(&big2, big2, 95738);
+     /* mul_bignums2(&big2, big2, 95738); */
      
-     print_bignum(big2);
-     printf("\n");
+     /* print_bignum(big2); */
+     /* printf("\n"); */
 
      /* BigNum big3 = make_bignum("8888", 4); */
      /* gcd(&big3, big, big2); */
