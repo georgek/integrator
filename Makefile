@@ -1,7 +1,7 @@
 LEX = flex -I
 YACC = bison -y -d
 
-CC = gcc -pg -Wall -ansi -pedantic
+CC = gcc -g -Wall -ansi -pedantic
 
 objects = tree.o simplify.o bignum.o
 

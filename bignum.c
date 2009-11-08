@@ -386,9 +386,9 @@ void half_bignum(BigNum *res, BigNum u)
           /* add least significant bit from last digit */
           if (lsb) *(*res+i) += RADIX/2;
           /* get least significant bit from this digit */
-          lsb = *(u+i) & 1;
+          lsb = get_dig(u,i-1) & 1;
           /* do right shift */
-          *(*res+i) += *(u+i) >> 1;
+          *(*res+i) += get_dig(u,i-1) >> 1;
           --i;
      }
      free_bignum(old_res);
@@ -409,9 +409,9 @@ void double_bignum(BigNum *res, BigNum u)
           /* add msb from last digit */
           if (msb) *(*res+i) += 1;
           /* get most significant bit from this digit */
-          msb = *(u+i) / (RADIX/2);
+          msb = get_dig(u,i-1) / (RADIX/2);
           /* do right shift */
-          *(*res+i) += (*(u+i)%(RADIX/2)) << 1;
+          *(*res+i) += (get_dig(u,i-1)%(RADIX/2)) << 1;
           ++i;
      }
      free_bignum(old_res);
