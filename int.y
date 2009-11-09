@@ -124,9 +124,10 @@ expression:     expression '+' expression
 int main (int argc, char *argv[])
 {
      int i;
+     SHORT_INT_T r;
      BigNum big = make_bignum ("38475839289824928", 17);
      BigNum big2 = make_bignum("39580306804398530", 17);
-     /* BigNum big3 = make_bignum("986356", 6); */
+     BigNum big3 = make_bignum("986356", 6);
 
      for (i=0; i < 1000; ++i) {
           mul_bignums(&big, big, big2);
@@ -148,6 +149,11 @@ int main (int argc, char *argv[])
      print_bignum(big2);
      printf("\n");
 
+     div_bignums2(&big2, &r, big2, 983758);
+     
+     print_bignum(big2);
+     printf("\n");
+
      /* mul_bignums2(&big2, big2, 95738); */
      
      /* print_bignum(big2); */
@@ -160,7 +166,7 @@ int main (int argc, char *argv[])
      /* printf("%d\n", bignum_lte(big, big2)); */
      free_bignum(big);
      free_bignum(big2);
-     /* free_bignum(big3); */
+     free_bignum(big3);
      /* big = big2 = big3 = NULL; */
 
      /* yyparse(); */

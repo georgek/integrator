@@ -1,3 +1,5 @@
+/* general bignum functions */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -14,10 +16,10 @@ static BigNum sub(BigNum, BigNum);
 static BigNum mul(BigNum, BigNum);
 static BigNum mul2(BigNum, SHORT_INT_T);
 static void dyv(BigNum*, BigNum*, BigNum, BigNum); /* div is a function in stdlib */
+static void dyv2(BigNum*, SHORT_INT_T*, BigNum, SHORT_INT_T);
 static int lt(BigNum, BigNum);
 static void copy(BigNum*, BigNum);
 static int zero(BigNum);
-/* static BigNum trim_bignum(BigNum); */
 
 BigNum make_bignum(char *string, int length)
 {
@@ -367,6 +369,21 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
      free_bignum(old_r);
 }
 
+void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
+{
+     BigNum old_q = *q;
+     if (!is_neg(left)) {
+          dyv2(q, r, left, right); /* a/b */
+     }
+     else {
+          dyv2(q,r, left, right); /* -(a/b) */
+          negate_bignum(*q);
+          *r = -(*r);
+     }
+     /* free old result */
+     free_bignum(old_q);
+}
+
 /* negates a bignum, returns p */
 void negate_bignum(BigNum p)
 {
@@ -653,6 +670,19 @@ static void dyv(BigNum *q, BigNum *r, BigNum u, BigNum v)
           /* multiply and subtract */
           mul_bignums2(&tv, nv, qd);
           
+     }
+}
+
+static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
+{
+     LONG_INT_T t = 0;
+     int j = length(left)-1;
+     *q = make_zero_bignum(length(left));
+     
+     for(; j >= 0; --j) {
+          t = (LONG_INT_T) (*r)*RADIX + get_dig(left,j);
+          *(*q+j+1) = (SHORT_INT_T) ((t/right)%RADIX);
+          *r = t % right;
      }
 }
 

@@ -27,9 +27,6 @@
 /* word length is the actual length of words in bits */
 #define WORD_LENGTH 30
 
-/* some masks */
-#define MSB (1 << (WORD_LENGTH-1))
-
 typedef SHORT_INT_T *BigNum;
 
 /* makes a new bignum from a string, returns pointer to array */
@@ -58,11 +55,13 @@ void sub_bignums(BigNum *res, BigNum left, BigNum right);
 void mul_bignums(BigNum *res, BigNum left, BigNum right);
 void mul_bignums2(BigNum *res, BigNum left, SHORT_INT_T right);
 void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right);
+void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right);
 
 void half_bignum(BigNum *res, BigNum u);
 void double_bignum(BigNum *res, BigNum u);
 
 /* greatest common divisor */
 void gcd(BigNum *gcd, BigNum u, BigNum v);
+
 
 #endif /* _BIGNUM_H_ */
