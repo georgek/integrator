@@ -11,6 +11,7 @@ static int length(BigNum);
 static int real_length(BigNum);
 static SHORT_INT_T get_dig(BigNum, int);
 static SHORT_INT_T get_dig2(BigNum, int);
+static void set_dig(BigNum, int, SHORT_INT_T);
 static BigNum add(BigNum, BigNum);
 static BigNum sub(BigNum, BigNum);
 static BigNum mul(BigNum, BigNum);
@@ -517,12 +518,20 @@ static SHORT_INT_T get_dig(BigNum p, int i)
      else return 0;
 }
 
+/* digits numbered from most significant */
 static SHORT_INT_T get_dig2(BigNum p, int i)
 {
      if (i < length(p)) {
           return *(p + length(p) - i);
      }
      else return 0;
+}
+
+static void set_dig(BigNum p, int i, SHORT_INT_T val)
+{
+     if (i < length(p)) {
+          *(p+i+1) = val;
+     }
 }
 
 /* these static functions always ignore the sign and assume both
