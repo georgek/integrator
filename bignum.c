@@ -351,6 +351,25 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 {
      BigNum old_q = *q;
      BigNum old_r = *r;
+
+     SHORT_INT_T little_r;
+     
+     if (zero(right)) {
+          printf("ERROR: division by zero");
+          return;
+     }
+     
+     if (real_length(right) == 1) {
+          div_bignums2(q, &little_r, left, get_dig(right, 0));
+          *r = make_bignum2(little_r);
+
+          /* free old result */
+          free_bignum(old_q);
+          free_bignum(old_r);
+
+          return;
+     }
+     
      if (!is_neg(left)) {
           if (!is_neg(right)) {
                dyv(q, r, left, right); /* a/b */
@@ -647,45 +666,98 @@ static BigNum mul2(BigNum left, SHORT_INT_T right)
      return result;
 }
 
-static void dyv(BigNum *q, BigNum *r, BigNum u, BigNum v)
+static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
 {
-     BigNum nu, nv, tv;
-     SHORT_INT_T d;
-     SHORT_INT_T j, qd, rd;
-     SHORT_INT_T m = length(u) - length(v);
-     SHORT_INT_T n = length(v);
+     SHORT_INT_T d;             /* normalisation factor */
+     int j, i;                  /* loop counters */
+     unsigned n = length(divisor);
+     unsigned m = length(dividend) - n;
+     LONG_INT_T t;              /* temp val */
+     LONG_INT_T qg;             /* quotient guess */
+     LONG_INT_T rg;             /* remainder guess */
+     BigNum u = NULL;
+     BigNum v = NULL;
+     BigNum qgv = NULL;
+     BigNum ut = make_zero_bignum(n+1); /* holds temp digits for u
+                                         * segment */
+     BigNum bc = make_zero_bignum(n+2); /* for doing the b's
+                                         * complement */
+     int borrow = 0;
 
-     /* allocate bignums for answer */
+     /* copy dividend and divisor */
+     copy(&u, dividend);
+     copy(&v, divisor);
+
+     /* set up bc */
+     set_dig(bc, n+1, 1);
+
+     /* set up quotient */
+     free_bignum(*q);
      *q = make_zero_bignum(m+1);
-     *r = make_zero_bignum(n);
+     /* set up remainder */
+     free_bignum(*r);
+     *r = NULL;
 
-     tv = make_zero_bignum(1);
+     /* normalisation */
+     d = (SHORT_INT_T) (RADIX/(get_dig2(v, 0)+1));
+     mul_bignums2(&u, u, d);
+     mul_bignums2(&v, v, d);
 
-     /* normalise */
-     d = RADIX/(get_dig2(v, n-1)+1);
-     mul_bignums2(&nu, u, d);
-     mul_bignums2(&nv, v, d);
+     /* main loop */
+     for (j = m; j >= 0; --j) {
+          t = (LONG_INT_T) get_dig(u, j+n)*RADIX + get_dig(u, j+n-1);
+          qg = t/get_dig(v, n-1);
+          rg = t%get_dig(v, n-1);
 
-     j = m;
-     while (j >= 0) {
-          qd = (get_dig2(nu, j+n)*RADIX + get_dig2(nu, j+n-1))/get_dig2(nv, n-1);
-          rd = (get_dig2(nu, j+m)*RADIX + get_dig2(nu, j+n-1))%get_dig2(nv, n-1);
-          /* test trial qd */
-          while (qd >= RADIX ||
-                 qd*get_dig2(nv, n-2) > (RADIX*rd + get_dig2(nu, j+n-2))) {
-               --qd;
-               rd += get_dig2(nv, n-1);
-               if (rd < RADIX) {
-                    continue;
-               }
-               else {
+          /* test guesses */
+          while ((qg >= RADIX) ||
+                 (qg*get_dig(v, n-2) > RADIX*rg+get_dig(u, j+n-2))) {
+               --qg;
+               rg -= get_dig(v, n-1);
+
+               if (rg >= RADIX) {
                     break;
+               } /* rg < b so repeat test */
+          }
+
+          /* multiply and subtract */
+          mul_bignums2(&qgv, v, (SHORT_INT_T) qg);
+          /* set up ut */
+          for (i = 0; i <= n; ++i) {
+               set_dig(ut, i, get_dig(u, i+j));
+          }
+          sub_bignums(&ut, ut, qgv);
+
+          if (is_neg(ut)) {
+               borrow = 1;
+               /* set ut to b's complement of real ut */
+               add_bignums(&ut, ut, bc);
+          }
+          else {
+               borrow = 0;
+          }
+          /* set digits of u */
+          for (i = 0; i <= n; ++i) {
+               set_dig(u, i+j, get_dig(ut, i));
+          }
+
+          set_dig(*q, j, qg);
+
+          /* add back if there was a borrow */
+          if (borrow) {
+               set_dig(*q, j, qg-1);
+               add_bignums(&ut, ut, v);
+               /* ignore carry */
+               set_dig(ut, n+1, 0);
+               /* set digits of u */
+               for (i = 0; i <= n; ++i) {
+                    set_dig(u, i+j, get_dig(ut, i));
                }
           }
-          /* multiply and subtract */
-          mul_bignums2(&tv, nv, qd);
-          
      }
+
+     /* unnormalise */
+     div_bignums2(r, NULL, u, d);
 }
 
 static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
