@@ -103,6 +103,10 @@ void print_bignum(BigNum p)
      int i = length(p);
      int negative = is_neg(p);
 
+     if (!p) {
+          return;
+     }
+
      if (negative) {
           printf("%c", '-');    /* print sign */
      }
@@ -121,12 +125,20 @@ void print_bignum(BigNum p)
 
 int is_neg(BigNum p)
 {
+     if (!p) {
+          return 0;
+     }
      return ((int) *p < 0) ? 1 : 0;
 }
 
 int bignum_equal(BigNum left, BigNum right)
 {
      int jl=length(left), jr=length(right);
+
+     if (!left || !right) {
+          return 0;
+     }
+
      if (!(is_neg(left) && is_neg(right))) {
           return 0;
      }
@@ -391,6 +403,7 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
                dyv(q, r, left, right); /* a/b */
           }
      }
+
      /* free old result */
      free_bignum(old_q);
      free_bignum(old_r);
@@ -514,6 +527,9 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
 /* returns length of bignum */
 static int length(BigNum p)
 {
+     if (!p) {
+          return 0;
+     }
      return abs((int) *p);
 }
 
@@ -693,10 +709,8 @@ static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
      set_dig(bc, n+1, 1);
 
      /* set up quotient */
-     free_bignum(*q);
      *q = make_zero_bignum(m+1);
      /* set up remainder */
-     free_bignum(*r);
      *r = NULL;
 
      /* normalisation */
@@ -780,6 +794,11 @@ static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
 static int lt(BigNum left, BigNum right)
 {
      int jl=length(left), jr=length(right);
+
+     if (!left || !right) {
+          return 0;
+     }
+
      /* find first non-zero digit of each */
      while (*(left+jl) == 0) {
           --jl;
