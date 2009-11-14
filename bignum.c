@@ -385,7 +385,7 @@ void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
      else {
           dyv2(q,r, left, right); /* -(a/b) */
           negate_bignum(*q);
-          *r = -(*r);
+          if (r) *r = -(*r);
      }
      /* free old result */
      free_bignum(old_q);
