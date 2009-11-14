@@ -356,15 +356,15 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
           }
           else {
                dyv(q,r, left, right); /* -(a/b) */
-               negate_bignum(*q);
-               negate_bignum(*r);
+               if (q) negate_bignum(*q);
+               if (r) negate_bignum(*r);
           }
      }
      else {
           if (!is_neg(right)) {
                dyv(q,r, left, right); /* -(a/b) */
-               negate_bignum(*q);
-               negate_bignum(*r);
+               if (q) negate_bignum(*q);
+               if (r) negate_bignum(*r);
           }
           else {
                dyv(q, r, left, right); /* a/b */
@@ -393,7 +393,7 @@ void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
 /* negates a bignum, returns p */
 void negate_bignum(BigNum p)
 {
-     *p = -((int) *p);
+     if (p) *p = -((int) *p);
 }
 
 /* halves a bignum, using a right shift */
@@ -687,8 +687,8 @@ static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
      
      for(; j >= 0; --j) {
           t = (LONG_INT_T) (*r)*RADIX + get_dig(left,j);
-          *(*q+j+1) = (SHORT_INT_T) (t/right);
-          *r = (SHORT_INT_T) (t%right);
+          if (q) *(*q+j+1) = (SHORT_INT_T) (t/right);
+          if (r) *r = (SHORT_INT_T) (t%right);
      }
 }
 
