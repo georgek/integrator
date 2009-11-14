@@ -687,7 +687,7 @@ static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
 {
      SHORT_INT_T d;             /* normalisation factor */
      int j, i;                  /* loop counters */
-     unsigned n = length(divisor);
+     unsigned n = real_length(divisor);
      unsigned m = length(dividend) - n;
      LONG_INT_T t;              /* temp val */
      LONG_INT_T qg;             /* quotient guess */
