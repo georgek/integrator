@@ -681,8 +681,8 @@ static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
      
      for(; j >= 0; --j) {
           t = (LONG_INT_T) (*r)*RADIX + get_dig(left,j);
-          *(*q+j+1) = (SHORT_INT_T) ((t/right)%RADIX);
-          *r = t % right;
+          *(*q+j+1) = (SHORT_INT_T) (t/right);
+          *r = (SHORT_INT_T) (t%right);
      }
 }
 
