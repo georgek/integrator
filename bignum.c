@@ -113,7 +113,8 @@ void print_bignum(BigNum p)
      printf("%u", *(p+i));      /* first digit is not padded */
      --i;
      while(i > 0) {
-          printf("%09u", *(p+i));
+          printf("%09u", *(p+i)); /* **TODO** fix to work with all
+                                       digit sizes */
           --i;
      }
 }
