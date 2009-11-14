@@ -125,49 +125,29 @@ int main (int argc, char *argv[])
 {
      int i;
      SHORT_INT_T r;
-     BigNum big = make_bignum ("38475839289824928", 17);
-     BigNum big2 = make_bignum("39580306804398530", 17);
-     BigNum big3 = make_bignum("986356", 6);
+     BigNum big1 = make_bignuml("83289472398457239847324");
+     BigNum big2 = make_bignuml("52293847329847329847");
+     BigNum big3 = NULL;
+     BigNum big4 = NULL;
 
-     for (i=0; i < 1000; ++i) {
-          mul_bignums(&big, big, big2);
-     }
-
-     /* add_bignums(&big2, big2, big3); */
-
-     /* for (i=0; i < 10; ++i) { */
-     /*      mul_bignums(&big2, big2, big2); */
-     /* } */
-
-     print_bignum(big);
+     print_bignum(big1);
      printf("\n");
-     print_bignum(big2);
-     printf("\n");
-
-     gcd(&big2, big, big2);
 
      print_bignum(big2);
      printf("\n");
 
-     div_bignums2(&big2, &r, big2, 983758);
+     div_bignums(&big3, &big4, big1, big2);
      
-     print_bignum(big2);
+     print_bignum(big3);
      printf("\n");
 
-     /* mul_bignums2(&big2, big2, 95738); */
-     
-     /* print_bignum(big2); */
-     /* printf("\n"); */
+     print_bignum(big4);
+     printf("\n");
 
-     /* BigNum big3 = make_bignum("8888", 4); */
-     /* gcd(&big3, big, big2); */
-     /* print_bignum(big3); */
-     /* printf("\n"); */
-     /* printf("%d\n", bignum_lte(big, big2)); */
-     free_bignum(big);
+     free_bignum(big1);
      free_bignum(big2);
      free_bignum(big3);
-     /* big = big2 = big3 = NULL; */
+     free_bignum(big4);
 
      /* yyparse(); */
      return 0;
