@@ -692,13 +692,15 @@ static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
 {
      LONG_INT_T t = 0;
      int j = length(left)-1;
+     SHORT_INT_T rt = 0;
      *q = make_zero_bignum(length(left));
      
      for(; j >= 0; --j) {
-          t = (LONG_INT_T) (*r)*RADIX + get_dig(left,j);
+          t = (LONG_INT_T) rt*RADIX + get_dig(left,j);
           if (q) *(*q+j+1) = (SHORT_INT_T) (t/right);
-          if (r) *r = (SHORT_INT_T) (t%right);
+          rt = (SHORT_INT_T) (t%right);
      }
+     if (r) *r = rt;
 }
 
 /* less than, ignores sign */
