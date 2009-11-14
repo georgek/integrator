@@ -31,6 +31,8 @@ typedef SHORT_INT_T *BigNum;
 
 /* makes a new bignum from a string, returns pointer to array */
 BigNum make_bignum(char *string, int length);
+/* with no string length */
+BigNum make_bignuml(char *string);
 /* make new bignum from integer */
 BigNum make_bignum2(SHORT_INT_T n);
 /* makes a new bignum of a given length initialised to 0 */

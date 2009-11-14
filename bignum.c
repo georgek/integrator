@@ -69,6 +69,12 @@ BigNum make_bignum(char *string, int length)
      return bignum;
 }
 
+BigNum make_bignuml(char *string)
+{
+     int l = strlen(string);
+     return make_bignum(string, l);
+}
+
 BigNum make_bignum2(SHORT_INT_T n)
 {
      BigNum bignum = malloc(sizeof(SHORT_INT_T)*2);
