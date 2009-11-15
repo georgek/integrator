@@ -372,7 +372,7 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
      }
      
      if (real_length(right) == 1) {
-          div_bignums2(q, &little_r, left, get_dig(right, 0));
+          dyv2(q, &little_r, left, get_dig(right, 0));
           *r = make_bignum2(little_r);
 
           /* free old result */
