@@ -553,6 +553,9 @@ void gcd2(BigNum *gcd, BigNum u, BigNum v)
           copy(&nv, r);
      }
      copy(gcd, nu);
+
+     free_bignum(nu);
+     free_bignum(nv);
 }
 
 /* returns length of bignum */
