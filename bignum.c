@@ -445,7 +445,7 @@ void negate_bignum(BigNum p)
 void half_bignum(BigNum *res, BigNum u)
 {
      BigNum old_res = *res;
-     int i = length(u);
+     int i = real_length(u);
      SHORT_INT_T lsb = 0;
      *res = make_zero_bignum(real_length(u));
      if (is_neg(u)) negate_bignum(*res);
