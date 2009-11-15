@@ -810,6 +810,7 @@ static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
      free_bignum(v);
      free_bignum(ut);
      free_bignum(bc);
+     free_bignum(qgv);
 }
 
 static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
