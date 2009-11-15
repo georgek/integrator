@@ -542,20 +542,26 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
 /* Euclid's algorithm */
 void gcd2(BigNum *gcd, BigNum u, BigNum v) 
 {
-     BigNum nu = NULL, nv = NULL, q = NULL, r = NULL;
+     BigNum onu = NULL, nu = NULL, nv = NULL, q = NULL, r = NULL;
      
      copy(&nu, u);
      copy(&nv, v);
 
      while (!zero(nv)) {
           div_bignums(&q, &r, nu, nv);
-          copy(&nu, nv);
-          copy(&nv, r);
+          onu = nu;
+          nu = nv;
+          nv = r;
+          r = NULL;
+          
+          free_bignum(onu);
+          onu = NULL;
      }
      copy(gcd, nu);
 
      free_bignum(nu);
      free_bignum(nv);
+     free_bignum(q);
 }
 
 /* returns length of bignum */
