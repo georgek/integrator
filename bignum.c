@@ -366,12 +366,12 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 
      SHORT_INT_T little_r;
      
-     if (zero(right)) {
+     if (zero(right)) {         /* divide by zero */
           printf("ERROR: division by zero");
           return;
      }
      
-     if (real_length(right) == 1) {
+     if (real_length(right) == 1) { /* short division */
           dyv2(q, &little_r, left, get_dig(right, 0));
           *r = make_bignum2(little_r);
 
@@ -381,7 +381,19 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 
           return;
      }
+
+     if (lt(left, right)) { /* dividend less than divisor */
+          *q = make_zero_bignum(1);
+          copy(r, left);
+
+          /* free old result */
+          free_bignum(old_q);
+          free_bignum(old_r);
+
+          return;
+     }
      
+     /* long division */
      if (!is_neg(left)) {
           if (!is_neg(right)) {
                dyv(q, r, left, right); /* a/b */
@@ -736,7 +748,8 @@ static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
 
           /* test guesses */
           while ((qg >= RADIX) ||
-                 (qg*get_dig(v, n-2) > RADIX*rg+get_dig(u, j+n-2))) {
+                 ((LONG_INT_T) qg*get_dig(v, n-2)
+                  > (LONG_INT_T) RADIX*rg+get_dig(u, j+n-2))) {
                --qg;
                rg -= get_dig(v, n-1);
 
@@ -783,14 +796,19 @@ static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
 
      /* unnormalise */
      div_bignums2(r, NULL, u, d);
+
+     free_bignum(u);
+     free_bignum(v);
+     free_bignum(ut);
+     free_bignum(bc);
 }
 
 static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
 {
      LONG_INT_T t = 0;
-     int j = length(left)-1;
+     int j = real_length(left)-1;
      SHORT_INT_T rt = 0;
-     *q = make_zero_bignum(length(left));
+     *q = make_zero_bignum(j+1);
      
      for(; j >= 0; --j) {
           t = (LONG_INT_T) rt*RADIX + get_dig(left,j);
