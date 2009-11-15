@@ -10,7 +10,6 @@
 static int length(BigNum);
 static int real_length(BigNum);
 static SHORT_INT_T get_dig(BigNum, int);
-static SHORT_INT_T get_dig2(BigNum, int);
 static void set_dig(BigNum, int, SHORT_INT_T);
 static BigNum add(BigNum, BigNum);
 static BigNum sub(BigNum, BigNum);
@@ -554,15 +553,6 @@ static SHORT_INT_T get_dig(BigNum p, int i)
      else return 0;
 }
 
-/* digits numbered from most significant */
-static SHORT_INT_T get_dig2(BigNum p, int i)
-{
-     if (i < length(p)) {
-          return *(p + length(p) - i);
-     }
-     else return 0;
-}
-
 static void set_dig(BigNum p, int i, SHORT_INT_T val)
 {
      if (i < length(p)) {
@@ -688,7 +678,7 @@ static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
      SHORT_INT_T d;             /* normalisation factor */
      int j, i;                  /* loop counters */
      unsigned n = real_length(divisor);
-     unsigned m = length(dividend) - n;
+     unsigned m = real_length(dividend) - n;
      LONG_INT_T t;              /* temp val */
      LONG_INT_T qg;             /* quotient guess */
      LONG_INT_T rg;             /* remainder guess */
@@ -714,7 +704,7 @@ static void dyv(BigNum *q, BigNum *r, BigNum dividend, BigNum divisor)
      *r = NULL;
 
      /* normalisation */
-     d = (SHORT_INT_T) (RADIX/(get_dig2(v, 0)+1));
+     d = (SHORT_INT_T) (RADIX/(get_dig(v, n-1)+1));
      mul_bignums2(&u, u, d);
      mul_bignums2(&v, v, d);
 
