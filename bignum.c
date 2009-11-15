@@ -122,6 +122,11 @@ void print_bignum(BigNum p)
      }
 }
 
+void bignum_copy(BigNum *d, BigNum s)
+{
+     copy(d, s);
+}
+
 int is_neg(BigNum p)
 {
      if (!p) {
