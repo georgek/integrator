@@ -62,8 +62,9 @@ void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right);
 void half_bignum(BigNum *res, BigNum u);
 void double_bignum(BigNum *res, BigNum u);
 
-/* greatest common divisor */
+/* greatest common divisor - binary method */
 void gcd(BigNum *gcd, BigNum u, BigNum v);
-
+/* greatest common divisor - Euclid's method */
+void gcd2(BigNum *gcd, BigNum u, BigNum v);
 
 #endif /* _BIGNUM_H_ */
