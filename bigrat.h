@@ -7,9 +7,8 @@
 
 #include "bignum.h"
 
-typedef struct 
-{
-     BigNum mum;                /* numerator */
+typedef struct {
+     BigNum num;                /* numerator */
      BigNum den;                /* denominator */
 } BigRat;
 
