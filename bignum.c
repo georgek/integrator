@@ -502,6 +502,13 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
      nv = make_zero_bignum(1);
      copy(&nu, u);
      copy(&nv, v);
+     /* make both positive */
+     if (is_neg(nu)) {
+          negate_bignum(nu);
+     }
+     if (is_neg(nv)) {
+          negate_bignum(nv);
+     }
 
      t = make_zero_bignum(1);
      /* find power of 2, keep dividing both until at least one is
@@ -551,6 +558,13 @@ void gcd2(BigNum *gcd, BigNum u, BigNum v)
      
      copy(&nu, u);
      copy(&nv, v);
+     /* make both positive */
+     if (is_neg(nu)) {
+          negate_bignum(nu);
+     }
+     if (is_neg(nv)) {
+          negate_bignum(nv);
+     }
 
      while (!zero(nv)) {
           div_bignums(&q, &r, nu, nv);
