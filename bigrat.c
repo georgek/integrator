@@ -10,22 +10,25 @@
 BigRat make_bigrat(BigNum num, BigNum den)
 {
      BigRat rat;
-     BigNum n = NULL, d = NULL, g = NULL, r = NULL;
-     bignum_copy(&n, num);
-     bignum_copy(&d, den);
-     /* find gcd */
-     gcd(&g, n, d);
-     div_bignums(&n, &r, n, g);
-     div_bignums(&d, &r, d, g);
-     rat.num = n;
-     rat.den = d;
+     rat.num = NULL;
+     rat.den = NULL;
+     bignum_copy(&rat.num, num);
+     bignum_copy(&rat.den, den);
+     reduce_bigrat(&rat);
+     /* set sign */
+     if (is_neg(rat.den)) {
+          negate_bignum(rat.num);
+          negate_bignum(rat.den);
+     }
      return rat;
 }
 
-void free_bigrat(BigRat f)
+void free_bigrat(BigRat *f)
 {
-     free_bignum(f.num);
-     free_bignum(f.den);
+     free_bignum(f->num);
+     free_bignum(f->den);
+     f->num = NULL;
+     f->den = NULL;
 }
 
 void print_bigrat(BigRat f)
@@ -35,5 +38,20 @@ void print_bigrat(BigRat f)
      printf("/");
      print_bignum(f.den);
      printf(")");
+}
+
+void reduce_bigrat(BigRat *f)
+{
+     BigNum g = NULL, r = NULL;
+     gcd(&g, f->num, f->den);
+     div_bignums(&f->num, &r, f->num, g);
+     div_bignums(&f->den, &r, f->den, g);
+     free_bignum(g);
+     free_bignum(r);
+}
+
+void mul_bigrats(BigRat *res, BigRat left, BigRat right)
+{
+     
 }
 
