@@ -356,13 +356,16 @@ void mul_bignums2(BigNum *res, BigNum left, SHORT_INT_T right)
      free_bignum(old_res);
 }
 
+/* this division gives the same result as "tdiv" or truncate division
+ * in GMP, that is to say the quotient will be rounded towards 0 and
+ * the remainder will have the same sign as the numerator */
 void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 {
      BigNum old_q = *q;
      BigNum old_r = *r;
 
      SHORT_INT_T little_r;
-     
+
      if (zero(right)) {         /* divide by zero */
           printf("ERROR: division by zero");
           return;
@@ -371,6 +374,14 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
      if (real_length(right) == 1) { /* short division */
           dyv2(q, &little_r, left, get_dig(right, 0));
           *r = make_bignum2(little_r);
+
+          /* set sign */
+          if ((S_SHORT_INT_T) (*left ^ *right) < 0) {
+               negate_bignum(*q);
+          }
+          if (is_neg(left)) {
+               negate_bignum(*r);
+          }
 
           /* free old result */
           free_bignum(old_q);
@@ -383,6 +394,14 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
           *q = make_zero_bignum(1);
           copy(r, left);
 
+          /* set sign */
+          if ((S_SHORT_INT_T) (*left ^ *right) < 0) {
+               negate_bignum(*q);
+          }
+          if (is_neg(left)) {
+               negate_bignum(*r);
+          }
+
           /* free old result */
           free_bignum(old_q);
           free_bignum(old_r);
@@ -391,25 +410,14 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
      }
      
      /* long division */
-     if (!is_neg(left)) {
-          if (!is_neg(right)) {
-               dyv(q, r, left, right); /* a/b */
-          }
-          else {
-               dyv(q,r, left, right); /* -(a/b) */
-               if (q) negate_bignum(*q);
-               if (r) negate_bignum(*r);
-          }
+     dyv(q, r, left, right);
+
+     /* set sign */
+     if ((S_SHORT_INT_T) (*left ^ *right) < 0) {
+          negate_bignum(*q);
      }
-     else {
-          if (!is_neg(right)) {
-               dyv(q,r, left, right); /* -(a/b) */
-               if (q) negate_bignum(*q);
-               if (r) negate_bignum(*r);
-          }
-          else {
-               dyv(q, r, left, right); /* a/b */
-          }
+     if (is_neg(left)) {
+          negate_bignum(*r);
      }
 
      /* free old result */
@@ -420,14 +428,16 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
 {
      BigNum old_q = *q;
-     if (!is_neg(left)) {
-          dyv2(q, r, left, right); /* a/b */
-     }
-     else {
-          dyv2(q,r, left, right); /* -(a/b) */
+
+     right = right%RADIX;
+     dyv2(q, r, left, right);
+
+     /* set sign */
+     if (is_neg(left)) {
           negate_bignum(*q);
           if (r) *r = -(*r);
      }
+
      /* free old result */
      free_bignum(old_q);
 }
