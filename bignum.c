@@ -496,12 +496,21 @@ void double_bignum(BigNum *res, BigNum u)
  * implements binary GCD algorithm */
 void gcd(BigNum *gcd, BigNum u, BigNum v) 
 {
-     BigNum nu, nv, t;
+     BigNum nu = NULL, nv = NULL, t = NULL;
      int k = 0;
      int i;
+
+     /* deal with zeros */
+     if (zero(u)) {
+          copy(gcd, v);
+          return;
+     }
+     if (zero(v)) {
+          copy(gcd, u);
+          return;
+     }
+
      /* copy u and v */
-     nu = make_zero_bignum(1);
-     nv = make_zero_bignum(1);
      copy(&nu, u);
      copy(&nv, v);
      /* make both positive */
@@ -512,7 +521,6 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
           negate_bignum(nv);
      }
 
-     t = make_zero_bignum(1);
      /* find power of 2, keep dividing both until at least one is
       * odd */
      while (!((get_dig(nu, 0)&1) || (get_dig(nv, 0)&1))) { /* while both even */
