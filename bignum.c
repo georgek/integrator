@@ -100,7 +100,7 @@ void free_bignum(BigNum p)
 void print_bignum(BigNum p)
 {
      int i = length(p);
-     int negative = is_neg(p);
+     int negative = is_neg(p) && !zero(p);
 
      if (!p) {
           return;
@@ -435,9 +435,6 @@ void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
 /* negates a bignum, returns p */
 void negate_bignum(BigNum p)
 {
-     /* don't negate zero */
-     if (zero(p)) return;
-
      if (p) *p = -((S_SHORT_INT_T) *p);
 }
 
