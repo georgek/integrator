@@ -132,7 +132,7 @@ int is_neg(BigNum p)
      if (!p) {
           return 0;
      }
-     return ((int) *p < 0) ? 1 : 0;
+     return ((S_SHORT_INT_T) *p < 0) ? 1 : 0;
 }
 
 int bignum_equal(BigNum left, BigNum right)
@@ -328,24 +328,14 @@ void sub_bignums(BigNum *res, BigNum left, BigNum right)
 void mul_bignums(BigNum *res, BigNum left, BigNum right)
 {
      BigNum old_res = *res;
-     if (!is_neg(left)) {
-          if (!is_neg(right)) {
-               *res = mul(left, right); /* a*b */
-          }
-          else {
-               *res = mul(left, right); /* -(a*b) */
-               negate_bignum(*res);
-          }
+
+     *res = mul(left, right);
+
+     /* set sign */
+     if ((S_SHORT_INT_T) (*left ^ *right) < 0) {
+          negate_bignum(*res);
      }
-     else {
-          if (!is_neg(right)) {
-               *res = mul(left, right); /* -(a*b) */
-               negate_bignum(*res);
-          }
-          else {
-               *res = mul(left, right); /* a*b */
-          }
-     }
+
      /* free old result */
      free_bignum(old_res);
 }
@@ -353,13 +343,15 @@ void mul_bignums(BigNum *res, BigNum left, BigNum right)
 void mul_bignums2(BigNum *res, BigNum left, SHORT_INT_T right)
 {
      BigNum old_res = *res;
-     if (!is_neg(left)) {
-          *res = mul2(left, right); /* a*b */
-     }
-     else {
-          *res = mul2(left, right); /* -(a*b) */
+
+     right = right%RADIX;
+     *res = mul2(left, right);
+
+     /* set sign */
+     if (is_neg(left)) {
           negate_bignum(*res);
      }
+
      /* free old result */
      free_bignum(old_res);
 }
@@ -443,7 +435,7 @@ void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
 /* negates a bignum, returns p */
 void negate_bignum(BigNum p)
 {
-     if (p) *p = -((int) *p);
+     if (p) *p = -((S_SHORT_INT_T) *p);
 }
 
 /* halves a bignum, using a right shift */

@@ -15,6 +15,8 @@
 
 /* short int type for storage */
 #define SHORT_INT_T unsigned int
+/* signed version for checking sign of bignum */
+#define S_SHORT_INT_T signed int
 /* and its argument for printf */
 #define PRINT_SI(var) printf("%u", var)
 
