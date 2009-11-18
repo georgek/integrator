@@ -61,10 +61,51 @@ void reduce_bigrat(BigRat *f)
      free_bignum(r);
 }
 
+void add_bigrats(BigRat *res, BigRat left, BigRat right)
+{
+     BigRat t;
+     init_bigrat(&t);
+
+     /* use t.num and t.den to hold temporary values */
+     mul_bignums(&t.num, left.num, right.den);
+     mul_bignums(&t.den, left.den, right.num);
+
+     /* w = uv' + u'v */
+     add_bignums(&t.num, t.num, t.den);
+     /* w' = u'v' */
+     mul_bignums(&t.den, left.den, right.den);
+
+     reduce_bigrat(&t);
+
+     free_bigrat(res);
+     res->num = t.num;
+     res->den = t.den;
+}
+
+void sub_bigrats(BigRat *res, BigRat left, BigRat right)
+{
+     BigRat t;
+     init_bigrat(&t);
+
+     /* use t.num and t.den to hold temporary values */
+     mul_bignums(&t.num, left.num, right.den);
+     mul_bignums(&t.den, left.den, right.num);
+
+     /* w = uv' - u'v */
+     sub_bignums(&t.num, t.num, t.den);
+     /* w' = u'v' */
+     mul_bignums(&t.den, left.den, right.den);
+
+     reduce_bigrat(&t);
+
+     free_bigrat(res);
+     res->num = t.num;
+     res->den = t.den;
+}
+
 void mul_bigrats(BigRat *res, BigRat left, BigRat right)
 {
      BigRat t;
-
      init_bigrat(&t);
 
      mul_bignums(&t.num, left.num, right.num);
@@ -76,3 +117,17 @@ void mul_bigrats(BigRat *res, BigRat left, BigRat right)
      res->den = t.den;
 }
 
+void div_bigrats(BigRat *res, BigRat left, BigRat right)
+{
+     /* same as multiply except inverts right */
+     BigRat t;
+     init_bigrat(&t);
+
+     mul_bignums(&t.num, left.num, right.den);
+     mul_bignums(&t.den, left.den, right.num);
+     reduce_bigrat(&t);
+
+     free_bigrat(res);
+     res->num = t.num;
+     res->den = t.den;
+}
