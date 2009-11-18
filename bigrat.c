@@ -63,6 +63,16 @@ void reduce_bigrat(BigRat *f)
 
 void mul_bigrats(BigRat *res, BigRat left, BigRat right)
 {
-     
+     BigRat t;
+
+     init_bigrat(&t);
+
+     mul_bignums(&t.num, left.num, right.num);
+     mul_bignums(&t.den, left.den, right.den);
+     reduce_bigrat(&t);
+
+     free_bigrat(res);
+     res->num = t.num;
+     res->den = t.den;
 }
 
