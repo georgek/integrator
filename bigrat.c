@@ -33,11 +33,16 @@ void free_bigrat(BigRat *f)
 
 void print_bigrat(BigRat f)
 {
-     printf("(");
-     print_bignum(f.num);
-     printf("/");
-     print_bignum(f.den);
-     printf(")");
+     if (one(f.den)) {
+          print_bignum(f.num);
+     }
+     else {
+          printf("(");
+          print_bignum(f.num);
+          printf("/");
+          print_bignum(f.den);
+          printf(")");
+     }
 }
 
 void reduce_bigrat(BigRat *f)
