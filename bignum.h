@@ -71,4 +71,10 @@ void gcd(BigNum *gcd, BigNum u, BigNum v);
 /* greatest common divisor - Euclid's method */
 void gcd2(BigNum *gcd, BigNum u, BigNum v);
 
+/* other */
+/* returns true is bignum is equal to zero */
+int zero(BigNum u);
+/* true if bignum is equal to one */
+int one(BigNum u);
+
 #endif /* _BIGNUM_H_ */

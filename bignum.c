@@ -19,7 +19,6 @@ static void dyv(BigNum*, BigNum*, BigNum, BigNum); /* div is a function in stdli
 static void dyv2(BigNum*, SHORT_INT_T*, BigNum, SHORT_INT_T);
 static int lt(BigNum, BigNum);
 static void copy(BigNum*, BigNum);
-static int zero(BigNum);
 
 BigNum make_bignum(char *string, int length)
 {
@@ -910,15 +909,18 @@ static void copy(BigNum *res, BigNum u)
      free_bignum(old_res);
 }
 
-static int zero(BigNum u)
+int zero(BigNum u)
 {
-     int i = 0;
-     while (i < length(u)) {
-          if (get_dig(u, i)) {
-               return 0;
-          }
-          ++i;
+     if (real_length(u) == 1 && get_dig(u,0) == 0) {
+          return 1;
      }
-     return 1;
+     return 0;
 }
 
+int one(BigNum u)
+{
+     if (real_length(u) == 1 && get_dig(u,0) == 1) {
+          return 1;
+     }
+     return 0;
+}
