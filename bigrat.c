@@ -7,20 +7,18 @@
 #include "bignum.h"
 #include "bigrat.h"
 
-BigRat make_bigrat(BigNum num, BigNum den)
+void make_bigrat(BigRat *f, BigNum num, BigNum den)
 {
-     BigRat rat;
-     rat.num = NULL;
-     rat.den = NULL;
-     bignum_copy(&rat.num, num);
-     bignum_copy(&rat.den, den);
-     reduce_bigrat(&rat);
+     free_bigrat(f);
+     
+     bignum_copy(&f->num, num);
+     bignum_copy(&f->den, den);
+     reduce_bigrat(f);
      /* set sign */
-     if (is_neg(rat.den)) {
-          negate_bignum(rat.num);
-          negate_bignum(rat.den);
+     if (is_neg(f->den)) {
+          negate_bignum(f->num);
+          negate_bignum(f->den);
      }
-     return rat;
 }
 
 void init_bigrat(BigRat *f)
