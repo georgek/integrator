@@ -15,6 +15,10 @@ typedef struct {
 /* make new bigrat from two bignums */
 BigRat make_bigrat(BigNum num, BigNum den);
 
+/* initialises bigrat, this function must be called for a bigrat
+ * before it is used */
+void init_bigrat(BigRat *f);
+
 void free_bigrat(BigRat *f);
 
 void print_bigrat(BigRat f);

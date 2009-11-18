@@ -23,6 +23,12 @@ BigRat make_bigrat(BigNum num, BigNum den)
      return rat;
 }
 
+void init_bigrat(BigRat *f)
+{
+     f->num = make_bignum2(0);
+     f->den = make_bignum2(1);
+}
+
 void free_bigrat(BigRat *f)
 {
      free_bignum(f->num);
