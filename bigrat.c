@@ -41,11 +41,9 @@ void print_bigrat(BigRat f)
           print_bignum(f.num);
      }
      else {
-          printf("(");
           print_bignum(f.num);
           printf("/");
           print_bignum(f.den);
-          printf(")");
      }
 }
 
