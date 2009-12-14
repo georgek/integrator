@@ -63,6 +63,11 @@ void reduce_bigrat(BigRat *f)
      free_bignum(r);
 }
 
+void negate_bigrat(BigRat *f)
+{
+     negate_bignum(f->num);
+}
+
 void add_bigrats(BigRat *res, BigRat left, BigRat right)
 {
      BigRat t;
