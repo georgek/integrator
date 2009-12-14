@@ -108,7 +108,9 @@ void add_monomial(Polynomial *p, int degree, Coefficient coef)
           q1->next->next = q;
           /* initialise new monomial */
           q1->next->degree = degree;
-          q1->next->coeff = coef;
+          /* copy ***RATIONAL ONLY*** TODO */
+          q1->next->coeff.type = rational;
+          bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
      }
 }
 
