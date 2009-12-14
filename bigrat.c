@@ -139,6 +139,11 @@ void div_bigrats(BigRat *res, BigRat left, BigRat right)
      res->den = t.den;
 }
 
+int br_zero(BigRat f)
+{
+     return bn_zero(f.num);
+}
+
 int br_one(BigRat f)
 {
      if (bn_one(f.num) && bn_one(f.den)) {
