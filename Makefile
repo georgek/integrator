@@ -3,7 +3,7 @@ YACC = bison -y -d
 
 CC = gcc -g -Wall -ansi -pedantic
 
-objects = tree.o simplify.o bignum.o bigrat.o
+objects = tree.o simplify.o bignum.o bigrat.o polynomial.o
 
 integrator:	$(objects) y.tab.o lex.yy.o
 		$(CC) -o integrator $(objects) y.tab.o lex.yy.o -ly -ll -lm
@@ -25,6 +25,8 @@ simplify.o:	simplify.h tree.h y.tab.h
 bignum.o:	bignum.h
 
 bigrat.o:	bigrat.h bignum.h
+
+polynomial.o:	polynomial.h bigrat.h
 
 .PHONY: clean
 clean:	
