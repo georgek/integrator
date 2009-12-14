@@ -37,7 +37,7 @@ void free_bigrat(BigRat *f)
 
 void print_bigrat(BigRat f)
 {
-     if (one(f.den)) {
+     if (bn_one(f.den)) {
           print_bignum(f.num);
      }
      else {
@@ -127,3 +127,12 @@ void div_bigrats(BigRat *res, BigRat left, BigRat right)
      res->num = t.num;
      res->den = t.den;
 }
+
+int br_one(BigRat f)
+{
+     if (bn_one(f.num) && bn_one(f.den)) {
+          return 1;
+     }
+     return 0;
+}
+

@@ -97,7 +97,7 @@ void free_bignum(BigNum p)
 void print_bignum(BigNum p)
 {
      int i = length(p);
-     int negative = is_neg(p) && !zero(p);
+     int negative = is_neg(p) && !bn_zero(p);
 
      if (!p) {
           return;
@@ -363,7 +363,7 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 
      SHORT_INT_T little_r;
 
-     if (zero(right)) {         /* divide by zero */
+     if (bn_zero(right)) {         /* divide by zero */
           printf("ERROR: division by zero");
           return;
      }
@@ -498,11 +498,11 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
      int i;
 
      /* deal with zeros */
-     if (zero(u)) {
+     if (bn_zero(u)) {
           copy(gcd, v);
           return;
      }
-     if (zero(v)) {
+     if (bn_zero(v)) {
           copy(gcd, u);
           return;
      }
@@ -538,7 +538,7 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
                half_bignum(&t, t);
           }
           /* reset max(u,v) */
-          if (!is_neg(t) && !zero(t)) {
+          if (!is_neg(t) && !bn_zero(t)) {
                copy(&nu, t);
           }
           else {
@@ -546,7 +546,7 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
                negate_bignum(nv);
           }
           sub_bignums(&t, nu, nv);
-     } while (!zero(t));
+     } while (!bn_zero(t));
      /* answer is u left shifted k times */
      for (i = 0; i < k; ++i) {
           double_bignum(&nu, nu);
@@ -573,7 +573,7 @@ void gcd2(BigNum *gcd, BigNum u, BigNum v)
           negate_bignum(nv);
      }
 
-     while (!zero(nv)) {
+     while (!bn_zero(nv)) {
           div_bignums(&q, &r, nu, nv);
           onu = nu;
           nu = nv;
@@ -907,7 +907,7 @@ static void copy(BigNum *res, BigNum u)
      free_bignum(old_res);
 }
 
-int zero(BigNum u)
+int bn_zero(BigNum u)
 {
      if (real_length(u) == 1 && get_dig(u,0) == 0) {
           return 1;
@@ -915,7 +915,7 @@ int zero(BigNum u)
      return 0;
 }
 
-int one(BigNum u)
+int bn_one(BigNum u)
 {
      if (real_length(u) == 1 && get_dig(u,0) == 1) {
           return 1;
