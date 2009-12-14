@@ -23,6 +23,8 @@ void free_bigrat(BigRat *f);
 
 void print_bigrat(BigRat f);
 
+void bigrat_copy(BigRat *f, BigRat g);
+
 void reduce_bigrat(BigRat *f);
 
 /* arithmetic */

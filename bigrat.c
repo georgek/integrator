@@ -47,6 +47,12 @@ void print_bigrat(BigRat f)
      }
 }
 
+void bigrat_copy(BigRat *f, BigRat g)
+{
+     bignum_copy(&f->num, g.num);
+     bignum_copy(&f->den, g.den);
+}
+
 void reduce_bigrat(BigRat *f)
 {
      BigNum g = NULL, r = NULL;
