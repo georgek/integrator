@@ -91,9 +91,7 @@ BigNum make_zero_bignum(int length)
 
 void free_bignum(BigNum p)
 {
-     if (p) {
-          free(p);
-     }
+     free(p);
 }
 
 void print_bignum(BigNum p)
