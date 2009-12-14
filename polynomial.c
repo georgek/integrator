@@ -282,3 +282,30 @@ void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right)
      free_poly(&old_res);
 }
 
+void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
+{
+     Polynomial old_res;
+     MonoPtr p, q;
+     Coefficient t;
+     t.type = special;
+     
+     if (left.variable != right.variable) {
+          printf("Error! Polynomials are in different variables.\n");
+          return;
+     }
+
+     old_res = *res;
+
+     *res = make_zero_poly(left.variable);
+
+     for (p = left.head->next; p->coeff.type != special; p = p->next) {
+          for (q = right.head->next; q->coeff.type != special; q = q->next) {
+               mul_coefficients(&t, p->coeff, q->coeff);
+               add_monomial(res, p->degree + q->degree, t);
+          }
+     }
+
+     /* free old result */
+     free_poly(&old_res);
+}
+
