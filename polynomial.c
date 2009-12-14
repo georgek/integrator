@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "polynomial.h"
+#include "bigrat.h"
 
 Polynomial make_zero_poly(char variable)
 {
@@ -136,4 +137,81 @@ void add_monomial(Polynomial *p, int degree, Coefficient coef)
      }
 }
 
+void sub_monomial(Polynomial* p, int degree, Coefficient coef)
+{
+     MonoPtr q, q1;             /* q1 will be one step behind q */
+     /* find position to add monomial */
+     q1 = p->head;
+     q = q1->next;
+     while (q->coeff.type != special && q->degree > degree) {
+          /* move along */
+          q1 = q;
+          q = q1->next;
+     }
+     /* is there already a monomial of this degree? */
+     if (q->degree == degree && q->coeff.type != special) {
+          sub_coefficients(&q->coeff, q->coeff, coef);
+     }
+     else {
+          /* insert between q1 and q */
+          q1->next = malloc(sizeof(Monomial));
+          q1->next->next = q;
+          /* initialise new monomial */
+          q1->next->degree = degree;
+          /* copy ***RATIONAL ONLY*** TODO */
+          q1->next->coeff.type = rational;
+          bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
+          negate_bigrat(&q1->next->coeff.u.rat);
+     }
+}
+
+void add_polynomials(Polynomial *res, Polynomial left, Polynomial right)
+{
+     Polynomial old_res;
+     MonoPtr p;
+     
+     if (left.variable != right.variable) {
+          printf("Error! Polynomials are in different variables.\n");
+          return;
+     }
+
+     old_res = *res;
+
+     *res = make_zero_poly(left.variable);
+
+     for (p = left.head->next; p->coeff.type != special; p = p->next) {
+          add_monomial(res, p->degree, p->coeff);
+     }
+     for (p = right.head->next; p->coeff.type != special; p = p->next) {
+          add_monomial(res, p->degree, p->coeff);
+     }
+
+     /* free old result */
+     free_poly(&old_res);
+}
+
+void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right)
+{
+     Polynomial old_res;
+     MonoPtr p;
+     
+     if (left.variable != right.variable) {
+          printf("Error! Polynomials are in different variables.\n");
+          return;
+     }
+
+     old_res = *res;
+
+     *res = make_zero_poly(left.variable);
+
+     for (p = left.head->next; p->coeff.type != special; p = p->next) {
+          add_monomial(res, p->degree, p->coeff);
+     }
+     for (p = right.head->next; p->coeff.type != special; p = p->next) {
+          sub_monomial(res, p->degree, p->coeff);
+     }
+
+     /* free old result */
+     free_poly(&old_res);
+}
 

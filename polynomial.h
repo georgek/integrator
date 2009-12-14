@@ -51,6 +51,7 @@ void free_poly(Polynomial *p);
 void print_poly(Polynomial p);
 
 void add_monomial(Polynomial* p, int degree, Coefficient coef);
+void sub_monomial(Polynomial* p, int degree, Coefficient coef);
 
 /* general coefficient functions */
 void print_coefficient(Coefficient c);
@@ -64,6 +65,8 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void div_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 
 /* polynomial arithmetic */
-
+void add_polynomials(Polynomial *res, Polynomial left, Polynomial right);
+void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right);
+void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 
 #endif /* _POLYNOMIAL_H_ */
