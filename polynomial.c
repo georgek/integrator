@@ -174,6 +174,13 @@ void add_monomial(Polynomial *p, int degree, Coefficient coef)
      /* is there already a monomial of this degree? */
      if (q->degree == degree && q->coeff.type != special) {
           add_coefficients(&q->coeff, q->coeff, coef);
+          /* remove zero coefficient */
+          if (coef_zero(q->coeff)) {
+               q1->next = q->next;
+               free_coefficient(&q->coeff);
+               free(q);
+               q = NULL;
+          }
      }
      else {
           /* insert between q1 and q */
@@ -190,6 +197,10 @@ void add_monomial(Polynomial *p, int degree, Coefficient coef)
 void sub_monomial(Polynomial* p, int degree, Coefficient coef)
 {
      MonoPtr q, q1;             /* q1 will be one step behind q */
+     
+     if (coef_zero(coef)) {
+          return;
+     }
      /* find position to add monomial */
      q1 = p->head;
      q = q1->next;
@@ -201,12 +212,18 @@ void sub_monomial(Polynomial* p, int degree, Coefficient coef)
      /* is there already a monomial of this degree? */
      if (q->degree == degree && q->coeff.type != special) {
           sub_coefficients(&q->coeff, q->coeff, coef);
+          /* remove zero coefficient */
+          if (coef_zero(q->coeff)) {
+               q1->next = q->next;
+               free_coefficient(&q->coeff);
+               free(q);
+               q = NULL;
+          }
      }
      else {
-          /* insert between q1 and q */
+          /* insert new (nonzero) coefficient between q1 and q */
           q1->next = malloc(sizeof(Monomial));
           q1->next->next = q;
-          /* initialise new monomial */
           q1->next->degree = degree;
           /* copy ***RATIONAL ONLY*** TODO */
           q1->next->coeff.type = rational;
