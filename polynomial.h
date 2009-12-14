@@ -46,7 +46,7 @@ typedef struct monomial
  * zero monomial */
 Polynomial make_zero_poly(char variable);
 
-void free_poly(Polynomial p);
+void free_poly(Polynomial *p);
 
 void print_poly(Polynomial p);
 
@@ -55,7 +55,7 @@ void add_monomial(Polynomial* p, int degree, Coefficient coef);
 /* general coefficient functions */
 void print_coefficient(Coefficient c);
 
-void free_coefficient(Coefficient c);
+void free_coefficient(Coefficient *c);
 
 /* general coefficient arithmetic functions */
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right);

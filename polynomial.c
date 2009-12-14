@@ -15,6 +15,19 @@ Polynomial make_zero_poly(char variable)
      return t;
 }
 
+void free_poly(Polynomial *p)
+{
+     MonoPtr q, r;
+     /* turn mono list into a normal list */
+     q = p->head->next;
+     p->head->next = NULL;
+     for ( ; q != NULL; q=r) {
+          r = q->next;
+          free(q);
+     }
+     p->head = NULL;
+}
+
 void print_poly(Polynomial p)
 {
      MonoPtr m = p.head->next;
@@ -57,7 +70,16 @@ void print_coefficient(Coefficient c)
      }
 }
 
-
+void free_coefficient(Coefficient *c)
+{
+     switch (c->type) {
+     case rational:
+          free_bigrat(&c->u.rat);
+          break;
+     default:
+          break;
+     }
+}
 
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
