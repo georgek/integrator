@@ -58,6 +58,9 @@ void print_coefficient(Coefficient c);
 
 void free_coefficient(Coefficient *c);
 
+int coef_zero(Coefficient c);
+int coef_one(Coefficient c);
+
 /* general coefficient arithmetic functions */
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right);

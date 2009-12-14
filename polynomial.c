@@ -82,6 +82,36 @@ void free_coefficient(Coefficient *c)
      }
 }
 
+int coef_zero(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          return br_zero(c.u.rat);
+     case polynomial:
+          if (c.u.poly->head->next->coeff.type == special) {
+               return 1;
+          }
+          else {
+               return 0;
+          }
+     default:
+          return 0;
+     }
+}
+
+int coef_one(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          return br_one(c.u.rat);
+     case polynomial:
+          /* poly_one() */
+          return 0;
+     default:
+          return 0;
+     }
+}
+
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      if (left.type == rational && right.type == rational) {
