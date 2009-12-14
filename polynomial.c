@@ -114,30 +114,50 @@ int coef_one(Coefficient c)
 
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
+     Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
+          res->type = rational;
+          res->u.rat.num = NULL;
+          res->u.rat.den = NULL;
           add_bigrats(&res->u.rat, left.u.rat, right.u.rat);
      }
+     free_coefficient(&old_res);
 }
 
 void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
+     Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
+          res->type = rational;
+          res->u.rat.num = NULL;
+          res->u.rat.den = NULL;
           sub_bigrats(&res->u.rat, left.u.rat, right.u.rat);
      }
+     free_coefficient(&old_res);
 }
 
 void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
+     Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
+          res->type = rational;
+          res->u.rat.num = NULL;
+          res->u.rat.den = NULL;
           mul_bigrats(&res->u.rat, left.u.rat, right.u.rat);
      }
+     free_coefficient(&old_res);
 }
 
 void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
+     Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
+          res->type = rational;
+          res->u.rat.num = NULL;
+          res->u.rat.den = NULL;
           div_bigrats(&res->u.rat, left.u.rat, right.u.rat);
      }
+     free_coefficient(&old_res);
 }
 
 void add_monomial(Polynomial *p, int degree, Coefficient coef)
