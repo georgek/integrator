@@ -4,6 +4,9 @@
 #include "polynomial.h"
 #include "bigrat.h"
 
+static void rat_coef_op(Coefficient *res, Coefficient left, Coefficient right,
+                        void (*op_fun)(BigRat*, BigRat, BigRat));
+
 Polynomial make_zero_poly(char variable)
 {
      Polynomial t;
@@ -116,10 +119,7 @@ void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
-          res->type = rational;
-          res->u.rat.num = NULL;
-          res->u.rat.den = NULL;
-          add_bigrats(&res->u.rat, left.u.rat, right.u.rat);
+          rat_coef_op(res, left, right, &add_bigrats);
      }
      free_coefficient(&old_res);
 }
@@ -128,10 +128,7 @@ void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
-          res->type = rational;
-          res->u.rat.num = NULL;
-          res->u.rat.den = NULL;
-          sub_bigrats(&res->u.rat, left.u.rat, right.u.rat);
+          rat_coef_op(res, left, right, &sub_bigrats);
      }
      free_coefficient(&old_res);
 }
@@ -140,10 +137,7 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
-          res->type = rational;
-          res->u.rat.num = NULL;
-          res->u.rat.den = NULL;
-          mul_bigrats(&res->u.rat, left.u.rat, right.u.rat);
+          rat_coef_op(res, left, right, &mul_bigrats);
      }
      free_coefficient(&old_res);
 }
@@ -152,10 +146,7 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
-          res->type = rational;
-          res->u.rat.num = NULL;
-          res->u.rat.den = NULL;
-          div_bigrats(&res->u.rat, left.u.rat, right.u.rat);
+          rat_coef_op(res, left, right, &div_bigrats);
      }
      free_coefficient(&old_res);
 }
@@ -307,5 +298,15 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
 
      /* free old result */
      free_poly(&old_res);
+}
+
+/* common part of coefficient arithmetic for rationals */
+static void rat_coef_op(Coefficient *res, Coefficient left, Coefficient right,
+                        void (*op_fun)(BigRat*, BigRat, BigRat))
+{
+     res->type = rational;
+     res->u.rat.num = NULL;
+     res->u.rat.den = NULL;
+     op_fun(&res->u.rat, left.u.rat, right.u.rat);
 }
 
