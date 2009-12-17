@@ -69,6 +69,7 @@ int coef_one(Coefficient c);
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right);
+void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
 void div_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 
 /* polynomials */
@@ -82,5 +83,7 @@ void add_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B);
+
+void poly_differentiate(Polynomial *pd, Polynomial p);
 
 #endif /* _POLYNOMIAL_H_ */

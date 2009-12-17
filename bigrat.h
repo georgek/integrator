@@ -32,6 +32,7 @@ void negate_bigrat(BigRat *f);
 void add_bigrats(BigRat *res, BigRat left, BigRat right);
 void sub_bigrats(BigRat *res, BigRat left, BigRat right);
 void mul_bigrats(BigRat *res, BigRat left, BigRat right);
+void mul_bigrats2(BigRat *res, BigRat left, SHORT_INT_T right);
 void div_bigrats(BigRat *res, BigRat left, BigRat right);
 
 int br_zero(BigRat f);

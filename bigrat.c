@@ -124,6 +124,20 @@ void mul_bigrats(BigRat *res, BigRat left, BigRat right)
      res->den = t.den;
 }
 
+void mul_bigrats2(BigRat *res, BigRat left, SHORT_INT_T right)
+{
+     BigRat t;
+     init_bigrat(&t);
+
+     mul_bignums2(&t.num, left.num, right);
+     bignum_copy(&t.den, left.den);
+     reduce_bigrat(&t);
+
+     free_bigrat(res);
+     res->num = t.num;
+     res->den = t.den;     
+}
+
 void div_bigrats(BigRat *res, BigRat left, BigRat right)
 {
      /* same as multiply except inverts right */

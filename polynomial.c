@@ -178,6 +178,18 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      free_coefficient(&old_res);
 }
 
+void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
+{
+     Coefficient old_res = *res;
+     if (left.type == rational) {
+          res->type = rational;
+          res->u.rat.num = NULL;
+          res->u.rat.den = NULL;
+          mul_bigrats2(&res->u.rat, left.u.rat, right);
+     }
+     free_coefficient(&old_res);
+}
+
 void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
@@ -396,6 +408,28 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
      free_poly(&old_Q);
      free_poly(&T);
      free_poly(&BT);
+}
+
+void poly_differentiate(Polynomial *pd, Polynomial p)
+{
+     MonoPtr q, r;
+     
+     copy_poly(pd, p);
+     for (r = pd->head, q = r->next;
+          q->coeff.type != special;
+          r = q, q = q->next)
+     {
+          if (q->degree == 0) {
+               /* remove monomial */
+               r->next = q->next;
+               free_coefficient(&q->coeff);
+               free(q);
+               q = r;
+               continue;
+          }
+          /* reduce power by one and multiply by old power */
+          mul_coefficients2(&q->coeff, q->coeff, q->degree--);
+     }
 }
 
 /* common part of coefficient arithmetic for rationals */
