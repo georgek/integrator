@@ -71,6 +71,12 @@ void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void div_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 
+/* polynomials */
+int poly_zero(Polynomial p);
+
+int poly_deg(Polynomial p);
+const Coefficient poly_lc(Polynomial p);
+
 /* polynomial arithmetic */
 void add_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right);

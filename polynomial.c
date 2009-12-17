@@ -186,6 +186,24 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      free_coefficient(&old_res);
 }
 
+int poly_zero(Polynomial p)
+{
+     if (p.head->next->coeff.type == special) {
+          return 1;
+     }
+     return 0;
+}
+
+int poly_deg(Polynomial p)
+{
+     return p.head->next->degree;
+}
+
+const Coefficient poly_lc(Polynomial p)
+{
+     return p.head->next->coeff;
+}
+
 void add_monomial(Polynomial *p, int degree, Coefficient coef)
 {
      MonoPtr q, q1;             /* q1 will be one step behind q */
