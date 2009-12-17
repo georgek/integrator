@@ -65,7 +65,11 @@ void print_poly(Polynomial p)
      }
      /* iterate through monomials */
      do {
-          print_coefficient(m->coeff);
+          /* don't print unit coefficient, unless we won't print variable */
+          if (!coef_one(m->coeff) || m->degree == 0) {
+               print_coefficient(m->coeff);
+          }
+          /* print variable if degree > 0 */
           if (m->degree != 0 && m->degree != 1) {
                printf("%c^%d", p.variable, m->degree);
           }
@@ -80,9 +84,6 @@ void print_coefficient(Coefficient c)
 {
      switch (c.type) {
      case rational:
-          if (br_one(c.u.rat)) {
-               break;
-          }
           if (bn_one(c.u.rat.den)) {
                print_bigrat(c.u.rat);
           }
