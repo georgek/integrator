@@ -93,6 +93,11 @@ void print_coefficient(Coefficient c)
                printf(")");
           }
           break;
+     case polynomial:
+          printf("(");
+          print_poly(*c.u.poly);
+          printf(")");
+          break;
      default:
           break;
      }
@@ -104,6 +109,9 @@ void copy_coefficient(Coefficient *c, Coefficient s)
      switch (s.type) {
      case rational:
           bigrat_copy(&c->u.rat, s.u.rat);
+          break;
+     case polynomial:
+          copy_poly(c->u.poly, *s.u.poly);
           break;
      default:
           break;
@@ -245,9 +253,20 @@ void add_monomial(Polynomial *p, int degree, Coefficient coef)
           q1->next->next = q;
           /* initialise new monomial */
           q1->next->degree = degree;
-          /* copy ***RATIONAL ONLY*** TODO */
-          q1->next->coeff.type = rational;
-          bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
+          q1->next->coeff.type = coef.type;
+          switch (coef.type) {
+          case rational:
+               init_bigrat(&q1->next->coeff.u.rat);
+               bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
+               break;
+          case polynomial:
+               q1->next->coeff.u.poly = malloc(sizeof(Polynomial));
+               *q1->next->coeff.u.poly = make_zero_poly(coef.u.poly->variable);
+               copy_poly(q1->next->coeff.u.poly, *coef.u.poly);
+               break;
+          default:
+               break;
+          }
      }
 }
 
