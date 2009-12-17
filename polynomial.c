@@ -32,6 +32,28 @@ void free_poly(Polynomial *p)
      p->head = NULL;
 }
 
+void copy_poly(Polynomial *p, Polynomial s)
+{
+     Polynomial old_res = *p;
+     MonoPtr q, pq;
+     
+     p->variable = s.variable;
+     p->head = malloc(sizeof(Monomial));
+     p->head->degree = 0;
+     p->head->coeff.type = special;
+     pq = p->head;
+
+     for (q = s.head->next; q->coeff.type != special; q = q->next) {
+          pq->next = malloc(sizeof(Monomial));
+          pq = pq->next;
+          pq->degree = q->degree;
+          copy_coefficient(&pq->coeff, q->coeff);
+     }
+     pq->next = p->head;
+
+     free_poly(&old_res);
+}
+
 void print_poly(Polynomial p)
 {
      MonoPtr m = p.head->next;
@@ -68,6 +90,18 @@ void print_coefficient(Coefficient c)
                print_bigrat(c.u.rat);
                printf(")");
           }
+          break;
+     default:
+          break;
+     }
+}
+
+void copy_coefficient(Coefficient *c, Coefficient s)
+{
+     c->type = s.type;
+     switch (s.type) {
+     case rational:
+          bigrat_copy(&c->u.rat, s.u.rat);
           break;
      default:
           break;

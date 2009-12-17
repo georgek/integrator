@@ -48,6 +48,8 @@ Polynomial make_zero_poly(char variable);
 
 void free_poly(Polynomial *p);
 
+void copy_poly(Polynomial *p, Polynomial s);
+
 void print_poly(Polynomial p);
 
 void add_monomial(Polynomial* p, int degree, Coefficient coef);
@@ -55,6 +57,8 @@ void sub_monomial(Polynomial* p, int degree, Coefficient coef);
 
 /* general coefficient functions */
 void print_coefficient(Coefficient c);
+
+void copy_coefficient(Coefficient *c, Coefficient s);
 
 void free_coefficient(Coefficient *c);
 
