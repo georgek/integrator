@@ -27,6 +27,7 @@ void free_poly(Polynomial *p)
      p->head->next = NULL;
      for ( ; q != NULL; q=r) {
           r = q->next;
+          free_coefficient(&q->coeff);
           free(q);
      }
      p->head = NULL;
