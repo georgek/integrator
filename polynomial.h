@@ -81,5 +81,6 @@ const Coefficient poly_lc(Polynomial p);
 void add_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right);
+void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B);
 
 #endif /* _POLYNOMIAL_H_ */

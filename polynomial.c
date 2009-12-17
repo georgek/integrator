@@ -353,6 +353,50 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
      free_poly(&old_res);
 }
 
+/* standard polynomial division for coefficients in a field (rationals) */
+void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
+{
+     Polynomial old_Q, old_R, T, BT;
+     int s_degree;
+     MonoPtr t;
+
+     if (poly_zero(B)) {
+          printf("Error! Polynomial division by zero!");
+          return;
+     }
+     if (A.variable != B.variable) {
+          printf("Error! Polynomials are in different variables.\n");
+          return;
+     }
+
+     old_Q = *Q;
+     old_R = *R;
+     T = make_zero_poly(A.variable);
+     BT = make_zero_poly(A.variable);
+     /* setup T, it will contain only one monomial */
+     T.head->next = malloc(sizeof(Monomial));
+     T.head->next->next = T.head;
+     t = T.head->next;
+     t->degree = 0;
+     t->coeff.type = rational;
+     t->coeff.u.rat.num = NULL;
+     t->coeff.u.rat.den = NULL;
+     
+     *Q = make_zero_poly(A.variable);
+     copy_poly(R, A);
+     while (!poly_zero(*R) && (s_degree = poly_deg(*R)-poly_deg(B)) >= 0) {
+          t->degree = s_degree;
+          div_coefficients(&t->coeff, poly_lc(*R), poly_lc(B));
+          add_monomial(Q, s_degree, T.head->next->coeff);
+          mul_polynomials(&BT, B, T);
+          sub_polynomials(R, *R, BT);
+     }
+
+     free_poly(&old_Q);
+     free_poly(&T);
+     free_poly(&BT);
+}
+
 /* common part of coefficient arithmetic for rationals */
 static void rat_coef_op(Coefficient *res, Coefficient left, Coefficient right,
                         void (*op_fun)(BigRat*, BigRat, BigRat))
