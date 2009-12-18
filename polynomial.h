@@ -86,5 +86,6 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B);
 
 void poly_differentiate(Polynomial *pd, Polynomial p);
+void poly_integrate(Polynomial *pi, Polynomial p);
 
 #endif /* _POLYNOMIAL_H_ */

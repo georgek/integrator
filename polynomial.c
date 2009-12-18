@@ -463,6 +463,17 @@ void poly_differentiate(Polynomial *pd, Polynomial p)
      }
 }
 
+void poly_integrate(Polynomial *pi, Polynomial p)
+{
+     MonoPtr q;
+
+     copy_poly(pi, p);
+     for (q = pi->head->next; q->coeff.type != special; q = q->next) {
+          /* increase power by one and divide by new power */
+          div_coefficients2(&q->coeff, q->coeff, ++q->degree);
+     }
+}
+
 /* common part of coefficient arithmetic for rationals */
 static void rat_coef_op(Coefficient *res, Coefficient left, Coefficient right,
                         void (*op_fun)(BigRat*, BigRat, BigRat))
