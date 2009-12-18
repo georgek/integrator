@@ -19,6 +19,18 @@ Polynomial make_zero_poly(char variable)
      return t;
 }
 
+Polynomial make_one_poly(char variable)
+{
+     Polynomial t = make_zero_poly(variable);
+     t.head->next = malloc(sizeof(Monomial));
+     t.head->next->next = t.head;
+     t.head->next->degree = 0;
+     t.head->next->coeff.type = rational;
+     t.head->next->coeff.u.rat.num = make_bignum2(1);
+     t.head->next->coeff.u.rat.den = make_bignum2(1);
+     return t;
+}
+
 void free_poly(Polynomial *p)
 {
      MonoPtr q, r;
@@ -240,6 +252,10 @@ const Coefficient poly_lc(Polynomial p)
 void add_monomial(Polynomial *p, int degree, Coefficient coef)
 {
      MonoPtr q, q1;             /* q1 will be one step behind q */
+
+     if (coef_zero(coef)) {
+          return;
+     }
      /* find position to add monomial */
      q1 = p->head;
      q = q1->next;
@@ -405,7 +421,7 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
      MonoPtr t;
 
      if (poly_zero(B)) {
-          printf("Error! Polynomial division by zero!");
+          printf("Error! Polynomial division by zero!\n");
           return;
      }
      if (A.variable != B.variable) {

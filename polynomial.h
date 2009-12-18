@@ -45,6 +45,7 @@ typedef struct monomial
 /* makes the special zero polynomial, which just contains the special
  * zero monomial */
 Polynomial make_zero_poly(char variable);
+Polynomial make_one_poly(char variable);
 
 void free_poly(Polynomial *p);
 
