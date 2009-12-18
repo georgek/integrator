@@ -207,6 +207,18 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      free_coefficient(&old_res);
 }
 
+void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
+{
+     Coefficient old_res = *res;
+     if (left.type == rational) {
+          res->type = rational;
+          res->u.rat.num = NULL;
+          res->u.rat.den = NULL;
+          div_bigrats2(&res->u.rat, left.u.rat, right);
+     }
+     free_coefficient(&old_res);
+}
+
 int poly_zero(Polynomial p)
 {
      if (p.head->next->coeff.type == special) {

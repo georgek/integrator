@@ -10,7 +10,7 @@
 void make_bigrat(BigRat *f, BigNum num, BigNum den)
 {
      free_bigrat(f);
-     
+
      bignum_copy(&f->num, num);
      bignum_copy(&f->den, den);
      reduce_bigrat(f);
@@ -135,7 +135,7 @@ void mul_bigrats2(BigRat *res, BigRat left, SHORT_INT_T right)
 
      free_bigrat(res);
      res->num = t.num;
-     res->den = t.den;     
+     res->den = t.den;
 }
 
 void div_bigrats(BigRat *res, BigRat left, BigRat right)
@@ -146,6 +146,20 @@ void div_bigrats(BigRat *res, BigRat left, BigRat right)
 
      mul_bignums(&t.num, left.num, right.den);
      mul_bignums(&t.den, left.den, right.num);
+     reduce_bigrat(&t);
+
+     free_bigrat(res);
+     res->num = t.num;
+     res->den = t.den;
+}
+
+void div_bigrats2(BigRat *res, BigRat left, SHORT_INT_T right)
+{
+     BigRat t;
+     init_bigrat(&t);
+
+     bignum_copy(&t.num, left.num);
+     mul_bignums2(&t.den, left.den, right);
      reduce_bigrat(&t);
 
      free_bigrat(res);
