@@ -476,6 +476,31 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
      free_poly(&BT);
 }
 
+void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power)
+{
+     Polynomial temp;
+     SHORT_INT_T mask = 0;
+     mask = ~(~mask>>1);        /* MSB of short int */
+
+     temp = make_zero_poly(p.variable);
+     copy_poly(&temp, p);
+
+     /* find first 1 in binary representation of power and skip it */
+     while (!(mask & power) && mask) {
+          mask = mask>>1;
+     }
+     mask = mask>>1;
+     for (; mask; mask = mask>>1) {
+          mul_polynomials(&temp, temp, temp);
+          if (mask & power) {
+               mul_polynomials(&temp, temp, p);
+          }
+     }
+
+     copy_poly(res, temp);
+     free_poly(&temp);
+}
+
 void poly_differentiate(Polynomial *pd, Polynomial p)
 {
      MonoPtr q, r;
