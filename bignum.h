@@ -63,6 +63,8 @@ void mul_bignums2(BigNum *res, BigNum left, SHORT_INT_T right);
 void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right);
 void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right);
 
+void bn_power(BigNum *res, BigNum p, SHORT_INT_T power);
+
 void half_bignum(BigNum *res, BigNum u);
 void double_bignum(BigNum *res, BigNum u);
 

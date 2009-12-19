@@ -439,6 +439,26 @@ void div_bignums2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
      free_bignum(old_q);
 }
 
+void bn_power(BigNum *res, BigNum p, SHORT_INT_T power)
+{
+     SHORT_INT_T mask = 0;
+     mask = ~(~mask>>1);        /* MSB of short int */
+
+     bignum_copy(res, p);
+
+     /* find first 1 in binary representation of power and skip it */
+     while (!(mask & power) && mask) {
+          mask = mask>>1;
+     }
+     mask = mask>>1;
+     for (; mask; mask = mask>>1) {
+          mul_bignums(res, *res, *res);
+          if (mask & power) {
+               mul_bignums(res, *res, p);
+          }
+     }
+}
+
 /* negates a bignum, returns p */
 void negate_bignum(BigNum p)
 {
