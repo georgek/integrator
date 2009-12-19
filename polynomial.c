@@ -360,12 +360,24 @@ void sub_monomial(Polynomial* p, int degree, Coefficient coef)
           /* insert new (nonzero) coefficient between q1 and q */
           q1->next = malloc(sizeof(Monomial));
           q1->next->next = q;
+          /* initialise new monomial */
           q1->next->degree = degree;
-          /* copy ***RATIONAL ONLY*** TODO */
-          q1->next->coeff.type = rational;
-          init_bigrat(&q1->next->coeff.u.rat);
-          bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
-          negate_bigrat(&q1->next->coeff.u.rat);
+          q1->next->coeff.type = coef.type;
+          switch (coef.type) {
+          case rational:
+               init_bigrat(&q1->next->coeff.u.rat);
+               bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
+               negate_bigrat(&q1->next->coeff.u.rat);
+               break;
+          case polynomial:
+               q1->next->coeff.u.poly = malloc(sizeof(Polynomial));
+               *q1->next->coeff.u.poly = make_zero_poly(coef.u.poly->variable);
+               copy_poly(q1->next->coeff.u.poly, *coef.u.poly);
+               negate_polynomial(q1->next->coeff.u.poly);
+               break;
+          default:
+               break;
+          }
      }
 }
 
