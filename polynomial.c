@@ -117,9 +117,12 @@ void print_coefficient(Coefficient c)
 
 void copy_coefficient(Coefficient *c, Coefficient s)
 {
+     Coefficient old_coef = *c;
+     
      c->type = s.type;
      switch (s.type) {
      case rational:
+          init_bigrat(&c->u.rat);
           bigrat_copy(&c->u.rat, s.u.rat);
           break;
      case polynomial:
@@ -128,6 +131,8 @@ void copy_coefficient(Coefficient *c, Coefficient s)
      default:
           break;
      }
+
+     free_coefficient(&old_coef);
 }
 
 void free_coefficient(Coefficient *c)
@@ -331,6 +336,7 @@ void sub_monomial(Polynomial* p, int degree, Coefficient coef)
           q1->next->degree = degree;
           /* copy ***RATIONAL ONLY*** TODO */
           q1->next->coeff.type = rational;
+          init_bigrat(&q1->next->coeff.u.rat);
           bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
           negate_bigrat(&q1->next->coeff.u.rat);
      }
