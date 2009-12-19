@@ -126,6 +126,7 @@ void copy_coefficient(Coefficient *c, Coefficient s)
           bigrat_copy(&c->u.rat, s.u.rat);
           break;
      case polynomial:
+          *c->u.poly = make_zero_poly(s.u.poly->variable);
           copy_poly(c->u.poly, *s.u.poly);
           break;
      default:
