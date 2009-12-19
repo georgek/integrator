@@ -67,6 +67,7 @@ int coef_zero(Coefficient c);
 int coef_one(Coefficient c);
 
 /* general coefficient arithmetic functions */
+void negate_coefficient(Coefficient *c);
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right);
@@ -83,6 +84,7 @@ int poly_deg(Polynomial p);
 const Coefficient poly_lc(Polynomial p);
 
 /* polynomial arithmetic */
+void negate_polynomial(Polynomial *p);
 void add_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right);

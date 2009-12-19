@@ -177,6 +177,20 @@ int coef_one(Coefficient c)
      }
 }
 
+void negate_coefficient(Coefficient *c)
+{
+     switch (c->type) {
+     case rational:
+          negate_bigrat(&c->u.rat);
+          break;
+     case polynomial:
+          negate_polynomial(c->u.poly);
+          break;
+     default:
+          break;
+     }
+}
+
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
@@ -352,6 +366,16 @@ void sub_monomial(Polynomial* p, int degree, Coefficient coef)
           init_bigrat(&q1->next->coeff.u.rat);
           bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
           negate_bigrat(&q1->next->coeff.u.rat);
+     }
+}
+
+void negate_polynomial(Polynomial *p)
+{
+     /* negate all coefficients */
+     MonoPtr q;
+
+     for (q = p->head->next; q->coeff.type != special; q = q->next) {
+          negate_coefficient(&q->coeff);
      }
 }
 
