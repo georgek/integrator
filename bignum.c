@@ -443,6 +443,13 @@ void bn_power(BigNum *res, BigNum p, SHORT_INT_T power)
 {
      BigNum temp = NULL;
      SHORT_INT_T mask = 0;
+
+     if (power == 0) {
+          free_bignum(*res);
+          *res = make_bignum2(1);
+          return;
+     }
+     
      mask = ~(~mask>>1);        /* MSB of short int */
 
      bignum_copy(&temp, p);

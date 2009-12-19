@@ -260,6 +260,9 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
           res->u.rat.den = NULL;
           br_power(&res->u.rat, coef.u.rat, power);
      }
+     else {
+          printf("poly power");
+     }
      free_coefficient(&old_res);
 }
 
@@ -516,6 +519,13 @@ void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power)
 {
      Polynomial temp;
      SHORT_INT_T mask = 0;
+
+     if (power == 0) {
+          free_poly(res);
+          *res = make_one_poly(p.variable);
+          return;
+     }
+     
      mask = ~(~mask>>1);        /* MSB of short int */
 
      temp = make_zero_poly(p.variable);

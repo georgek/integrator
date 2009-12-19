@@ -171,6 +171,14 @@ void br_power(BigRat *res, BigRat p, SHORT_INT_T power)
 {
      BigRat temp;
      SHORT_INT_T mask = 0;
+
+     if (power == 0) {
+          free_bigrat(res);
+          res->num = make_bignum2(1);
+          res->den = make_bignum2(1);
+          return;
+     }
+     
      mask = ~(~mask>>1);        /* MSB of short int */
 
      init_bigrat(&temp);
