@@ -17,4 +17,11 @@ void ExtendedEuclidean(Polynomial *g, Polynomial *s, Polynomial *t,
 void HalfExtendedEuclidean(Polynomial *g, Polynomial *s,
                            Polynomial a, Polynomial b);
 
+/* solves a diophantine equation of the form sa + tb = c */
+void SolveDiophantineEquation(Polynomial *s, Polynomial *t,
+                              Polynomial a, Polynomial b, Polynomial c);
+/* half version only calculates s */
+void HalfSolveDiophantineEquation(Polynomial *s,
+                                  Polynomial a, Polynomial b, Polynomial c);
+
 #endif /* _EUCLIDIAN_H_ */
