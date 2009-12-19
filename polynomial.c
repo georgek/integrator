@@ -237,6 +237,18 @@ void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
      free_coefficient(&old_res);
 }
 
+void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
+{
+     Coefficient old_res = *res;
+     if (coef.type == rational) {
+          res->type = rational;
+          res->u.rat.num = NULL;
+          res->u.rat.den = NULL;
+          br_power(&res->u.rat, coef.u.rat, power);
+     }
+     free_coefficient(&old_res);
+}
+
 int poly_zero(Polynomial p)
 {
      if (p.head->next->coeff.type == special) {

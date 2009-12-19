@@ -74,6 +74,8 @@ void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
 void div_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
 
+void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power);
+
 /* polynomials */
 int poly_zero(Polynomial p);
 
