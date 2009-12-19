@@ -167,6 +167,31 @@ void div_bigrats2(BigRat *res, BigRat left, SHORT_INT_T right)
      res->den = t.den;
 }
 
+void br_power(BigRat *res, BigRat p, SHORT_INT_T power)
+{
+     BigRat temp;
+     SHORT_INT_T mask = 0;
+     mask = ~(~mask>>1);        /* MSB of short int */
+
+     init_bigrat(&temp);
+     bigrat_copy(&temp, p);
+
+     /* find first 1 in binary representation of power and skip it */
+     while (!(mask & power) && mask) {
+          mask = mask>>1;
+     }
+     mask = mask>>1;
+     for (; mask; mask = mask>>1) {
+          mul_bigrats(&temp, temp, temp);
+          if (mask & power) {
+               mul_bigrats(&temp, temp, p);
+          }
+     }
+
+     bigrat_copy(res, temp);
+     free_bigrat(&temp);
+}
+
 int br_zero(BigRat f)
 {
      return bn_zero(f.num);

@@ -36,6 +36,8 @@ void mul_bigrats2(BigRat *res, BigRat left, SHORT_INT_T right);
 void div_bigrats(BigRat *res, BigRat left, BigRat right);
 void div_bigrats2(BigRat *res, BigRat left, SHORT_INT_T right);
 
+void br_power(BigRat *res, BigRat p, SHORT_INT_T power);
+
 int br_zero(BigRat f);
 int br_one(BigRat f);
 
