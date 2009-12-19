@@ -941,7 +941,7 @@ int bn_zero(BigNum u)
 
 int bn_one(BigNum u)
 {
-     if (real_length(u) == 1 && get_dig(u,0) == 1) {
+     if (real_length(u) == 1 && get_dig(u,0) == 1 && !is_neg(u)) {
           return 1;
      }
      return 0;
