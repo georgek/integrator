@@ -35,6 +35,10 @@ Polynomial make_one_poly(char variable)
 void free_poly(Polynomial *p)
 {
      MonoPtr q, r;
+     if (p->head == NULL) {
+          /* empty poly */
+          return;
+     }
      /* turn mono list into a normal list */
      q = p->head->next;
      p->head->next = NULL;
