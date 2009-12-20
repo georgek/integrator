@@ -578,6 +578,15 @@ void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
      free_poly(&BT);
 }
 
+void exact_div_polynomials(Polynomial *Q, Polynomial A, Polynomial B)
+{
+     Polynomial R = make_zero_poly(A.variable);
+     div_polynomials(Q, &R, A, B);
+     if (!poly_zero(R)) {
+          printf("Error! Exact division not exact!\n");
+     }
+}
+
 void add_poly_rat(Polynomial *res, Polynomial left, BigRat right)
 {
      Coefficient coef;

@@ -92,6 +92,7 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
                      Polynomial B);
 void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
                             Polynomial B);
+void exact_div_polynomials(Polynomial *Q, Polynomial A, Polynomial B);
 
 void add_poly_rat(Polynomial *res, Polynomial left, BigRat right);
 void sub_poly_rat(Polynomial *res, Polynomial left, BigRat right);
