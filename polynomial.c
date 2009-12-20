@@ -516,6 +516,130 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
      free_poly(&BT);
 }
 
+void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
+                            Polynomial B)
+{
+     Polynomial old_Q, old_R, T, BT, b;
+     int s_degree, N;
+     MonoPtr t;
+
+     if (poly_zero(B)) {
+          printf("Error! Polynomial division by zero!\n");
+          return;
+     }
+     if (A.variable != B.variable) {
+          printf("Error! Polynomials are in different variables.\n");
+          return;
+     }
+
+     old_Q = *Q;
+     old_R = *R;
+     T = make_zero_poly(A.variable);
+     BT = make_zero_poly(A.variable);
+     /* setup T, it will contain only one monomial */
+     T.head->next = malloc(sizeof(Monomial));
+     T.head->next->next = T.head;
+     t = T.head->next;
+     t->degree = 0;
+     t->coeff.type = rational;
+     t->coeff.u.rat.num = NULL;
+     t->coeff.u.rat.den = NULL;
+
+     b = make_zero_poly(A.variable);
+     add_monomial(&b, 0, poly_lc(B));
+
+     N = poly_deg(A) - poly_deg(B) + 1;
+     
+     *Q = make_zero_poly(A.variable);
+     copy_poly(R, A);
+     while (!poly_zero(*R) && (s_degree = poly_deg(*R)-poly_deg(B)) >= 0) {
+          t->degree = s_degree;
+          copy_coefficient(&t->coeff, poly_lc(*R));
+          --N;
+          mul_polynomials(Q, *Q, b);
+          add_monomial(Q, s_degree, T.head->next->coeff);
+          mul_polynomials(R, *R, b);
+          mul_polynomials(&BT, B, T);
+          sub_polynomials(R, *R, BT);
+     }
+
+     poly_power(&b, b, abs(N));
+     if (N > 0) {
+          mul_polynomials(Q, *Q, b);
+          mul_polynomials(R, *R, b);
+     }
+     else if (N < 0) {
+          div_polynomials(Q, &T, *Q, b);
+          div_polynomials(R, &T, *R, b);
+     }
+
+     free_poly(&old_Q);
+     free_poly(&T);
+     free_poly(&BT);
+}
+
+void add_poly_rat(Polynomial *res, Polynomial left, BigRat right)
+{
+     Coefficient coef;
+     
+     coef.type = rational;
+     /* hack because we know the rat will get copied by add_monomial() */
+     coef.u.rat.num = right.num;
+     coef.u.rat.den = right.den;
+
+     copy_poly(res, left);
+     add_monomial(res, 0, coef);
+}
+
+void sub_poly_rat(Polynomial *res, Polynomial left, BigRat right)
+{
+     Coefficient coef;
+     
+     coef.type = rational;
+     /* hack because we know the rat will get copied by sub_monomial() */
+     coef.u.rat.num = right.num;
+     coef.u.rat.den = right.den;
+
+     copy_poly(res, left);
+     sub_monomial(res, 0, coef);
+}
+
+void mul_poly_rat(Polynomial *res, Polynomial left, BigRat right)
+{
+     Coefficient coef;
+     MonoPtr q;
+     
+     coef.type = rational;
+     /* hack because we know the rat will get copied by mul_coefficients() */
+     coef.u.rat.num = right.num;
+     coef.u.rat.den = right.den;
+
+     copy_poly(res, left);
+
+     /* multiply each coefficient by the rational */
+     for (q = res->head->next; q->coeff.type != special; q = q->next) {
+          mul_coefficients(&q->coeff, q->coeff, coef);
+     }
+}
+
+void div_poly_rat(Polynomial *res, Polynomial left, BigRat right)
+{
+     Coefficient coef;
+     MonoPtr q;
+     
+     coef.type = rational;
+     /* hack because we know the rat will get copied by div_coefficients() */
+     coef.u.rat.num = right.num;
+     coef.u.rat.den = right.den;
+
+     copy_poly(res, left);
+
+     /* divide each coefficient by the rational */
+     for (q = res->head->next; q->coeff.type != special; q = q->next) {
+          div_coefficients(&q->coeff, q->coeff, coef);
+     }
+}
+
 void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power)
 {
      Polynomial temp;
@@ -590,4 +714,3 @@ static void rat_coef_op(Coefficient *res, Coefficient left, Coefficient right,
      res->u.rat.den = NULL;
      op_fun(&res->u.rat, left.u.rat, right.u.rat);
 }
-

@@ -88,7 +88,15 @@ void negate_polynomial(Polynomial *p);
 void add_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right);
 void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right);
-void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B);
+void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
+                     Polynomial B);
+void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
+                            Polynomial B);
+
+void add_poly_rat(Polynomial *res, Polynomial left, BigRat right);
+void sub_poly_rat(Polynomial *res, Polynomial left, BigRat right);
+void mul_poly_rat(Polynomial *res, Polynomial left, BigRat right);
+void div_poly_rat(Polynomial *res, Polynomial left, BigRat right);
 
 void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power);
 
