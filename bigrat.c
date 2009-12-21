@@ -27,6 +27,12 @@ void init_bigrat(BigRat *f)
      f->den = make_bignum2(1);
 }
 
+void init_bigrat2(BigRat *f, SHORT_INT_T val)
+{
+     f->num = make_bignum2(val);
+     f->den = make_bignum2(1);
+}
+
 void free_bigrat(BigRat *f)
 {
      free_bignum(f->num);

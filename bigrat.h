@@ -18,6 +18,7 @@ void make_bigrat(BigRat *f, BigNum num, BigNum den);
 /* initialises bigrat, this function must be called for a bigrat
  * before it is used */
 void init_bigrat(BigRat *f);
+void init_bigrat2(BigRat *f, SHORT_INT_T val);
 
 void free_bigrat(BigRat *f);
 
