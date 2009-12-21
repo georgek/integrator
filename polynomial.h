@@ -18,22 +18,24 @@ typedef enum coef_types {
 
 typedef struct polynomial *PolyPtr;
 
-typedef struct monomial *MonoPtr;
+typedef struct coefficient *CoefPtr;
 
-typedef struct coefficient
-{
-     coef_types type;
-     union {
-          BigRat rat;
-          PolyPtr poly;
-     } u;
-} Coefficient;
+typedef struct monomial *MonoPtr;
 
 typedef struct polynomial
 {
      char variable;
      MonoPtr head;
 } Polynomial;
+
+typedef struct coefficient
+{
+     coef_types type;
+     union {
+          BigRat rat;
+          Polynomial poly;
+     } u;
+} Coefficient;
 
 typedef struct monomial
 {

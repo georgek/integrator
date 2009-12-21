@@ -112,7 +112,7 @@ void print_coefficient(Coefficient c)
           break;
      case polynomial:
           printf("(");
-          print_poly(*c.u.poly);
+          print_poly(c.u.poly);
           printf(")");
           break;
      default:
@@ -131,8 +131,8 @@ void copy_coefficient(Coefficient *c, Coefficient s)
           bigrat_copy(&c->u.rat, s.u.rat);
           break;
      case polynomial:
-          *c->u.poly = make_zero_poly(s.u.poly->variable);
-          copy_poly(c->u.poly, *s.u.poly);
+          c->u.poly.head = NULL;
+          copy_poly(&c->u.poly, s.u.poly);
           break;
      default:
           break;
@@ -147,6 +147,9 @@ void free_coefficient(Coefficient *c)
      case rational:
           free_bigrat(&c->u.rat);
           break;
+     case polynomial:
+          free_poly(&c->u.poly);
+          break;
      default:
           break;
      }
@@ -158,7 +161,7 @@ int coef_zero(Coefficient c)
      case rational:
           return br_zero(c.u.rat);
      case polynomial:
-          if (c.u.poly->head->next->coeff.type == special) {
+          if (c.u.poly.head->next->coeff.type == special) {
                return 1;
           }
           else {
@@ -189,7 +192,7 @@ void negate_coefficient(Coefficient *c)
           negate_bigrat(&c->u.rat);
           break;
      case polynomial:
-          negate_polynomial(c->u.poly);
+          negate_polynomial(&c->u.poly);
           break;
      default:
           break;
@@ -220,6 +223,19 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      if (left.type == rational && right.type == rational) {
           rat_coef_op(res, left, right, &mul_bigrats);
      }
+     else if (left.type == polynomial && right.type == polynomial) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          mul_polynomials(&res->u.poly, left.u.poly, right.u.poly);
+     }
+     else if (left.type == polynomial && right.type == rational) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          mul_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
+     }
+     else {
+          printf("Warning! Muling coefficients not fully implemented!\n"); /* TODO */
+     }
      free_coefficient(&old_res);
 }
 
@@ -240,6 +256,19 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
           rat_coef_op(res, left, right, &div_bigrats);
+     }
+     else if (left.type == polynomial && right.type == polynomial) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          exact_div_polynomials(&res->u.poly, left.u.poly, right.u.poly);
+     }
+     else if (left.type == polynomial && right.type == rational) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          div_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
+     }
+     else {
+          printf("Warning! Diving coefficients not fully implemented!\n"); /* TODO */
      }
      free_coefficient(&old_res);
 }
@@ -266,7 +295,9 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
           br_power(&res->u.rat, coef.u.rat, power);
      }
      else {
-          printf("poly power");
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          poly_power(&res->u.poly, coef.u.poly, power);
      }
      free_coefficient(&old_res);
 }
@@ -328,9 +359,8 @@ void add_monomial(Polynomial *p, int degree, Coefficient coef)
                bigrat_copy(&q1->next->coeff.u.rat, coef.u.rat);
                break;
           case polynomial:
-               q1->next->coeff.u.poly = malloc(sizeof(Polynomial));
-               *q1->next->coeff.u.poly = make_zero_poly(coef.u.poly->variable);
-               copy_poly(q1->next->coeff.u.poly, *coef.u.poly);
+               q1->next->coeff.u.poly = make_zero_poly(coef.u.poly.variable);
+               copy_poly(&q1->next->coeff.u.poly, coef.u.poly);
                break;
           default:
                break;
@@ -378,10 +408,9 @@ void sub_monomial(Polynomial* p, int degree, Coefficient coef)
                negate_bigrat(&q1->next->coeff.u.rat);
                break;
           case polynomial:
-               q1->next->coeff.u.poly = malloc(sizeof(Polynomial));
-               *q1->next->coeff.u.poly = make_zero_poly(coef.u.poly->variable);
-               copy_poly(q1->next->coeff.u.poly, *coef.u.poly);
-               negate_polynomial(q1->next->coeff.u.poly);
+               q1->next->coeff.u.poly = make_zero_poly(coef.u.poly.variable);
+               copy_poly(&q1->next->coeff.u.poly, coef.u.poly);
+               negate_polynomial(&q1->next->coeff.u.poly);
                break;
           default:
                break;
