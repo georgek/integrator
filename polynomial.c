@@ -205,6 +205,9 @@ void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      if (left.type == rational && right.type == rational) {
           rat_coef_op(res, left, right, &add_bigrats);
      }
+     else {
+          printf("Warning! Adding coefficients not fully implemented!\n"); /* TODO */
+     }
      free_coefficient(&old_res);
 }
 
@@ -213,6 +216,9 @@ void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
           rat_coef_op(res, left, right, &sub_bigrats);
+     }
+     else {
+          printf("Warning! Subbing coefficients not fully implemented!\n"); /* TODO */
      }
      free_coefficient(&old_res);
 }
