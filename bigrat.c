@@ -59,6 +59,10 @@ void reduce_bigrat(BigRat *f)
      gcd(&g, f->num, f->den);
      div_bignums(&f->num, &r, f->num, g);
      div_bignums(&f->den, &r, f->den, g);
+     if (is_neg(f->den)) {
+          negate_bignum(f->num);
+          negate_bignum(f->den);
+     }
      free_bignum(g);
      free_bignum(r);
 }
