@@ -59,3 +59,11 @@ Coefficient ca_get(CoefArray *ca, unsigned index)
      return *(ca->head + index);
 }
 
+void ca_free(CoefArray *ca)
+{
+     ca->size = 0;
+     ca->max_size = 0;
+     free(ca->head);
+     ca->head = NULL;
+}
+

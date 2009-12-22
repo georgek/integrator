@@ -24,6 +24,7 @@ CoefPtr ca_rational_push_back(CoefArray *ca, BigRat nr);
 /* get a polynomial from array, it is an error to use an invalid index
  * ie. index must be < size */
 Coefficient ca_get(CoefArray *ca, unsigned index);
-
+/* free array */
+void ca_free(CoefArray *ca);
 
 #endif /* _COEF_ARRAY_H_ */
