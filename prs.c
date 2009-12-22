@@ -4,26 +4,25 @@
 
 void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
 {
-     unsigned i, j, k;
-     int s;
+     unsigned i = 0, j = 0, k = 0;
+     int s = 0;
      CoefArray betas = new_coef_array();
-     Polynomial Q, R, zero_poly;
-     Coefficient beta, gamma, gammat, r, rt, c, rest;
-     int delta;
+     Polynomial Q = {'x', NULL}, R = {'x', NULL};
+     Polynomial zero_poly = make_zero_poly(A.variable);
+     Coefficient beta = {special}, gamma = {special}, gammat = {special};
+     Coefficient r = {special}, rt = {special}, c = {special}, rest = {special};
+     int delta = 0;
 
      if (A.variable != B.variable) {
           printf("Error! A and B have different variables! (PRS)\n");
           return;
      }
 
-     Q = make_zero_poly(A.variable);
-     R = make_zero_poly(A.variable);
-     zero_poly = make_zero_poly(A.variable);
-
      rest.type = polynomial;
      rest.u.poly.head = NULL;
 
-     *prs = new_coef_array();   /* TODO: free old array? */
+     ca_free(prs);
+     *prs = new_coef_array();
      ca_poly_push_back(prs, A);
      ca_poly_push_back(prs, B);
      i = 1;
