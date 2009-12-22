@@ -26,6 +26,8 @@ void Euclidean(Polynomial *res, Polynomial a, Polynomial b)
      }
 
      copy_poly(res, na);
+     /* make monic */
+     div_poly_rat(res, *res, poly_lc(na).u.rat);
 
      free_poly(&na);
      free_poly(&nb);

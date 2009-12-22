@@ -43,7 +43,7 @@ void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
      ca_push_back(&betas, beta);
 
      while (!coef_zero(ca_get(prs, i))) {
-          r = poly_lc(ca_get(prs, i).u.poly);
+          copy_coefficient(&r, poly_lc(ca_get(prs, i).u.poly));
           pseudo_div_polynomials(&Q, &R, ca_get(prs, i-1).u.poly,
                                  ca_get(prs, i).u.poly);
           ca_poly_push_back(prs, R);
@@ -127,5 +127,88 @@ void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
      free_coefficient(&rt);
      free_coefficient(&c);
      free_coefficient(&rest);
+}
+
+void SubResultantGCD(Polynomial *gcd, Polynomial A, Polynomial B)
+{
+     Polynomial Q = {'x', NULL}, a = {'x', NULL}, b = {'x', NULL};
+     Coefficient beta = {special}, gamma = {special}, gammat = {special};
+     Coefficient R = {special}, r = {special}, rt = {special}, c = {special};
+     int delta = 0;
+
+     if (A.variable != B.variable) {
+          printf("Error! A and B have different variables! (PRS)\n");
+          return;
+     }
+
+     copy_poly(&a, A);
+     copy_poly(&b, B);
+
+     /* gamma <-- -1 */
+     gamma.type = rational;
+     init_bigrat2(&gamma.u.rat, 1);
+     negate_bigrat(&gamma.u.rat);
+     
+     delta = poly_deg(A)-poly_deg(B);
+
+     /* beta <-- (-1)^(delta+1) */
+     beta.type = rational;
+     init_bigrat2(&beta.u.rat, 1);
+     if (delta % 2 == 0) {
+          negate_coefficient(&beta);
+     }
+
+     R.type = polynomial;
+     R.u.poly.head = NULL;
+
+     while (!poly_zero(b)) {
+          copy_coefficient(&r, poly_lc(b));
+          pseudo_div_polynomials(&Q, &R.u.poly, a, b);
+
+          div_coefficients(&R, R, beta);
+          copy_poly(&a, b);
+          copy_poly(&b, R.u.poly);
+          if (poly_zero(b)) {
+               break;
+          }
+
+          copy_coefficient(&rt, r);
+          negate_coefficient(&rt);
+          copy_coefficient(&gammat, gamma);
+          if (delta > 0) {
+               coef_power(&rt, rt, delta);
+               coef_power(&gammat, gammat, delta-1);
+               div_coefficients(&gamma, rt, gammat);
+          }
+          else {
+               coef_power(&rt, rt, -delta);
+               coef_power(&gammat, gammat, -delta);
+               div_coefficients(&gamma, gammat, rt);
+          }
+          delta = poly_deg(a) - poly_deg(b);
+          
+          copy_coefficient(&beta, r);
+          negate_coefficient(&beta);
+          if (delta > 0) {
+               coef_power(&gammat, gamma, delta);
+               mul_coefficients(&beta, beta, gammat);
+          }
+          else if (delta < 0) {
+               coef_power(&gammat, gamma, -delta);
+               div_coefficients(&beta, beta, gammat);
+          }
+     }
+
+     copy_poly(gcd, a);
+     /* make monic, only works for rational coefs TODO */
+     div_poly_rat(gcd, *gcd, poly_lc(a).u.rat);
+
+     free_poly(&Q);
+     free_coefficient(&beta);
+     free_coefficient(&gamma);
+     free_coefficient(&gammat);
+     free_coefficient(&r);
+     free_coefficient(&rt);
+     free_coefficient(&c);
 }
 
