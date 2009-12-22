@@ -116,5 +116,17 @@ void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
           negate_coefficient(&rest);
      }
      copy_poly(res, rest.u.poly);
+
+     ca_free(&betas);
+     free_poly(&Q);
+     free_poly(&R);
+     free_poly(&zero_poly);
+     free_coefficient(&beta);
+     free_coefficient(&gamma);
+     free_coefficient(&gammat);
+     free_coefficient(&r);
+     free_coefficient(&rt);
+     free_coefficient(&c);
+     free_coefficient(&rest);
 }
 
