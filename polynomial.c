@@ -323,7 +323,15 @@ int poly_deg(Polynomial p)
 
 const Coefficient poly_lc(Polynomial p)
 {
-     return p.head->next->coeff;
+     Coefficient lc;
+     if (p.head->next->coeff.type != special) {
+          copy_coefficient(&lc, p.head->next->coeff);
+     }
+     else {
+          lc.type = rational;
+          init_bigrat(&lc.u.rat);
+     }
+     return lc;
 }
 
 void add_monomial(Polynomial *p, int degree, Coefficient coef)
