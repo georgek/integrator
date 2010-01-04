@@ -1,6 +1,8 @@
 #ifndef _TREE_H_
 #define _TREE_H_
 
+#include "bignum.h"
+
 typedef enum node_types {
      int_type, var_type, op1_type, op2_type
 } node_types;
@@ -8,7 +10,7 @@ typedef enum node_types {
 /* contents of nodes for each type */
 /* integer */
 typedef struct {
-     int value;
+     BigNum value;
 } int_node_type;
 
 /* variable */
@@ -43,7 +45,7 @@ typedef struct node_type {
 
 /* functions for adding nodes to the tree */
 
-node_type *add_int(int value);
+node_type *add_int(BigNum value);
 node_type *add_var(char name);
 node_type *add_op1(int operator, node_type *operand);
 node_type *add_op2(int operator, node_type *operand1, node_type *operand2);

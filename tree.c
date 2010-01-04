@@ -11,7 +11,7 @@ void yyerror(char *s);
 /* size of node without contents */
 #define SIZEOF_NODE ((char *)&p->u.intg - (char *)p)
 
-node_type *add_int(int value)
+node_type *add_int(BigNum value)
 {
      node_type *p;
      size_t node_size;
@@ -87,7 +87,10 @@ void free_tree(node_type *p)
      if (!p) {
           return;
      }
-     if (p->type == op1_type) {
+     if (p->type == int_type) {
+          free_bignum(p->u.intg.value);
+     }
+     else if (p->type == op1_type) {
           free_tree(p->u.op1.operand);
      }
      else if (p->type == op2_type) {
@@ -108,7 +111,7 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
      if (!p) return;
      switch (p->type) {
      case int_type:
-          printf("%d", p->u.intg.value);
+          print_bignum(p->u.intg.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
@@ -152,7 +155,7 @@ void traverse_prefix(node_type *p)
      if (!p) return;
      switch (p->type) {
      case int_type:
-          printf("%d", p->u.intg.value);
+          print_bignum(p->u.intg.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
@@ -183,7 +186,7 @@ void traverse_postfix(node_type *p)
      if (!p) return;
      switch (p->type) {
      case int_type:
-          printf("%d", p->u.intg.value);
+          print_bignum(p->u.intg.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
@@ -214,7 +217,7 @@ void traverse_infix(node_type *p)
      if (!p) return;
      switch (p->type) {
      case int_type:
-          printf("%d", p->u.intg.value);
+          print_bignum(p->u.intg.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
