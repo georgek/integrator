@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+#include "bignum.h"
 #include "tree.h"
 #include "y.tab.h"
 
@@ -23,23 +24,6 @@ node_type *add_int(int value)
      /* copy information */
      p->type = int_type;
      p->u.intg.value = value;
-     
-     return p;
-}
-
-node_type *add_float(double value)
-{
-     node_type *p;
-     size_t node_size;
-
-     node_size = SIZEOF_NODE + sizeof(float_node_type);
-     if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
-     }
-     
-     /* copy information */
-     p->type = float_type;
-     p->u.flot.value = value;
      
      return p;
 }
@@ -126,9 +110,6 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
      case int_type:
           printf("%d", p->u.intg.value);
           break;
-     case float_type:
-          printf("%g", p->u.flot.value);
-          break;
      case var_type:
           printf("%c", p->u.var.name);
           break;
@@ -173,9 +154,6 @@ void traverse_prefix(node_type *p)
      case int_type:
           printf("%d", p->u.intg.value);
           break;
-     case float_type:
-          printf("%g", p->u.flot.value);
-          break;
      case var_type:
           printf("%c", p->u.var.name);
           break;
@@ -207,9 +185,6 @@ void traverse_postfix(node_type *p)
      case int_type:
           printf("%d", p->u.intg.value);
           break;
-     case float_type:
-          printf("%g", p->u.flot.value);
-          break;
      case var_type:
           printf("%c", p->u.var.name);
           break;
@@ -240,9 +215,6 @@ void traverse_infix(node_type *p)
      switch (p->type) {
      case int_type:
           printf("%d", p->u.intg.value);
-          break;
-     case float_type:
-          printf("%g", p->u.flot.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);

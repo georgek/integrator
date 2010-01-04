@@ -2,7 +2,7 @@
 #define _TREE_H_
 
 typedef enum node_types {
-     int_type, float_type, var_type, op1_type, op2_type
+     int_type, var_type, op1_type, op2_type
 } node_types;
 
 /* contents of nodes for each type */
@@ -10,11 +10,6 @@ typedef enum node_types {
 typedef struct {
      int value;
 } int_node_type;
-
-/* float */
-typedef struct {
-     double value;
-} float_node_type;
 
 /* variable */
 typedef struct {
@@ -39,7 +34,6 @@ typedef struct node_type {
      /* node contents */
      union {
           int_node_type intg;
-          float_node_type flot;
           var_node_type var;
           op1_node_type op1;
           op2_node_type op2;
@@ -50,7 +44,6 @@ typedef struct node_type {
 /* functions for adding nodes to the tree */
 
 node_type *add_int(int value);
-node_type *add_float(double value);
 node_type *add_var(char name);
 node_type *add_op1(int operator, node_type *operand);
 node_type *add_op2(int operator, node_type *operand1, node_type *operand2);

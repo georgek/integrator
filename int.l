@@ -1,6 +1,7 @@
 %{
 #include <math.h>
 
+#include "bignum.h"
 #include "tree.h"
 #include "y.tab.h"
 
@@ -12,13 +13,8 @@ UINT 0|[1-9][0-9]*
 %%
 
 {UINT} {
-     yylval.ival = strtoul(yytext, (char**)NULL, 10);
+     yylval.ival = make_bignum(yytext, yyleng);
      return INTEGER;
-}
-
-({UINT}?\.[0-9]+)([eE][+-]?[0-9]+)? {
-     yylval.fval = atof(yytext);
-     return FLOAT;
 }
 
 [xyz] {
@@ -48,16 +44,6 @@ UINT 0|[1-9][0-9]*
 
 "eval" {
      return EVAL;
-}
-
-"e" {
-     yylval.fval = exp(1);
-     return FLOAT;
-}
-
-"pi" {
-     yylval.fval = 4*atan(1);
-     return FLOAT;
 }
 
 [-+*/^(),\n] {
