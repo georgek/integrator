@@ -1,3 +1,8 @@
+/* lexer for integrator front end */
+
+%option nounput
+%option noinput
+
 %{
 #include <math.h>
 

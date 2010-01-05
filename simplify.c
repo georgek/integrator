@@ -176,7 +176,10 @@ void simple_simplify(node_type **root)
           /* remove unecessary unary minuses */
           if (r->u.op1.operator == UMINUS) {
                if (r->u.op1.operand->type == int_type) {
-                    negate_bignum((*root)->u.op1.operand->u.intg.value);
+                    negate_bignum(r->u.op1.operand->u.intg.value);
+                    *root = r->u.op1.operand;
+                    r->u.op1.operand = NULL;
+                    free_tree(r);
                }
           }
           break;

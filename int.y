@@ -1,3 +1,5 @@
+/* parser for integrator front end */
+
 %{
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,6 +19,7 @@
 #define YYERROR_VERBOSE
 
 void yyerror(char *s);
+int yylex(void);
 
 node_type *root = NULL;         /* root of parse tree */
 %}

@@ -1,13 +1,13 @@
 LEX = flex -I
 YACC = bison -y -d
 
-CC = gcc -g -Wall -ansi -pedantic
+CC = gcc -g -Wall -ansi -pedantic -D_POSIX_SOURCE
 
 objects = tree.o simplify.o bignum.o bigrat.o polynomial.o euclidean.o \
 		coef_array.o prs.o squarefree.o
 
 integrator:	$(objects) y.tab.o lex.yy.o
-		$(CC) -o integrator $(objects) y.tab.o lex.yy.o -ly -ll -lm
+		$(CC) -o integrator $(objects) y.tab.o lex.yy.o -ly -lfl -lm
 
 lex.yy.o:	lex.yy.c y.tab.h
 
