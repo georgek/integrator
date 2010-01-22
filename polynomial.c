@@ -730,6 +730,16 @@ void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power)
      free_poly(&temp);
 }
 
+void poly_content(Polynomial p)
+{
+     
+}
+
+void poly_pp(Polynomial p)
+{
+
+}
+
 void poly_differentiate(Polynomial *pd, Polynomial p)
 {
      MonoPtr q, r;

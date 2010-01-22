@@ -104,6 +104,10 @@ void div_poly_rat(Polynomial *res, Polynomial left, BigRat right);
 
 void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power);
 
+/* content and primitive part */
+void poly_content(Polynomial p);
+void poly_pp(Polynomial p);
+
 void poly_differentiate(Polynomial *pd, Polynomial p);
 void poly_integrate(Polynomial *pi, Polynomial p);
 
