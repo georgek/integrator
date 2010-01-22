@@ -178,8 +178,7 @@ int coef_one(Coefficient c)
      case rational:
           return br_one(c.u.rat);
      case polynomial:
-          /* poly_one() */
-          return 0;
+          return poly_one(c.u.poly);
      default:
           return 0;
      }
@@ -311,6 +310,17 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
 int poly_zero(Polynomial p)
 {
      if (p.head->next->coeff.type == special) {
+          return 1;
+     }
+     return 0;
+}
+
+int poly_one(Polynomial p)
+{
+     if (p.head->next->coeff.type != special
+         && p.head->next->next->coeff.type == special
+         && p.head->next->degree == 0
+         && coef_one(p.head->next->coeff)) {
           return 1;
      }
      return 0;

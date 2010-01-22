@@ -81,6 +81,7 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power);
 
 /* polynomials */
 int poly_zero(Polynomial p);
+int poly_one(Polynomial p);
 
 int poly_deg(Polynomial p);
 const Coefficient poly_lc(Polynomial p);
