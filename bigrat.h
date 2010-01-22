@@ -13,7 +13,11 @@ typedef struct {
 } BigRat;
 
 /* make new bigrat from two bignums */
-void make_bigrat(BigRat *f, BigNum num, BigNum den);
+BigRat make_bigrat(BigNum num, BigNum den);
+/* make from one bignum */
+BigRat make_bigrat2(BigNum num);
+
+BigRat make_bigrat3(SHORT_INT_T val);
 
 /* initialises bigrat, this function must be called for a bigrat
  * before it is used */
