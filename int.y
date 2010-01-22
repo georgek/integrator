@@ -34,8 +34,10 @@ node_type *root = NULL;         /* root of parse tree */
 %token <var> VARIABLE
 %token LN EXP COS SIN TAN EVAL DIFF
 
-%left '+' '-'
-%left '*' '/'
+%left '-'
+%left '+'
+%left '*'
+%left '/'
 %nonassoc UMINUS UPLUS
 %left '^'
 
@@ -114,7 +116,7 @@ expression:     expression '+' expression
                         }
         |       INTEGER
                         {
-                             $$ = add_int($1);
+                             $$ = add_rat($1);
                         }
         |       VARIABLE
                         {
