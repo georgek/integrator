@@ -2,21 +2,28 @@
 #define _TREE_H_
 
 #include "bignum.h"
+#include "bigrat.h"
+#include "polynomial.h"
 
 typedef enum node_types {
-     int_type, var_type, op1_type, op2_type
+     rat_type, var_type, poly_type, op1_type, op2_type
 } node_types;
 
 /* contents of nodes for each type */
-/* integer */
+/* rational */
 typedef struct {
-     BigNum value;
-} int_node_type;
+     BigRat value;
+} rat_node_type;
 
 /* variable */
 typedef struct {
      char name;
 } var_node_type;
+
+/* monomial */
+typedef struct {
+     Polynomial poly;
+} poly_node_type;
 
 /* unary operator */
 typedef struct {
@@ -35,8 +42,9 @@ typedef struct node_type {
      node_types type;
      /* node contents */
      union {
-          int_node_type intg;
+          rat_node_type rat;
           var_node_type var;
+          poly_node_type poly;
           op1_node_type op1;
           op2_node_type op2;
      } u;
@@ -45,8 +53,9 @@ typedef struct node_type {
 
 /* functions for adding nodes to the tree */
 
-node_type *add_int(BigNum value);
+node_type *add_rat(BigNum value);
 node_type *add_var(char name);
+node_type *add_poly(Polynomial poly);
 node_type *add_op1(int operator, node_type *operand);
 node_type *add_op2(int operator, node_type *operand1, node_type *operand2);
 

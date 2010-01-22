@@ -9,22 +9,23 @@
 void yyerror(char *s);
 
 /* size of node without contents */
-#define SIZEOF_NODE ((char *)&p->u.intg - (char *)p)
+#define SIZEOF_NODE ((char *)&p->u.rat - (char *)p)
 
-node_type *add_int(BigNum value)
+node_type *add_rat(BigNum value)
 {
      node_type *p;
      size_t node_size;
 
-     node_size = SIZEOF_NODE + sizeof(int_node_type);
+     node_size = SIZEOF_NODE + sizeof(rat_node_type);
      if ((p = malloc(node_size)) == NULL) {
           yyerror("out of memory");
      }
-     
-     /* copy information */
-     p->type = int_type;
-     p->u.intg.value = value;
-     
+
+     /* initialise */
+     p->type = rat_type;
+     p->u.rat.value.num = value;
+     p->u.rat.value.den = make_bignum2(1);
+
      return p;
 }
 
@@ -41,6 +42,24 @@ node_type *add_var(char name)
      /* copy information */
      p->type = var_type;
      p->u.var.name = name;
+     
+     return p;
+}
+
+node_type *add_poly(Polynomial poly)
+{
+     node_type *p;
+     size_t node_size;
+
+     node_size = SIZEOF_NODE + sizeof(poly_node_type);
+     if ((p = malloc(node_size)) == NULL) {
+          yyerror("out of memory");
+     }
+     
+     /* copy information */
+     p->type = poly_type;
+     p->u.poly.poly.variable = poly.variable;
+     p->u.poly.poly.head = poly.head;
      
      return p;
 }
@@ -87,8 +106,8 @@ void free_tree(node_type *p)
      if (!p) {
           return;
      }
-     if (p->type == int_type) {
-          free_bignum(p->u.intg.value);
+     else if (p->type == rat_type) {
+          free_bigrat(&p->u.rat.value);
      }
      else if (p->type == op1_type) {
           free_tree(p->u.op1.operand);
@@ -110,11 +129,14 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
 {
      if (!p) return;
      switch (p->type) {
-     case int_type:
-          print_bignum(p->u.intg.value);
+     case rat_type:
+          print_bigrat(p->u.rat.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
+          break;
+     case poly_type:
+          print_poly(p->u.poly.poly);
           break;
      case op1_type:
           printf("(");
@@ -154,11 +176,14 @@ void traverse_prefix(node_type *p)
 {
      if (!p) return;
      switch (p->type) {
-     case int_type:
-          print_bignum(p->u.intg.value);
+     case rat_type:
+          print_bigrat(p->u.rat.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
+          break;
+     case poly_type:
+          print_poly(p->u.poly.poly);
           break;
      case op1_type:
           print_operator(p->u.op1.operator);
@@ -185,11 +210,14 @@ void traverse_postfix(node_type *p)
 {
      if (!p) return;
      switch (p->type) {
-     case int_type:
-          print_bignum(p->u.intg.value);
+     case rat_type:
+          print_bigrat(p->u.rat.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
+          break;
+     case poly_type:
+          print_poly(p->u.poly.poly);
           break;
      case op1_type:
           traverse_postfix(p->u.op1.operand);
@@ -216,11 +244,14 @@ void traverse_infix(node_type *p)
 {
      if (!p) return;
      switch (p->type) {
-     case int_type:
-          print_bignum(p->u.intg.value);
+     case rat_type:
+          print_bigrat(p->u.rat.value);
           break;
      case var_type:
           printf("%c", p->u.var.name);
+          break;
+     case poly_type:
+          print_poly(p->u.poly.poly);
           break;
      case op1_type:
           /* deal with unary minus */
@@ -302,13 +333,13 @@ int op_priority(int i)
      int p;
      switch (i) 
      {
-     case '+': p=0; break;
      case '-': p=0; break;
-     case '*': p=1; break; 
-     case '/': p=1; break;
-     case UMINUS: p=2; break;
-     case '^': p=3; break;
-     default: p=4;break;       
+     case '+': p=1; break;
+     case '*': p=2; break; 
+     case '/': p=3; break;
+     case UMINUS: p=4; break;
+     case '^': p=5; break;
+     default: p=6;break;       
      }                   
      return (p);
 }
