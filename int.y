@@ -34,8 +34,7 @@ node_type *root = NULL;         /* root of parse tree */
 %token <var> VARIABLE
 %token LN EXP COS SIN TAN EVAL DIFF
 
-%left '-'
-%left '+'
+%left '+' '-'
 %left '*'
 %left '/'
 %nonassoc UMINUS UPLUS

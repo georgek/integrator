@@ -333,7 +333,7 @@ int op_priority(int i)
      int p;
      switch (i) 
      {
-     case '-': p=0; break;
+     case '-': p=1; break;
      case '+': p=1; break;
      case '*': p=2; break; 
      case '/': p=3; break;
