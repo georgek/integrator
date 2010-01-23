@@ -230,6 +230,26 @@ void extract_polys(node_type **root)
                     r->u.op2.operand2 = NULL;
                     free_tree(r);
                }
+               else if (r->u.op2.operand1->type == poly_type
+                   && r->u.op2.operand2->type == poly_type) {
+                    /* poly * poly = poly */
+                    mul_polynomials(&r->u.op2.operand1->u.poly.poly,
+                                    r->u.op2.operand1->u.poly.poly,
+                                    r->u.op2.operand2->u.poly.poly);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == poly_type
+                   && r->u.op2.operand2->type == rat_type) {
+                    /* poly * rat = poly */
+                    mul_poly_rat(&r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand2->u.rat.value);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
                break;
 
           case '+':
@@ -266,6 +286,40 @@ void extract_polys(node_type **root)
                }
                break;
                
+          case '-':
+               if (r->u.op2.operand1->type == poly_type
+                   && r->u.op2.operand2->type == poly_type) {
+                    /* poly + poly = poly */
+                    poly_splice_sub(&r->u.op2.operand1->u.poly.poly,
+                                    &r->u.op2.operand2->u.poly.poly);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               /* TODO: these two cases can be done more efficiently
+                * by splicing */
+               else if (r->u.op2.operand1->type == poly_type
+                        && r->u.op2.operand2->type == rat_type) {
+                    /* poly + rat = poly */
+                    sub_poly_rat(&r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand2->u.rat.value);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == rat_type
+                        && r->u.op2.operand2->type == poly_type) {
+                    /* rat + poly = poly */
+                    sub_poly_rat(&r->u.op2.operand2->u.poly.poly,
+                                 r->u.op2.operand2->u.poly.poly,
+                                 r->u.op2.operand1->u.rat.value);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               break;
+               
           default:
                break;
           }
@@ -273,6 +327,15 @@ void extract_polys(node_type **root)
           break;
      case op1_type:
           extract_polys(&r->u.op1.operand);
+
+          /* deal with unary minus */
+          if (r->u.op1.operator == UMINUS
+              && r->u.op1.operand->type == poly_type) {
+               negate_polynomial(&r->u.op1.operand->u.poly.poly);
+               *root = r->u.op1.operand;
+               r->u.op1.operand = NULL;
+               free_tree(r);
+          }
           
           break;
      case var_type:
