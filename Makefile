@@ -1,5 +1,5 @@
 LEX = flex -I
-YACC = bison -y -d
+YACC = bison -y -d -v
 
 CC = gcc -g -Wall -ansi -pedantic -D_POSIX_SOURCE
 
