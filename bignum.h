@@ -46,6 +46,8 @@ void print_bignum(BigNum p);
 
 void bignum_copy(BigNum *d, BigNum s);
 
+int real_length(BigNum);
+
 /* logical operations */
 int is_neg(BigNum p);
 int bignum_equal(BigNum left, BigNum right);

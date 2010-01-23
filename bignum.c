@@ -8,7 +8,6 @@
 
 /* utility functions */
 static int length(BigNum);
-static int real_length(BigNum);
 static SHORT_INT_T get_dig(BigNum, int);
 static void set_dig(BigNum, int, SHORT_INT_T);
 static BigNum add(BigNum, BigNum);
@@ -631,7 +630,7 @@ static int length(BigNum p)
 }
 
 /* returns real length, excluding leading zero digits */
-static int real_length(BigNum p)
+int real_length(BigNum p)
 {
      int i = length(p);
      
