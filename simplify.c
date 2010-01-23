@@ -190,3 +190,99 @@ void simple_simplify(node_type **root)
      }
 }
 
+void extract_polys(node_type **root)
+{
+     node_type *r = *root;
+
+     switch (r->type) {
+     case op2_type:
+          extract_polys(&r->u.op2.operand1);
+          extract_polys(&r->u.op2.operand2);
+
+          switch (r->u.op2.operator) {
+          case '^':
+               if (r->u.op2.operand1->type == poly_type
+                   && r->u.op2.operand2->type == rat_type) {
+                    /* poly ^ rat = poly */
+                    if (real_length(r->u.op2.operand2->u.rat.value.num)
+                        != 1) {
+                         printf("Error! Multiple precision indices are not "
+                                "supported!\n");
+                         exit(1);
+                    }
+                    poly_power(&r->u.op2.operand1->u.poly.poly,
+                               r->u.op2.operand1->u.poly.poly,
+                               *(r->u.op2.operand2->u.rat.value.num+1));
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               break;
+               
+          case '*':
+               if (r->u.op2.operand1->type == rat_type
+                   && r->u.op2.operand2->type == poly_type) {
+                    /* rat * poly = poly */
+                    mul_poly_rat(&r->u.op2.operand2->u.poly.poly,
+                                 r->u.op2.operand2->u.poly.poly,
+                                 r->u.op2.operand1->u.rat.value);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               break;
+
+          case '+':
+               if (r->u.op2.operand1->type == poly_type
+                   && r->u.op2.operand2->type == poly_type) {
+                    /* poly + poly = poly */
+                    poly_splice_add(&r->u.op2.operand1->u.poly.poly,
+                                    &r->u.op2.operand2->u.poly.poly);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               /* TODO: these two cases can be done more efficiently
+                * by splicing */
+               else if (r->u.op2.operand1->type == poly_type
+                        && r->u.op2.operand2->type == rat_type) {
+                    /* poly + rat = poly */
+                    add_poly_rat(&r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand2->u.rat.value);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == rat_type
+                        && r->u.op2.operand2->type == poly_type) {
+                    /* rat + poly = poly */
+                    add_poly_rat(&r->u.op2.operand2->u.poly.poly,
+                                 r->u.op2.operand2->u.poly.poly,
+                                 r->u.op2.operand1->u.rat.value);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               break;
+               
+          default:
+               break;
+          }
+          
+          break;
+     case op1_type:
+          extract_polys(&r->u.op1.operand);
+          
+          break;
+     case var_type:
+          /* this is a monomial */
+          *root = add_poly(make_mono_poly(r->u.var.name,1));
+          free_tree(r);
+          break;
+     default:
+          break;
+     }
+     
+}
+

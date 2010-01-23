@@ -53,6 +53,7 @@ statement:      expression
                         {
                              root = $1;
                              simple_simplify(&root);
+                             extract_polys(&root);
                              print_prefix(root);
                              print_postfix(root);
                              print_prefix_lisp(root);
