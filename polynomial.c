@@ -81,6 +81,14 @@ void copy_poly(Polynomial *p, Polynomial s)
 
 void print_poly(Polynomial p)
 {
+     if (poly_neg(p)) {
+          print_poly_sign(p);
+     }
+     print_poly2(p);
+}
+
+void print_poly2(Polynomial p)
+{
      MonoPtr m = p.head->next;
      /* check for zero polynomial */
      if (m->coeff.type == special) {
@@ -90,8 +98,8 @@ void print_poly(Polynomial p)
      /* iterate through monomials */
      do {
           /* don't print unit coefficient, unless we won't print variable */
-          if (!coef_one(m->coeff) || m->degree == 0) {
-               print_coefficient(m->coeff);
+          if (!coef_one2(m->coeff) || m->degree == 0) {
+               print_coefficient2(m->coeff);
           }
           /* print variable if degree > 0 */
           if (m->degree != 0 && m->degree != 1) {
@@ -101,7 +109,18 @@ void print_poly(Polynomial p)
                printf("%c", p.variable);
           }
           m = m->next;
-     } while (m->coeff.type != special && printf(" + "));
+     } while (m->coeff.type != special && print_coef_sign(m->coeff));
+}
+
+void print_poly3(Polynomial p)
+{
+     print_poly_sign(p);
+     print_poly2(p);
+}
+
+void print_poly_sign(Polynomial p)
+{
+     print_coef_sign(poly_lc(p));
 }
 
 void print_coefficient(Coefficient c)
@@ -125,6 +144,67 @@ void print_coefficient(Coefficient c)
      default:
           break;
      }
+}
+
+void print_coefficient2(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          if (bn_one(c.u.rat.den)) {
+               print_bigrat2(c.u.rat);
+          }
+          else {
+               printf("(");
+               print_bigrat2(c.u.rat);
+               printf(")");
+          }
+          break;
+     case polynomial:
+          printf("(");
+          print_poly2(c.u.poly);
+          printf(")");
+          break;
+     default:
+          break;
+     }
+}
+
+void print_coefficient3(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          if (bn_one(c.u.rat.den)) {
+               print_bigrat3(c.u.rat);
+          }
+          else {
+               printf("(");
+               print_bigrat3(c.u.rat);
+               printf(")");
+          }
+          break;
+     case polynomial:
+          printf("(");
+          print_poly3(c.u.poly);
+          printf(")");
+          break;
+     default:
+          break;
+     }
+}
+
+int print_coef_sign(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          print_br_sign(c.u.rat);
+          break;
+     case polynomial:
+          print_poly_sign(c.u.poly);
+          break;
+     default:
+          break;
+     }
+     return 1;
 }
 
 void copy_coefficient(Coefficient *c, Coefficient s)
@@ -184,6 +264,18 @@ int coef_one(Coefficient c)
      switch (c.type) {
      case rational:
           return br_one(c.u.rat);
+     case polynomial:
+          return poly_one(c.u.poly);
+     default:
+          return 0;
+     }
+}
+
+int coef_one2(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          return br_one2(c.u.rat);
      case polynomial:
           return poly_one(c.u.poly);
      default:
@@ -314,6 +406,18 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
      free_coefficient(&old_res);
 }
 
+int coef_neg(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          return br_neg(c.u.rat);
+     case polynomial:
+          return poly_neg(c.u.poly);
+     default:
+          return 0;
+     }
+}
+
 int poly_zero(Polynomial p)
 {
      if (p.head->next->coeff.type == special) {
@@ -328,6 +432,17 @@ int poly_one(Polynomial p)
          && p.head->next->next->coeff.type == special
          && p.head->next->degree == 0
          && coef_one(p.head->next->coeff)) {
+          return 1;
+     }
+     return 0;
+}
+
+int poly_one2(Polynomial p)
+{
+     if (p.head->next->coeff.type != special
+         && p.head->next->next->coeff.type == special
+         && p.head->next->degree == 0
+         && coef_one2(p.head->next->coeff)) {
           return 1;
      }
      return 0;
@@ -457,7 +572,7 @@ void add_polynomials(Polynomial *res, Polynomial left, Polynomial right)
      MonoPtr p;
      
      if (left.variable != right.variable) {
-          printf("Error! Polynomials are in different variables.\n");
+          printf("Error! Multivariate polynomials are not supported yet.\n");
           return;
      }
 
@@ -482,7 +597,7 @@ void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right)
      MonoPtr p;
      
      if (left.variable != right.variable) {
-          printf("Error! Polynomials are in different variables.\n");
+          printf("Error! Multivariate polynomials are not supported yet.\n");
           return;
      }
 
@@ -509,7 +624,7 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
      t.type = special;
      
      if (left.variable != right.variable) {
-          printf("Error! Polynomials are in different variables.\n");
+          printf("Error! Multivariate polynomials not supported yet.\n");
           return;
      }
 
@@ -540,7 +655,7 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
           return;
      }
      if (A.variable != B.variable) {
-          printf("Error! Polynomials are in different variables.\n");
+          printf("Error! Multivariate polynomials are not supported yet.\n");
           return;
      }
 
@@ -584,7 +699,7 @@ void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
           return;
      }
      if (A.variable != B.variable) {
-          printf("Error! Polynomials are in different variables.\n");
+          printf("Error! Multivariate polynomials are not supported yet.\n");
           return;
      }
 
@@ -742,7 +857,7 @@ void poly_splice_add(Polynomial *left, Polynomial *right)
      MonoPtr q, q1, r, r1;
      
      if (left->variable != right->variable) {
-          printf("Error! Polynomials are in different variables.\n");
+          printf("Error! Multivariate polynomials are not supported yet.\n");
           return;
      }
 
@@ -759,6 +874,13 @@ void poly_splice_add(Polynomial *left, Polynomial *right)
           if (r->degree == q->degree) {
                /* add coefficients */
                add_coefficients(&q->coeff, q->coeff, r->coeff);
+               /* remove zero coefficient */
+               if (coef_zero(q->coeff)) {
+                    q1->next = q->next;
+                    free_coefficient(&q->coeff);
+                    free(q);
+                    q = NULL;
+               }
                /* advance right pointer */
                r1 = r;
                r = r->next;
@@ -772,6 +894,58 @@ void poly_splice_add(Polynomial *left, Polynomial *right)
                q1->next = q;
           }
      }
+}
+
+void poly_splice_sub(Polynomial *left, Polynomial *right)
+{
+     MonoPtr q, q1, r, r1;
+
+     if (left->variable != right->variable) {
+          printf("Error! Multivariate polynomials are not supported yet.\n");
+          return;
+     }
+
+     q1 = left->head;
+     q = q1->next;
+
+     r1 = right->head;
+     r = r1->next;
+
+     /* iterate through each monomial in right */
+     while (r->coeff.type != special) {
+          /* find place for this monomial in left */
+          for (; q->degree > r->degree; q1 = q, q = q->next);
+          if (r->degree == q->degree) {
+               printf("%d,%d\n",r->degree,q->degree);
+               /* sub coefficients */
+               sub_coefficients(&q->coeff, q->coeff, r->coeff);
+
+               /* remove zero coefficient */
+               if (coef_zero(q->coeff)) {
+                    q1->next = q->next;
+                    free_coefficient(&q->coeff);
+                    free(q);
+                    q = NULL;
+               }
+               /* advance right pointer */
+               r1 = r;
+               r = r->next;
+          }
+          else {
+               negate_coefficient(&r->coeff);
+               /* splice monomial */
+               q1->next = r;
+               q1 = r;
+               r = r->next;
+               r1->next = r;
+               q1->next = q;
+          }
+     }
+}
+
+int poly_neg(Polynomial p)
+{
+     return coef_neg(poly_lc(p));
 }
 
 void poly_content(Polynomial p)

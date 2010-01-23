@@ -57,12 +57,22 @@ void free_poly(Polynomial *p);
 void copy_poly(Polynomial *p, Polynomial s);
 
 void print_poly(Polynomial p);
+void print_poly2(Polynomial p);
+void print_poly3(Polynomial p);
+void print_poly_sign(Polynomial p);
 
 void add_monomial(Polynomial* p, int degree, Coefficient coef);
 void sub_monomial(Polynomial* p, int degree, Coefficient coef);
 
 /* general coefficient functions */
+/* print coefficient with its sign if negative */
 void print_coefficient(Coefficient c);
+/* print coefficient without its sign */
+void print_coefficient2(Coefficient c);
+/* print coefficient with sign always */
+void print_coefficient3(Coefficient c);
+/* print just sign */
+int print_coef_sign(Coefficient c);
 
 void copy_coefficient(Coefficient *c, Coefficient s);
 
@@ -70,6 +80,8 @@ void free_coefficient(Coefficient *c);
 
 int coef_zero(Coefficient c);
 int coef_one(Coefficient c);
+/* returns true for 1 or -1 */
+int coef_one2(Coefficient c);
 
 /* general coefficient arithmetic functions */
 void negate_coefficient(Coefficient *c);
@@ -82,9 +94,13 @@ void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
 
 void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power);
 
+int coef_neg(Coefficient c);
+
 /* polynomials */
 int poly_zero(Polynomial p);
 int poly_one(Polynomial p);
+/* returns true for 1 or -1 */
+int poly_one2(Polynomial p);
 
 int poly_deg(Polynomial p);
 const Coefficient poly_lc(Polynomial p);
@@ -107,8 +123,11 @@ void div_poly_rat(Polynomial *res, Polynomial left, BigRat right);
 
 void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power);
 
-/* more efficient way to add when we don't want to keep the RHS poly */
+/* more efficient way to add/sub when we don't want to keep the RHS poly */
 void poly_splice_add(Polynomial *left, Polynomial *right);
+void poly_splice_sub(Polynomial *left, Polynomial *right);
+
+int poly_neg(Polynomial p);
 
 /* content and primitive part */
 void poly_content(Polynomial p);

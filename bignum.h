@@ -42,7 +42,14 @@ BigNum make_zero_bignum(int length);
 
 void free_bignum(BigNum p);
 
+/* print with sign if negative */
 void print_bignum(BigNum p);
+/* print without sign */
+void print_bignum2(BigNum p);
+/* print with sign always */
+void print_bignum3(BigNum p);
+/* print just sign */
+void print_sign(BigNum p);
 
 void bignum_copy(BigNum *d, BigNum s);
 
@@ -80,5 +87,7 @@ void gcd2(BigNum *gcd, BigNum u, BigNum v);
 int bn_zero(BigNum u);
 /* true if bignum is equal to one */
 int bn_one(BigNum u);
+/* returns true for 1 or -1 */
+int bn_one2(BigNum u);
 
 #endif /* _BIGNUM_H_ */

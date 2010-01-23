@@ -95,7 +95,6 @@ void free_bignum(BigNum p)
 
 void print_bignum(BigNum p)
 {
-     int i = length(p);
      int negative = is_neg(p) && !bn_zero(p);
 
      if (!p) {
@@ -103,8 +102,20 @@ void print_bignum(BigNum p)
      }
 
      if (negative) {
-          printf("%c", '-');    /* print sign */
+          printf("%c", '-');
      }
+     
+     print_bignum2(p);
+}
+
+void print_bignum2(BigNum p)
+{
+     int i = length(p);
+
+     if (!p) {
+          return;
+     }
+
      /* skip zero digits */
      while (*(p+i) == 0 && i > 1) {
           --i;
@@ -115,6 +126,28 @@ void print_bignum(BigNum p)
           printf("%09u", *(p+i)); /* **TODO** fix to work with all
                                        digit sizes */
           --i;
+     }
+}
+
+void print_bignum3(BigNum p)
+{
+     print_sign(p);
+     print_bignum2(p);
+}
+
+void print_sign(BigNum p)
+{
+     int negative = is_neg(p) && !bn_zero(p);
+
+     if (!p) {
+          return;
+     }
+
+     if (negative) {
+          printf("%c", '-');
+     }
+     else {
+          printf("%c", '+');
      }
 }
 
@@ -948,6 +981,14 @@ int bn_zero(BigNum u)
 int bn_one(BigNum u)
 {
      if (real_length(u) == 1 && get_dig(u,0) == 1 && !is_neg(u)) {
+          return 1;
+     }
+     return 0;
+}
+
+int bn_one2(BigNum u)
+{
+     if (real_length(u) == 1 && get_dig(u,0) == 1) {
           return 1;
      }
      return 0;

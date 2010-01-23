@@ -26,7 +26,14 @@ void init_bigrat2(BigRat *f, SHORT_INT_T val);
 
 void free_bigrat(BigRat *f);
 
+/* print with sign ig negative */
 void print_bigrat(BigRat f);
+/* print bigrat without its sign */
+void print_bigrat2(BigRat f);
+/* print with sign */
+void print_bigrat3(BigRat f);
+/* print just sign */
+void print_br_sign(BigRat f);
 
 void bigrat_copy(BigRat *f, BigRat g);
 
@@ -45,5 +52,8 @@ void br_power(BigRat *res, BigRat p, SHORT_INT_T power);
 
 int br_zero(BigRat f);
 int br_one(BigRat f);
+/* returns true for 1 or -1 */
+int br_one2(BigRat f);
+int br_neg(BigRat f);
 
 #endif /* _BIGRAT_H_ */

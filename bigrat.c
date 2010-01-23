@@ -69,8 +69,37 @@ void print_bigrat(BigRat f)
      else {
           print_bignum(f.num);
           printf("/");
-          print_bignum(f.den);
+          print_bignum2(f.den);
      }
+}
+
+void print_bigrat2(BigRat f)
+{
+     if (bn_one(f.den)) {
+          print_bignum2(f.num);
+     }
+     else {
+          print_bignum2(f.num);
+          printf("/");
+          print_bignum2(f.den);
+     }
+}
+
+void print_bigrat3(BigRat f)
+{
+     if (bn_one(f.den)) {
+          print_bignum3(f.num);
+     }
+     else {
+          print_bignum3(f.num);
+          printf("/");
+          print_bignum2(f.den);
+     }
+}
+
+void print_br_sign(BigRat f)
+{
+     print_sign(f.num);
 }
 
 void bigrat_copy(BigRat *f, BigRat g)
@@ -241,5 +270,18 @@ int br_one(BigRat f)
           return 1;
      }
      return 0;
+}
+
+int br_one2(BigRat f)
+{
+     if (bn_one2(f.num) && bn_one(f.den)) {
+          return 1;
+     }
+     return 0;
+}
+
+int br_neg(BigRat f)
+{
+     return is_neg(f.num);
 }
 
