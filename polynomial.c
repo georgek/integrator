@@ -32,6 +32,13 @@ Polynomial make_one_poly(char variable)
      return t;
 }
 
+Polynomial make_mono_poly(char variable, int degree)
+{
+     Polynomial t = make_one_poly(variable);
+     t.head->next->degree = degree;
+     return t;
+}
+
 void free_poly(Polynomial *p)
 {
      MonoPtr q, r;
@@ -728,6 +735,43 @@ void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power)
 
      copy_poly(res, temp);
      free_poly(&temp);
+}
+
+void poly_splice_add(Polynomial *left, Polynomial *right)
+{
+     MonoPtr q, q1, r, r1;
+     
+     if (left->variable != right->variable) {
+          printf("Error! Polynomials are in different variables.\n");
+          return;
+     }
+
+     q1 = left->head;
+     q = q1->next;
+
+     r1 = right->head;
+     r = r1->next;
+
+     /* iterate through each monomial in right */
+     while (r->coeff.type != special) {
+          /* find place for this monomial in left */
+          for (; q->degree > r->degree; q1 = q, q = q->next);
+          if (r->degree == q->degree) {
+               /* add coefficients */
+               add_coefficients(&q->coeff, q->coeff, r->coeff);
+               /* advance right pointer */
+               r1 = r;
+               r = r->next;
+          }
+          else {
+               /* splice monomial */
+               q1->next = r;
+               q1 = r;
+               r = r->next;
+               r1->next = r;
+               q1->next = q;
+          }
+     }
 }
 
 void poly_content(Polynomial p)

@@ -49,6 +49,9 @@ typedef struct monomial
 Polynomial make_zero_poly(char variable);
 Polynomial make_one_poly(char variable);
 
+/* makes a polynomial with one unit monomial */
+Polynomial make_mono_poly(char variable, int degree);
+
 void free_poly(Polynomial *p);
 
 void copy_poly(Polynomial *p, Polynomial s);
@@ -103,6 +106,9 @@ void mul_poly_rat(Polynomial *res, Polynomial left, BigRat right);
 void div_poly_rat(Polynomial *res, Polynomial left, BigRat right);
 
 void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power);
+
+/* more efficient way to add when we don't want to keep the RHS poly */
+void poly_splice_add(Polynomial *left, Polynomial *right);
 
 /* content and primitive part */
 void poly_content(Polynomial p);
