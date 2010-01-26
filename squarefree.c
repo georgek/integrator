@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 #include "bigrat.h"
+#include "coef_array.h"
 #include "euclidean.h"
 #include "polynomial.h"
 #include "prs.h"

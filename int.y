@@ -34,6 +34,7 @@ node_type *root = NULL;         /* root of parse tree */
 %token <var> VARIABLE
 %token LN EXP COS SIN TAN EVAL DIFF
 
+%left ','
 %left '+' '-'
 %left '*'
 %left '/'
@@ -53,10 +54,15 @@ statement:      expression
                              root = $1;
                              simple_simplify(&root);
                              extract_polys(&root);
+                             printf("Input:\n");
                              print_prefix(root);
                              print_postfix(root);
                              print_prefix_lisp(root);
                              print_infix(root);
+                             /* printf("Squarefree factorisation:\n"); */
+                             /* SquarefreeI(root); */
+                             printf("GCD:\n");
+                             GCDI(root);
                              free_tree(root);
                              root = NULL;
                         }
@@ -93,6 +99,10 @@ expression:     expression '+' expression
         |       expression '^' expression
                         {
                              $$ = add_op2('^', $1, $3);
+                        }
+        |       expression ',' expression
+                        {
+                             $$ = add_op2(',', $1, $3);
                         }
         |       LN '(' expression ')'
                         {

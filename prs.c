@@ -201,7 +201,7 @@ void SubResultantGCD(Polynomial *gcd, Polynomial A, Polynomial B)
 
      copy_poly(gcd, a);
      /* make monic, only works for rational coefs TODO */
-     div_poly_rat(gcd, *gcd, poly_lc(a).u.rat);
+     /* div_poly_rat(gcd, *gcd, poly_lc(a).u.rat); */
 
      free_poly(&Q);
      free_coefficient(&beta);
@@ -212,3 +212,21 @@ void SubResultantGCD(Polynomial *gcd, Polynomial A, Polynomial B)
      free_coefficient(&c);
 }
 
+void GCDI(node_type *root)
+{
+     Polynomial res = {'x', NULL};
+     
+     /* input must be two polynomials */
+     if (root->type != op2_type || root->u.op2.operator != ','
+         || root->u.op2.operand1->type != poly_type
+         || root->u.op2.operand2->type != poly_type) {
+          printf("Error. Input to GCD must be two polynomials.\n");
+          return;
+     }
+
+     SubResultantGCD(&res, root->u.op2.operand1->u.poly.poly,
+                     root->u.op2.operand2->u.poly.poly);
+     print_poly(res);
+     printf("\n");
+     free_poly(&res);
+}

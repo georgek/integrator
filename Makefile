@@ -36,7 +36,7 @@ coef_array.o:	coef_array.h polynomial.h
 
 prs.o:		prs.h coef_array.h polynomial.h
 
-squarefree.o:	squarefree.h
+squarefree.o:	squarefree.h coef_array.h polynomial.h
 
 .PHONY: clean
 clean:	
