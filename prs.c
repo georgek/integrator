@@ -215,18 +215,37 @@ void SubResultantGCD(Polynomial *gcd, Polynomial A, Polynomial B)
 void GCDI(node_type *root)
 {
      Polynomial res = {'x', NULL};
+     BigNum res2 = NULL;
      
-     /* input must be two polynomials */
-     if (root->type != op2_type || root->u.op2.operator != ','
-         || root->u.op2.operand1->type != poly_type
-         || root->u.op2.operand2->type != poly_type) {
-          printf("Error. Input to GCD must be two polynomials.\n");
+     if (root->type != op2_type || root->u.op2.operator != ',') {
+          printf("Error. GCD requires two inputs.\n");
           return;
      }
 
-     SubResultantGCD(&res, root->u.op2.operand1->u.poly.poly,
-                     root->u.op2.operand2->u.poly.poly);
-     print_poly(res);
-     printf("\n");
-     free_poly(&res);
+     if (root->u.op2.operand1->type == poly_type
+         && root->u.op2.operand2->type == poly_type) {
+          /* polynomials */
+          SubResultantGCD(&res, root->u.op2.operand1->u.poly.poly,
+                          root->u.op2.operand2->u.poly.poly);
+          print_poly(res);
+          printf("\n");
+          free_poly(&res);
+     }
+     else if (root->u.op2.operand1->type == rat_type
+              && root->u.op2.operand2->type == rat_type
+              && bn_one(root->u.op2.operand1->u.rat.value.den)
+              && bn_one(root->u.op2.operand2->u.rat.value.den)) {
+          /* integers */
+          gcd(&res2, root->u.op2.operand1->u.rat.value.num,
+              root->u.op2.operand2->u.rat.value.num);
+          print_bignum(res2);
+          printf("\n");
+          free_bignum(res2);
+          res2 = NULL;
+     }
+     else {
+          printf("Error. Input to GCD should be two polynomials "
+                 "or two integers.\n");
+          return;
+     }
 }
