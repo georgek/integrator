@@ -53,12 +53,12 @@ statement:      expression
                         {
                              root = $1;
                              simple_simplify(&root);
-                             extract_polys(&root);
                              printf("Input:\n");
                              print_prefix(root);
                              print_postfix(root);
                              print_prefix_lisp(root);
                              print_infix(root);
+                             extract_polys(&root);
                              /* printf("Squarefree factorisation:\n"); */
                              /* SquarefreeI(root); */
                              printf("GCD:\n");
