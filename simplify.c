@@ -252,6 +252,19 @@ void extract_polys(node_type **root)
                }
                break;
 
+          case '/':
+               if (r->u.op2.operand1->type == poly_type
+                   && r->u.op2.operand2->type == rat_type) {
+                    /* poly / rat = poly */
+                    div_poly_rat(&r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand1->u.poly.poly,
+                                 r->u.op2.operand2->u.rat.value);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               break;
+
           case '+':
                if (r->u.op2.operand1->type == poly_type
                    && r->u.op2.operand2->type == poly_type) {
