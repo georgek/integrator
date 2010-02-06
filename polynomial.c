@@ -410,6 +410,24 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
      free_coefficient(&old_res);
 }
 
+void coef_gcd(Coefficient *res, Coefficient a, Coefficient b)
+{
+     if (a.type == rational && b.type == rational) {
+          res->type = rational;
+          res->u.rat.den = make_bignum2(1);
+          if (br_int(a.u.rat) && br_int(b.u.rat)) {
+               gcd(&res->u.rat.num, a.u.rat.num, b.u.rat.num);
+          }
+          else {
+               /* just return 1 for the gcd of rationals */
+               res->u.rat.num = make_bignum2(1);
+          }
+     }
+     else {
+          printf("Coefficient GCD not fully implemented.\n");
+     }
+}
+
 int coef_neg(Coefficient c)
 {
      switch (c.type) {

@@ -94,6 +94,8 @@ void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
 
 void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power);
 
+void coef_gcd(Coefficient *res, Coefficient a, Coefficient b);
+
 int coef_neg(Coefficient c);
 
 /* polynomials */
