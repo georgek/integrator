@@ -101,6 +101,10 @@ void print_poly2(Polynomial p)
           if (!coef_one2(m->coeff) || m->degree == 0) {
                print_coefficient2(m->coeff);
           }
+          /* coefficient and variable printed? */
+          if (!coef_one2(m->coeff) && m->degree != 0) {
+               printf("*");
+          }
           /* print variable if degree > 0 */
           if (m->degree > 1) {
                printf("%c^%d", p.variable, m->degree);
