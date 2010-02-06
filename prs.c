@@ -203,6 +203,9 @@ void SubResultantGCD(Polynomial *gcd, Polynomial A, Polynomial B)
      /* make monic, only works for rational coefs TODO */
      /* div_poly_rat(gcd, *gcd, poly_lc(a).u.rat); */
 
+     /* make primitive */
+     poly_pp(gcd, *gcd);
+
      free_poly(&Q);
      free_coefficient(&beta);
      free_coefficient(&gamma);

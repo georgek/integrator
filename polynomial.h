@@ -132,8 +132,8 @@ void poly_splice_sub(Polynomial *left, Polynomial *right);
 int poly_neg(Polynomial p);
 
 /* content and primitive part */
-void poly_content(Polynomial p);
-void poly_pp(Polynomial p);
+void poly_content(Coefficient *cont, Polynomial p);
+void poly_pp(Polynomial *pp, Polynomial p);
 
 void poly_differentiate(Polynomial *pd, Polynomial p);
 void poly_integrate(Polynomial *pi, Polynomial p);

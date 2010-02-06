@@ -970,14 +970,51 @@ int poly_neg(Polynomial p)
      return coef_neg(poly_lc(p));
 }
 
-void poly_content(Polynomial p)
+void poly_content(Coefficient *cont, Polynomial p)
 {
-     
+     Coefficient old_res = *cont;
+
+     MonoPtr q, r;
+
+     if (poly_zero(p)) {
+          cont->type = rational;
+          cont->u.rat = make_bigrat3(0);
+          free_coefficient(&old_res);
+          return;
+     }
+
+     q = p.head->next;
+     r = q->next;
+     if (r->coeff.type == special) {
+          /* only one coefficient */
+          copy_coefficient(cont, q->coeff);
+          free_coefficient(&old_res);
+          return;
+     }
+
+     coef_gcd(cont, q->coeff, r->coeff);
+
+     for (q = r->next; q->coeff.type != special; q = q->next) {
+          coef_gcd(cont, *cont, q->coeff);
+     }
+
+     free_coefficient(&old_res);
 }
 
-void poly_pp(Polynomial p)
+void poly_pp(Polynomial *pp, Polynomial p)
 {
+     Coefficient content = {special};
 
+     poly_content(&content, p);
+
+     if (content.type == rational) {
+          div_poly_rat(pp, p, content.u.rat);
+     }
+     else {
+          printf("Polynomial coefficients not supported.\n");
+     }
+
+     free_coefficient(&content);
 }
 
 void poly_differentiate(Polynomial *pd, Polynomial p)
