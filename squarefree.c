@@ -79,3 +79,37 @@ void Squarefree(CoefArray *f, Polynomial A)
      mul_coefficients(f->head, *f->head, c);
 }
 
+void SquarefreeI(node_type *root)
+{
+     CoefArray arr;
+     int i;
+     
+     /* input must be one polynomial */
+     if (root->type != poly_type) {
+          printf("Error. Input to Squarefree must be a polynomial.\n");
+          return;
+     }
+
+     arr = new_coef_array();
+
+     Squarefree(&arr, root->u.poly.poly);
+
+     for (i = 0; i < arr.size; ++i) {
+          if (coef_one(ca_get(&arr, i))) {
+               continue;
+          }
+          print_coefficient(ca_get(&arr, i));
+          if (i > 0) {
+               printf("^%u", i+1);
+          }
+          if (i != arr.size-1) {
+               printf("*");
+          }
+          else {
+               printf("\n");
+          }
+     }
+
+     ca_free(&arr);
+}
+
