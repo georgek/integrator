@@ -285,3 +285,8 @@ int br_neg(BigRat f)
      return is_neg(f.num);
 }
 
+int br_int(BigRat f)
+{
+     return bn_one(f.den);
+}
+

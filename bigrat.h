@@ -55,5 +55,7 @@ int br_one(BigRat f);
 /* returns true for 1 or -1 */
 int br_one2(BigRat f);
 int br_neg(BigRat f);
+/* returns true if the bigrat is an integer */
+int br_int(BigRat f);
 
 #endif /* _BIGRAT_H_ */
