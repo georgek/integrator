@@ -307,8 +307,20 @@ void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      if (left.type == rational && right.type == rational) {
           rat_coef_op(res, left, right, &add_bigrats);
      }
+     else if (left.type == polynomial && right.type == polynomial) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          add_polynomials(&res->u.poly, left.u.poly, right.u.poly);
+     }
+     else if (left.type == polynomial && right.type == rational) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          add_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
+     }
      else {
-          printf("Warning! Adding coefficients not fully implemented!\n"); /* TODO */
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          add_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
      }
      free_coefficient(&old_res);
 }
@@ -319,8 +331,20 @@ void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right)
      if (left.type == rational && right.type == rational) {
           rat_coef_op(res, left, right, &sub_bigrats);
      }
+     else if (left.type == polynomial && right.type == polynomial) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          sub_polynomials(&res->u.poly, left.u.poly, right.u.poly);
+     }
+     else if (left.type == polynomial && right.type == rational) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          sub_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
+     }
      else {
-          printf("Warning! Subbing coefficients not fully implemented!\n"); /* TODO */
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          sub_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
      }
      free_coefficient(&old_res);
 }
@@ -342,7 +366,9 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           mul_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
      else {
-          printf("Warning! Muling coefficients not fully implemented!\n"); /* TODO */
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          mul_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
      }
      free_coefficient(&old_res);
 }
@@ -592,14 +618,31 @@ void add_polynomials(Polynomial *res, Polynomial left, Polynomial right)
 {
      Polynomial old_res;
      MonoPtr p;
-     
-     if (left.variable != right.variable) {
-          printf("Error! Multivariate polynomials are not supported yet.\n");
-          return;
-     }
+     Coefficient t;
 
      old_res = *res;
 
+     /* different variables */
+     if (left.variable < right.variable) {
+          *res = make_zero_poly('x');
+          copy_poly(res, left);
+          t.type = polynomial;
+          t.u.poly = right;
+          add_monomial(res, 0, t);
+          free_poly(&old_res);
+          return;
+     }
+     else if (right.variable < left.variable) {
+          *res = make_zero_poly('x');
+          copy_poly(res, right);
+          t.type = polynomial;
+          t.u.poly = left;
+          add_monomial(res, 0, t);
+          free_poly(&old_res);
+          return;
+     }
+
+     /* same variable */
      *res = make_zero_poly(left.variable);
 
      for (p = left.head->next; p->coeff.type != special; p = p->next) {
@@ -644,13 +687,36 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
      MonoPtr p, q;
      Coefficient t;
      t.type = special;
-     
-     if (left.variable != right.variable) {
-          printf("Error! Multivariate polynomials not supported yet.\n");
+
+     old_res = *res;
+
+     /* different variables */
+     if (left.variable < right.variable) {
+          *res = make_zero_poly('x');
+          copy_poly(res, left);
+          t.type = polynomial;
+          t.u.poly = right;
+
+          for (p = res->head->next; p->coeff.type != special; p = p->next) {
+               mul_coefficients(&p->coeff, p->coeff, t);
+          }
+          free_poly(&old_res);
+          return;
+     }
+     else if (right.variable < left.variable) {
+          *res = make_zero_poly('x');
+          copy_poly(res, right);
+          t.type = polynomial;
+          t.u.poly = left;
+
+          for (p = res->head->next; p->coeff.type != special; p = p->next) {
+               mul_coefficients(&p->coeff, p->coeff, t);
+          }
+          free_poly(&old_res);
           return;
      }
 
-     old_res = *res;
+     /* polynomials of same variable */
 
      *res = make_zero_poly(left.variable);
 
@@ -661,6 +727,7 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
           }
      }
 
+     free_coefficient(&t);
      /* free old result */
      free_poly(&old_res);
 }
@@ -879,7 +946,7 @@ void poly_splice_add(Polynomial *left, Polynomial *right)
      MonoPtr q, q1, r, r1;
      
      if (left->variable != right->variable) {
-          printf("Error! Multivariate polynomials are not supported yet.\n");
+          add_polynomials(left, *left, *right);
           return;
      }
 
