@@ -17,12 +17,13 @@ void Squarefree(CoefArray *f, Polynomial A)
      Polynomial Z = {'x', NULL}, At = {'x', NULL};
      /* unsigned i = 1; */
 
-     /* c <-- content(A), this works for rational coefs
-      * TODO polynomial coefficients too */
-     c.type = rational;
-     init_bigrat2(&c.u.rat, 1);
-     /* S <-- pp(A), again rational coefs only TODO */
-     copy_poly(&S, A);
+     /* c <-- content(A) */
+     poly_content(&c, A);
+     /* printf("c = "); */
+     /* print_coefficient(c); */
+     /* printf("\n"); */
+     /* S <-- pp(A) */
+     poly_pp(&S, A);
      poly_differentiate(&Sd, S);
      /* printf("S' = "); */
      /* print_poly(Sd); */
