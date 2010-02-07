@@ -205,6 +205,10 @@ void SubResultantGCD(Polynomial *gcd, Polynomial A, Polynomial B)
 
      /* make primitive */
      poly_pp(gcd, *gcd);
+     /* take the positive gcd */
+     if (poly_neg(*gcd)) {
+          negate_polynomial(gcd);
+     }
 
      free_poly(&Q);
      free_coefficient(&beta);
