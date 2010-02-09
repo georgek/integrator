@@ -466,6 +466,40 @@ int coef_neg(Coefficient c)
      }
 }
 
+BigRat coef_rat_part(Coefficient c)
+{
+     BigRat r = {NULL, NULL}, t = {NULL, NULL};
+     MonoPtr p, q;
+     
+     switch (c.type) {
+     case rational:
+          return make_bigrat2(c.u.rat.den);
+     case polynomial:
+          p = c.u.poly.head->next;
+          q = p->next;
+          if (p->coeff.type == special) { /* zero */
+               return make_bigrat3(0);
+          }
+          if (q->coeff.type == special) { /* one coefficient */
+               return make_bigrat2(p->coeff.u.rat.den);
+          }
+          /* at least two coefficients */
+          init_bigrat(&r);
+          gcd(&t.num, p->coeff.u.rat.den, q->coeff.u.rat.den);
+          mul_bignums(&r.num, p->coeff.u.rat.den, q->coeff.u.rat.den);
+          div_bignums(&r.num, &t.den, r.num, t.num);
+          for (p = q->next; p->coeff.type != special; p = p->next) {
+               gcd(&t.num, r.num, p->coeff.u.rat.den);
+               mul_bignums(&r.num, r.num, p->coeff.u.rat.den);
+               div_bignums(&r.num, &t.den, r.num, t.num);
+          }
+          free_bigrat(&t);
+          return r;
+     default:
+          return r;
+     }
+}
+
 int poly_zero(Polynomial p)
 {
      if (p.head->next->coeff.type == special) {
@@ -1115,6 +1149,14 @@ void poly_integrate(Polynomial *pi, Polynomial p)
           /* increase power by one and divide by new power */
           div_coefficients2(&q->coeff, q->coeff, ++q->degree);
      }
+}
+
+BigRat poly_rat_part(Polynomial p)
+{
+     Coefficient c;
+     c.type = polynomial;
+     c.u.poly = p;
+     return coef_rat_part(c);
 }
 
 /* common part of coefficient arithmetic for rationals */

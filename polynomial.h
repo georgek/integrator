@@ -98,6 +98,8 @@ void coef_gcd(Coefficient *res, Coefficient a, Coefficient b);
 
 int coef_neg(Coefficient c);
 
+BigRat coef_rat_part(Coefficient c);
+
 /* polynomials */
 int poly_zero(Polynomial p);
 int poly_one(Polynomial p);
@@ -137,5 +139,8 @@ void poly_pp(Polynomial *pp, Polynomial p);
 
 void poly_differentiate(Polynomial *pd, Polynomial p);
 void poly_integrate(Polynomial *pi, Polynomial p);
+
+/* rational part of polynomial ie. lcm of coef denominators */
+BigRat poly_rat_part(Polynomial p);
 
 #endif /* _POLYNOMIAL_H_ */
