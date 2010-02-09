@@ -4,6 +4,7 @@
 
 #include "polynomial.h"
 #include "bigrat.h"
+#include "prs.h"
 
 static void rat_coef_op(Coefficient *res, Coefficient left, Coefficient right,
                         void (*op_fun)(BigRat*, BigRat, BigRat));
@@ -402,7 +403,9 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           div_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
      else {
-          printf("Warning! Diving coefficients not fully implemented!\n"); /* TODO */
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          exact_div_polynomials(&res->u.poly, left.u.poly, right.u.poly);
      }
      free_coefficient(&old_res);
 }
@@ -438,9 +441,11 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
 
 void coef_gcd(Coefficient *res, Coefficient a, Coefficient b)
 {
+     Coefficient old_res = *res;
      if (a.type == rational && b.type == rational) {
           res->type = rational;
           res->u.rat.den = make_bignum2(1);
+          res->u.rat.num = NULL;
           if (br_int(a.u.rat) && br_int(b.u.rat)) {
                gcd(&res->u.rat.num, a.u.rat.num, b.u.rat.num);
           }
@@ -449,9 +454,15 @@ void coef_gcd(Coefficient *res, Coefficient a, Coefficient b)
                res->u.rat.num = make_bignum2(1);
           }
      }
+     else if (a.type == polynomial && b.type == polynomial) {
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          SubResultantGCD(&res->u.poly, a.u.poly, b.u.poly);
+     }
      else {
           printf("Coefficient GCD not fully implemented.\n");
      }
+     free_coefficient(&old_res);
 }
 
 int coef_neg(Coefficient c)
@@ -1089,7 +1100,6 @@ void poly_content(Coefficient *cont, Polynomial p)
      if (r->coeff.type == special) {
           /* only one coefficient */
           copy_coefficient(cont, q->coeff);
-          free_coefficient(&old_res);
           return;
      }
 
@@ -1097,6 +1107,11 @@ void poly_content(Coefficient *cont, Polynomial p)
 
      for (q = r->next; q->coeff.type != special; q = q->next) {
           coef_gcd(cont, *cont, q->coeff);
+     }
+
+     if (cont->type == polynomial) {
+          printf("Warning! Poly content probably doesn't work for "
+                 "multivariate polynomials!\n");
      }
 
      free_coefficient(&old_res);
