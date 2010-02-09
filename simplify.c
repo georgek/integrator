@@ -304,7 +304,7 @@ void extract_polys(node_type **root)
           case '-':
                if (r->u.op2.operand1->type == poly_type
                    && r->u.op2.operand2->type == poly_type) {
-                    /* poly + poly = poly */
+                    /* poly - poly = poly */
                     poly_splice_sub(&r->u.op2.operand1->u.poly,
                                     &r->u.op2.operand2->u.poly);
                     *root = r->u.op2.operand1;
@@ -315,7 +315,7 @@ void extract_polys(node_type **root)
                 * by splicing */
                else if (r->u.op2.operand1->type == poly_type
                         && r->u.op2.operand2->type == rat_type) {
-                    /* poly + rat = poly */
+                    /* poly - rat = poly */
                     sub_poly_rat(&r->u.op2.operand1->u.poly,
                                  r->u.op2.operand1->u.poly,
                                  r->u.op2.operand2->u.rat);
@@ -325,10 +325,11 @@ void extract_polys(node_type **root)
                }
                else if (r->u.op2.operand1->type == rat_type
                         && r->u.op2.operand2->type == poly_type) {
-                    /* rat + poly = poly */
+                    /* rat - poly = poly */
                     sub_poly_rat(&r->u.op2.operand2->u.poly,
                                  r->u.op2.operand2->u.poly,
                                  r->u.op2.operand1->u.rat);
+                    negate_polynomial(&r->u.op2.operand2->u.poly);
                     *root = r->u.op2.operand2;
                     r->u.op2.operand2 = NULL;
                     free_tree(r);
@@ -404,6 +405,26 @@ void extract_ratfuns(node_type **root)
                     free_tree(r);
                }
                else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == poly_type) {
+                    /* ratfun * poly = ratfun */
+                    mul_ratfun_poly(&r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand2->u.poly);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == poly_type
+                        && r->u.op2.operand2->type == ratfun_type) {
+                    /* poly * ratfun = ratfun */
+                    mul_ratfun_poly(&r->u.op2.operand2->u.ratfun,
+                                    r->u.op2.operand2->u.ratfun,
+                                    r->u.op2.operand1->u.poly);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
                         && r->u.op2.operand2->type == ratfun_type) {
                     /* ratfun * ratfun = ratfun */
                     mul_ratfuns(&r->u.op2.operand1->u.ratfun,
@@ -436,21 +457,21 @@ void extract_ratfuns(node_type **root)
                     free_tree(r);
                }
                else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == poly_type) {
+                    /* ratfun / poly = ratfun */
+                    div_ratfun_poly(&r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand2->u.poly);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
                         && r->u.op2.operand2->type == rat_type) {
                     /* ratfun / rat = ratfun */
                     div_ratfun_rat(&r->u.op2.operand1->u.ratfun,
                                    r->u.op2.operand1->u.ratfun,
                                    r->u.op2.operand2->u.rat);
-                    *root = r->u.op2.operand1;
-                    r->u.op2.operand1 = NULL;
-                    free_tree(r);
-               }
-               else if (r->u.op2.operand1->type == rat_type
-                        && r->u.op2.operand2->type == ratfun_type) {
-                    /* rat / ratfun = ratfun */
-                    div_ratfun_rat(&r->u.op2.operand1->u.ratfun,
-                                   r->u.op2.operand2->u.ratfun,
-                                   r->u.op2.operand1->u.rat);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -466,6 +487,26 @@ void extract_ratfuns(node_type **root)
                                 r->u.op2.operand2->u.ratfun);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == poly_type) {
+                    /* ratfun + poly = ratfun */
+                    add_ratfun_poly(&r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand2->u.poly);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == poly_type
+                        && r->u.op2.operand2->type == ratfun_type) {
+                    /* poly + ratfun = ratfun */
+                    add_ratfun_poly(&r->u.op2.operand2->u.ratfun,
+                                    r->u.op2.operand2->u.ratfun,
+                                    r->u.op2.operand1->u.poly);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
                     free_tree(r);
                }
                else if (r->u.op2.operand1->type == ratfun_type
@@ -502,6 +543,27 @@ void extract_ratfuns(node_type **root)
                     free_tree(r);
                }
                else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == poly_type) {
+                    /* ratfun - poly = ratfun */
+                    sub_ratfun_poly(&r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand1->u.ratfun,
+                                    r->u.op2.operand2->u.poly);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == poly_type
+                        && r->u.op2.operand2->type == ratfun_type) {
+                    /* poly - ratfun = ratfun */
+                    sub_ratfun_poly(&r->u.op2.operand2->u.ratfun,
+                                    r->u.op2.operand2->u.ratfun,
+                                    r->u.op2.operand1->u.poly);
+                    negate_ratfun(&r->u.op2.operand2->u.ratfun);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
                         && r->u.op2.operand2->type == rat_type) {
                     /* ratfun - rat = ratfun */
                     sub_ratfun_rat(&r->u.op2.operand1->u.ratfun,
@@ -517,6 +579,7 @@ void extract_ratfuns(node_type **root)
                     sub_ratfun_rat(&r->u.op2.operand2->u.ratfun,
                                    r->u.op2.operand2->u.ratfun,
                                    r->u.op2.operand1->u.rat);
+                    negate_ratfun(&r->u.op2.operand2->u.ratfun);
                     *root = r->u.op2.operand2;
                     r->u.op2.operand2 = NULL;
                     free_tree(r);

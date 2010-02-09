@@ -32,6 +32,11 @@ void negate_ratfun(RatFun *r);
 
 void ratfun_power(RatFun *res, RatFun p, SHORT_INT_T power);
 
+void add_ratfun_poly(RatFun *res, RatFun left, Polynomial right);
+void sub_ratfun_poly(RatFun *res, RatFun left, Polynomial right);
+void mul_ratfun_poly(RatFun *res, RatFun left, Polynomial right);
+void div_ratfun_poly(RatFun *res, RatFun left, Polynomial right);
+
 void add_ratfun_rat(RatFun *res, RatFun left, BigRat right);
 void sub_ratfun_rat(RatFun *res, RatFun left, BigRat right);
 void mul_ratfun_rat(RatFun *res, RatFun left, BigRat right);

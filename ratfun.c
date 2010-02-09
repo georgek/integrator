@@ -146,6 +146,86 @@ void ratfun_power(RatFun *res, RatFun p, SHORT_INT_T power)
      canonicalise_ratfun(res);
 }
 
+void add_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
+{
+     RatFun t;
+     Coefficient tc;
+     tc.type = polynomial;
+     tc.u.poly = right;
+
+     /* use t.num and t.den to hold temporary values */
+     mul_coefficients(&t.den, left.den, tc);
+
+     /* w = uv' + u'v */
+     add_coefficients(&t.num, left.num, t.den);
+     /* w' = u'v' */
+     t.den.type = special;
+     copy_coefficient(&t.den, left.den);
+
+     canonicalise_ratfun(&t);
+
+     free_ratfun(res);
+     res->num = t.num;
+     res->den = t.den;
+}
+
+void sub_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
+{
+     RatFun t;
+     Coefficient tc;
+     tc.type = polynomial;
+     tc.u.poly = right;
+
+     /* use t.num and t.den to hold temporary values */
+     mul_coefficients(&t.den, left.den, tc);
+
+     /* w = uv' - u'v */
+     sub_coefficients(&t.num, left.num, t.den);
+     /* w' = u'v' */
+     t.den.type = special;
+     copy_coefficient(&t.den, left.den);
+
+     canonicalise_ratfun(&t);
+
+     free_ratfun(res);
+     res->num = t.num;
+     res->den = t.den;
+}
+
+void mul_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
+{
+     RatFun t;
+     Coefficient tc;
+     tc.type = polynomial;
+     tc.u.poly = right;
+
+     mul_coefficients(&t.num, left.num, tc);
+     t.den.type = special;
+     copy_coefficient(&t.den, left.den);
+     canonicalise_ratfun(&t);
+
+     free_ratfun(res);
+     res->num = t.num;
+     res->den = t.den;
+}
+
+void div_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
+{
+     RatFun t;
+     Coefficient tc;
+     tc.type = polynomial;
+     tc.u.poly = right;
+
+     mul_coefficients(&t.den, left.den, tc);
+     t.num.type = special;
+     copy_coefficient(&t.num, left.num);
+     canonicalise_ratfun(&t);
+
+     free_ratfun(res);
+     res->num = t.num;
+     res->den = t.den;
+}
+
 void add_ratfun_rat(RatFun *res, RatFun left, BigRat right)
 {
      RatFun t;
