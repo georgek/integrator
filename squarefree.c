@@ -7,6 +7,7 @@
 #include "polynomial.h"
 #include "prs.h"
 #include "squarefree.h"
+#include "tree.h"
 
 void Squarefree(CoefArray *f, Polynomial A)
 {
@@ -93,7 +94,7 @@ void SquarefreeI(node_type *root)
 
      arr = new_coef_array();
 
-     Squarefree(&arr, root->u.poly.poly);
+     Squarefree(&arr, root->u.poly);
 
      for (i = 0; i < arr.size; ++i) {
           if (coef_one(ca_get(&arr, i))) {

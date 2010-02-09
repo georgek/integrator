@@ -1,5 +1,6 @@
 #include <stdio.h>
 
+#include "tree.h"
 #include "prs.h"
 
 void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
@@ -232,19 +233,19 @@ void GCDI(node_type *root)
      if (root->u.op2.operand1->type == poly_type
          && root->u.op2.operand2->type == poly_type) {
           /* polynomials */
-          SubResultantGCD(&res, root->u.op2.operand1->u.poly.poly,
-                          root->u.op2.operand2->u.poly.poly);
+          SubResultantGCD(&res, root->u.op2.operand1->u.poly,
+                          root->u.op2.operand2->u.poly);
           print_poly(res);
           printf("\n");
           free_poly(&res);
      }
      else if (root->u.op2.operand1->type == rat_type
               && root->u.op2.operand2->type == rat_type
-              && bn_one(root->u.op2.operand1->u.rat.value.den)
-              && bn_one(root->u.op2.operand2->u.rat.value.den)) {
+              && bn_one(root->u.op2.operand1->u.rat.den)
+              && bn_one(root->u.op2.operand2->u.rat.den)) {
           /* integers */
-          gcd(&res2, root->u.op2.operand1->u.rat.value.num,
-              root->u.op2.operand2->u.rat.value.num);
+          gcd(&res2, root->u.op2.operand1->u.rat.num,
+              root->u.op2.operand2->u.rat.num);
           print_bignum(res2);
           printf("\n");
           free_bignum(res2);
