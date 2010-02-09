@@ -4,7 +4,7 @@ YACC = bison -y -d -v
 CC = gcc -g -Wall -ansi -pedantic -D_POSIX_SOURCE
 
 objects = tree.o simplify.o bignum.o bigrat.o polynomial.o euclidean.o \
-		coef_array.o prs.o squarefree.o
+		coef_array.o prs.o squarefree.o ratfun.o
 
 integrator:	$(objects) y.tab.o lex.yy.o
 		$(CC) -o integrator $(objects) y.tab.o lex.yy.o -ly -lfl -lm
@@ -34,9 +34,11 @@ euclidean.o:	euclidean.h polynomial.h
 
 coef_array.o:	coef_array.h polynomial.h
 
-prs.o:		prs.h coef_array.h polynomial.h
+prs.o:		prs.h coef_array.h polynomial.h tree.h
 
-squarefree.o:	squarefree.h coef_array.h polynomial.h
+squarefree.o:	squarefree.h coef_array.h polynomial.h tree.h
+
+ratfun.o:	ratfun.h polynomial.h bigrat.h
 
 .PHONY: clean
 clean:	

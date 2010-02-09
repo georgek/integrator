@@ -7,6 +7,7 @@
 #include "simplify.h"
 #include "y.tab.h"
 #include "polynomial.h"
+#include "ratfun.h"
 
 /* this function performs a simplficiation (ie. replacing 3*2 with 5
  * etc.) and reduces the tree into rationals and polynomials if
@@ -360,6 +361,187 @@ void extract_polys(node_type **root)
      default:
           break;
      }
-     
 }
 
+void extract_ratfuns(node_type **root)
+{
+     node_type *r = *root;
+
+     switch (r->type) {
+     case op2_type:
+          extract_ratfuns(&r->u.op2.operand1);
+          extract_ratfuns(&r->u.op2.operand2);
+
+          switch (r->u.op2.operator) {
+          case '^':
+               if (r->u.op2.operand1->type == ratfun_type
+                   && r->u.op2.operand2->type == rat_type) {
+                    /* ratfun ^ rat = ratfun */
+                    if (real_length(r->u.op2.operand2->u.rat.num)
+                        != 1) {
+                         printf("Error! Multiple precision indices are not "
+                                "supported!\n");
+                         exit(1);
+                    }
+                    ratfun_power(&r->u.op2.operand1->u.ratfun,
+                                 r->u.op2.operand1->u.ratfun,
+                                 *(r->u.op2.operand2->u.rat.num+1));
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               break;
+               
+          case '*':
+               if (r->u.op2.operand1->type == rat_type
+                   && r->u.op2.operand2->type == ratfun_type) {
+                    /* rat * ratfun = ratfun */
+                    mul_ratfun_rat(&r->u.op2.operand2->u.ratfun,
+                                   r->u.op2.operand2->u.ratfun,
+                                   r->u.op2.operand1->u.rat);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == ratfun_type) {
+                    /* ratfun * ratfun = ratfun */
+                    mul_ratfuns(&r->u.op2.operand1->u.ratfun,
+                                r->u.op2.operand1->u.ratfun,
+                                r->u.op2.operand2->u.ratfun);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == rat_type) {
+                    /* ratfun * rat = ratfun */
+                    mul_ratfun_rat(&r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand2->u.rat);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               break;
+
+          case '/':
+               if (r->u.op2.operand1->type == poly_type
+                   && r->u.op2.operand2->type == poly_type) {
+                    /* poly / poly = ratfun */
+                    *root = add_ratfun(r->u.op2.operand1->u.poly,
+                                       r->u.op2.operand2->u.poly);
+                    r->u.op2.operand1->u.poly.head = NULL;
+                    r->u.op2.operand2->u.poly.head = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == rat_type) {
+                    /* ratfun / rat = ratfun */
+                    div_ratfun_rat(&r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand2->u.rat);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == rat_type
+                        && r->u.op2.operand2->type == ratfun_type) {
+                    /* rat / ratfun = ratfun */
+                    div_ratfun_rat(&r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand2->u.ratfun,
+                                   r->u.op2.operand1->u.rat);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               break;
+
+          case '+':
+               if (r->u.op2.operand1->type == ratfun_type
+                   && r->u.op2.operand2->type == ratfun_type) {
+                    /* ratfun + ratfun = ratfun */
+                    add_ratfuns(&r->u.op2.operand1->u.ratfun,
+                                r->u.op2.operand1->u.ratfun,
+                                r->u.op2.operand2->u.ratfun);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == rat_type) {
+                    /* ratfun + rat = ratfun */
+                    add_ratfun_rat(&r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand2->u.rat);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == rat_type
+                        && r->u.op2.operand2->type == ratfun_type) {
+                    /* rat + ratfun = ratfun */
+                    add_ratfun_rat(&r->u.op2.operand2->u.ratfun,
+                                   r->u.op2.operand2->u.ratfun,
+                                   r->u.op2.operand1->u.rat);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               break;
+               
+          case '-':
+               if (r->u.op2.operand1->type == ratfun_type
+                   && r->u.op2.operand2->type == ratfun_type) {
+                    /* ratfun - ratfun = ratfun */
+                    sub_ratfuns(&r->u.op2.operand1->u.ratfun,
+                                r->u.op2.operand1->u.ratfun,
+                                r->u.op2.operand2->u.ratfun);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == ratfun_type
+                        && r->u.op2.operand2->type == rat_type) {
+                    /* ratfun - rat = ratfun */
+                    sub_ratfun_rat(&r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand1->u.ratfun,
+                                   r->u.op2.operand2->u.rat);
+                    *root = r->u.op2.operand1;
+                    r->u.op2.operand1 = NULL;
+                    free_tree(r);
+               }
+               else if (r->u.op2.operand1->type == rat_type
+                        && r->u.op2.operand2->type == ratfun_type) {
+                    /* rat - ratfun = ratfun */
+                    sub_ratfun_rat(&r->u.op2.operand2->u.ratfun,
+                                   r->u.op2.operand2->u.ratfun,
+                                   r->u.op2.operand1->u.rat);
+                    *root = r->u.op2.operand2;
+                    r->u.op2.operand2 = NULL;
+                    free_tree(r);
+               }
+               break;
+               
+          default:
+               break;
+          }
+          
+          break;
+     case op1_type:
+          extract_ratfuns(&r->u.op1.operand);
+
+          /* deal with unary minus */
+          if (r->u.op1.operator == UMINUS
+              && r->u.op1.operand->type == ratfun_type) {
+               negate_ratfun(&r->u.op1.operand->u.ratfun);
+               *root = r->u.op1.operand;
+               r->u.op1.operand = NULL;
+               free_tree(r);
+          }
+          
+          break;
+     default:
+          break;
+     }     
+}

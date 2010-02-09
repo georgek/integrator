@@ -64,6 +64,23 @@ node_type *add_poly(Polynomial poly)
      return p;
 }
 
+node_type *add_ratfun(Polynomial num, Polynomial den)
+{
+     node_type *p;
+     size_t node_size;
+
+     node_size = SIZEOF_NODE + sizeof(ratfun_node_type);
+     if ((p = malloc(node_size)) == NULL) {
+          yyerror("out of memory");
+     }
+     
+     /* copy information */
+     p->type = ratfun_type;
+     p->u.ratfun.num.type = polynomial;
+     p->u.ratfun.den.type = polynomial;
+     p->u.ratfun.num.u.poly = num;
+     p->u.ratfun.den.u.poly = den;
+     canonicalise_ratfun(&p->u.ratfun);
      
      return p;
 }
@@ -142,6 +159,9 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
      case poly_type:
           print_poly(p->u.poly);
           break;
+     case ratfun_type:
+          print_ratfun(p->u.ratfun);
+          break;
      case op1_type:
           printf("(");
           print_operator(p->u.op1.operator);
@@ -189,6 +209,9 @@ void traverse_prefix(node_type *p)
      case poly_type:
           print_poly(p->u.poly);
           break;
+     case ratfun_type:
+          print_ratfun(p->u.ratfun);
+          break;
      case op1_type:
           print_operator(p->u.op1.operator);
           printf(" ");
@@ -223,6 +246,9 @@ void traverse_postfix(node_type *p)
      case poly_type:
           print_poly(p->u.poly);
           break;
+     case ratfun_type:
+          print_ratfun(p->u.ratfun);
+          break;
      case op1_type:
           traverse_postfix(p->u.op1.operand);
           printf(" ");
@@ -256,6 +282,9 @@ void traverse_infix(node_type *p)
           break;
      case poly_type:
           print_poly(p->u.poly);
+          break;
+     case ratfun_type:
+          print_ratfun(p->u.ratfun);
           break;
      case op1_type:
           /* deal with unary minus */

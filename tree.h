@@ -4,9 +4,10 @@
 #include "bignum.h"
 #include "bigrat.h"
 #include "polynomial.h"
+#include "ratfun.h"
 
 typedef enum node_types {
-     rat_type, var_type, poly_type, op1_type, op2_type
+     rat_type, var_type, poly_type, ratfun_type, op1_type, op2_type
 } node_types;
 
 /* contents of nodes for each type */
@@ -18,6 +19,9 @@ typedef char var_node_type;
 
 /* monomial */
 typedef Polynomial poly_node_type;
+
+/* rational function */
+typedef RatFun ratfun_node_type;
 
 /* unary operator */
 typedef struct {
@@ -39,6 +43,7 @@ typedef struct node_type {
           rat_node_type rat;
           var_node_type var;
           poly_node_type poly;
+          ratfun_node_type ratfun;
           op1_node_type op1;
           op2_node_type op2;
      } u;
@@ -50,6 +55,7 @@ typedef struct node_type {
 node_type *add_rat(BigNum value);
 node_type *add_var(char name);
 node_type *add_poly(Polynomial poly);
+node_type *add_ratfun(Polynomial num, Polynomial den);
 node_type *add_op1(int operator, node_type *operand);
 node_type *add_op2(int operator, node_type *operand1, node_type *operand2);
 
