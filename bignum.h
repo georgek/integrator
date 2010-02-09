@@ -81,6 +81,8 @@ void double_bignum(BigNum *res, BigNum u);
 void gcd(BigNum *gcd, BigNum u, BigNum v);
 /* greatest common divisor - Euclid's method */
 void gcd2(BigNum *gcd, BigNum u, BigNum v);
+/* least common multiple */
+void lcm(BigNum *lcm, BigNum u, BigNum v);
 
 /* other */
 /* returns true is bignum is equal to zero */

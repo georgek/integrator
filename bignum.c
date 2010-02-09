@@ -653,6 +653,31 @@ void gcd2(BigNum *gcd, BigNum u, BigNum v)
      free_bignum(q);
 }
 
+void lcm(BigNum *lcm, BigNum u, BigNum v)
+{
+     BigNum t = NULL;
+
+     if (bn_zero(u) || bn_zero(v)) {
+          free_bignum(*lcm);
+          *lcm = make_bignum2(0);
+          return;
+     }
+     if (bn_one(u)) {
+          bignum_copy(lcm, v);
+          return;
+     }
+     if (bn_one(v)) {
+          bignum_copy(lcm, u);
+          return;
+     }
+     
+     gcd(&t, u, v);
+     div_bignums(&t, NULL, u, t);
+     mul_bignums(lcm, v, t);
+
+     free_bignum(t);
+}
+
 /* returns length of bignum */
 static int length(BigNum p)
 {
