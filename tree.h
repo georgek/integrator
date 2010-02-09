@@ -11,19 +11,13 @@ typedef enum node_types {
 
 /* contents of nodes for each type */
 /* rational */
-typedef struct {
-     BigRat value;
-} rat_node_type;
+typedef BigRat rat_node_type;
 
 /* variable */
-typedef struct {
-     char name;
-} var_node_type;
+typedef char var_node_type;
 
 /* monomial */
-typedef struct {
-     Polynomial poly;
-} poly_node_type;
+typedef Polynomial poly_node_type;
 
 /* unary operator */
 typedef struct {

@@ -6,6 +6,7 @@
 #include "bignum.h"
 #include "simplify.h"
 #include "y.tab.h"
+#include "polynomial.h"
 
 /* this function performs a simplficiation (ie. replacing 3*2 with 5
  * etc.) and reduces the tree into rationals and polynomials if
@@ -21,7 +22,7 @@ void simple_simplify(node_type **root)
 
           if (r->u.op2.operand1->type == rat_type) {
                /* left operand is a rational */
-               if (br_zero(r->u.op2.operand1->u.rat.value)) {
+               if (br_zero(r->u.op2.operand1->u.rat)) {
                     /* left operand is zero */
                     switch (r->u.op2.operator) {
                     case '+':
@@ -41,11 +42,11 @@ void simple_simplify(node_type **root)
                     case '/':
                          /* 0/x = 0 */
                          *root = add_rat(make_bignum2(0));
-                         free_tree(r);
-                         break;
+                    free_tree(r);
+                    break;
                     case '^':
                          if (((r->u.op2.operand2->type == rat_type)
-                              && (br_zero(r->u.op2.operand2->u.rat.value)))) {
+                              && (br_zero(r->u.op2.operand2->u.rat)))) {
                               /* 0^A = 1 where A = 0 */
                               *root = add_rat(make_bignum2(1));
                               free_tree(r);
@@ -64,48 +65,48 @@ void simple_simplify(node_type **root)
                     /* right operand is also a rational */
                     switch (r->u.op2.operator) {
                     case '+':
-                         add_bigrats(&r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand2->u.rat.value);
+                         add_bigrats(&r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand2->u.rat);
                          *root = r->u.op2.operand1;
                          r->u.op2.operand1 = NULL;
                          free_tree(r);
                          break;
                     case '-':
-                         sub_bigrats(&r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand2->u.rat.value);
+                         sub_bigrats(&r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand2->u.rat);
                          *root = r->u.op2.operand1;
                          r->u.op2.operand1 = NULL;
                          free_tree(r);
                          break;
                     case '*':
-                         mul_bigrats(&r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand2->u.rat.value);
+                         mul_bigrats(&r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand2->u.rat);
                          *root = r->u.op2.operand1;
                          r->u.op2.operand1 = NULL;
                          free_tree(r);
                          break;
                     case '/':
-                         div_bigrats(&r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand1->u.rat.value,
-                                     r->u.op2.operand2->u.rat.value);
+                         div_bigrats(&r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand1->u.rat,
+                                     r->u.op2.operand2->u.rat);
                          *root = r->u.op2.operand1;
                          r->u.op2.operand1 = NULL;
                          free_tree(r);
                          break;
-                    /* case '^': */
-                    /*      *root = add_int( */
-                    /*           (int) pow(r->u.op2.operand1->u.intg.value, */
-                    /*                     r->u.op2.operand2->u.intg.value)); */
-                    /*      free_tree(r); */
-                    /*      break; */
+                         /* case '^': */
+                         /*      *root = add_int( */
+                         /*           (int) pow(r->u.op2.operand1->u.intg.value, */
+                         /*                     r->u.op2.operand2->u.intg.value)); */
+                         /*      free_tree(r); */
+                         /*      break; */
                     default:
                          break;
                     }
                }
-               else if (br_one(r->u.op2.operand1->u.rat.value)) {
+               else if (br_one(r->u.op2.operand1->u.rat)) {
                     /* left operand is 1 */
                     switch (r->u.op2.operator) {
                     case '*':
@@ -128,7 +129,7 @@ void simple_simplify(node_type **root)
                /* left operand is not numeric */
                if (r->u.op2.operand2->type == rat_type) {
                     /* right operand is an integer */
-                    if (br_zero(r->u.op2.operand2->u.rat.value)) {
+                    if (br_zero(r->u.op2.operand2->u.rat)) {
                          /* right operand is 0 */
                          switch (r->u.op2.operator) {
                          case '+':
@@ -136,9 +137,9 @@ void simple_simplify(node_type **root)
                          case '-':
                               /* x-0 = x */
                               *root = r->u.op2.operand1;
-                              r->u.op2.operand1 = NULL;
-                              free_tree(r);
-                              break;
+                         r->u.op2.operand1 = NULL;
+                         free_tree(r);
+                         break;
                          case '*':
                               /* x*0 = 0 */
                               *root = add_rat(make_bignum2(0));
@@ -153,7 +154,7 @@ void simple_simplify(node_type **root)
                               break;
                          }
                     }
-                    else if (br_one(r->u.op2.operand2->u.rat.value)) {
+                    else if (br_one(r->u.op2.operand2->u.rat)) {
                          /* right operand is 1 */
                          switch (r->u.op2.operator) {
                          case '*':
@@ -178,7 +179,7 @@ void simple_simplify(node_type **root)
           /* remove unecessary unary minuses */
           if (r->u.op1.operator == UMINUS) {
                if (r->u.op1.operand->type == rat_type) {
-                    negate_bigrat(&r->u.op1.operand->u.rat.value);
+                    negate_bigrat(&r->u.op1.operand->u.rat);
                     *root = r->u.op1.operand;
                     r->u.op1.operand = NULL;
                     free_tree(r);
@@ -204,15 +205,15 @@ void extract_polys(node_type **root)
                if (r->u.op2.operand1->type == poly_type
                    && r->u.op2.operand2->type == rat_type) {
                     /* poly ^ rat = poly */
-                    if (real_length(r->u.op2.operand2->u.rat.value.num)
+                    if (real_length(r->u.op2.operand2->u.rat.num)
                         != 1) {
                          printf("Error! Multiple precision indices are not "
                                 "supported!\n");
                          exit(1);
                     }
-                    poly_power(&r->u.op2.operand1->u.poly.poly,
-                               r->u.op2.operand1->u.poly.poly,
-                               *(r->u.op2.operand2->u.rat.value.num+1));
+                    poly_power(&r->u.op2.operand1->u.poly,
+                               r->u.op2.operand1->u.poly,
+                               *(r->u.op2.operand2->u.rat.num+1));
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -223,29 +224,29 @@ void extract_polys(node_type **root)
                if (r->u.op2.operand1->type == rat_type
                    && r->u.op2.operand2->type == poly_type) {
                     /* rat * poly = poly */
-                    mul_poly_rat(&r->u.op2.operand2->u.poly.poly,
-                                 r->u.op2.operand2->u.poly.poly,
-                                 r->u.op2.operand1->u.rat.value);
+                    mul_poly_rat(&r->u.op2.operand2->u.poly,
+                                 r->u.op2.operand2->u.poly,
+                                 r->u.op2.operand1->u.rat);
                     *root = r->u.op2.operand2;
                     r->u.op2.operand2 = NULL;
                     free_tree(r);
                }
                else if (r->u.op2.operand1->type == poly_type
-                   && r->u.op2.operand2->type == poly_type) {
+                        && r->u.op2.operand2->type == poly_type) {
                     /* poly * poly = poly */
-                    mul_polynomials(&r->u.op2.operand1->u.poly.poly,
-                                    r->u.op2.operand1->u.poly.poly,
-                                    r->u.op2.operand2->u.poly.poly);
+                    mul_polynomials(&r->u.op2.operand1->u.poly,
+                                    r->u.op2.operand1->u.poly,
+                                    r->u.op2.operand2->u.poly);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
                }
                else if (r->u.op2.operand1->type == poly_type
-                   && r->u.op2.operand2->type == rat_type) {
+                        && r->u.op2.operand2->type == rat_type) {
                     /* poly * rat = poly */
-                    mul_poly_rat(&r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand2->u.rat.value);
+                    mul_poly_rat(&r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand2->u.rat);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -256,9 +257,9 @@ void extract_polys(node_type **root)
                if (r->u.op2.operand1->type == poly_type
                    && r->u.op2.operand2->type == rat_type) {
                     /* poly / rat = poly */
-                    div_poly_rat(&r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand2->u.rat.value);
+                    div_poly_rat(&r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand2->u.rat);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -269,8 +270,8 @@ void extract_polys(node_type **root)
                if (r->u.op2.operand1->type == poly_type
                    && r->u.op2.operand2->type == poly_type) {
                     /* poly + poly = poly */
-                    poly_splice_add(&r->u.op2.operand1->u.poly.poly,
-                                    &r->u.op2.operand2->u.poly.poly);
+                    poly_splice_add(&r->u.op2.operand1->u.poly,
+                                    &r->u.op2.operand2->u.poly);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -280,9 +281,9 @@ void extract_polys(node_type **root)
                else if (r->u.op2.operand1->type == poly_type
                         && r->u.op2.operand2->type == rat_type) {
                     /* poly + rat = poly */
-                    add_poly_rat(&r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand2->u.rat.value);
+                    add_poly_rat(&r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand2->u.rat);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -290,9 +291,9 @@ void extract_polys(node_type **root)
                else if (r->u.op2.operand1->type == rat_type
                         && r->u.op2.operand2->type == poly_type) {
                     /* rat + poly = poly */
-                    add_poly_rat(&r->u.op2.operand2->u.poly.poly,
-                                 r->u.op2.operand2->u.poly.poly,
-                                 r->u.op2.operand1->u.rat.value);
+                    add_poly_rat(&r->u.op2.operand2->u.poly,
+                                 r->u.op2.operand2->u.poly,
+                                 r->u.op2.operand1->u.rat);
                     *root = r->u.op2.operand2;
                     r->u.op2.operand2 = NULL;
                     free_tree(r);
@@ -303,8 +304,8 @@ void extract_polys(node_type **root)
                if (r->u.op2.operand1->type == poly_type
                    && r->u.op2.operand2->type == poly_type) {
                     /* poly + poly = poly */
-                    poly_splice_sub(&r->u.op2.operand1->u.poly.poly,
-                                    &r->u.op2.operand2->u.poly.poly);
+                    poly_splice_sub(&r->u.op2.operand1->u.poly,
+                                    &r->u.op2.operand2->u.poly);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -314,9 +315,9 @@ void extract_polys(node_type **root)
                else if (r->u.op2.operand1->type == poly_type
                         && r->u.op2.operand2->type == rat_type) {
                     /* poly + rat = poly */
-                    sub_poly_rat(&r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand1->u.poly.poly,
-                                 r->u.op2.operand2->u.rat.value);
+                    sub_poly_rat(&r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand1->u.poly,
+                                 r->u.op2.operand2->u.rat);
                     *root = r->u.op2.operand1;
                     r->u.op2.operand1 = NULL;
                     free_tree(r);
@@ -324,9 +325,9 @@ void extract_polys(node_type **root)
                else if (r->u.op2.operand1->type == rat_type
                         && r->u.op2.operand2->type == poly_type) {
                     /* rat + poly = poly */
-                    sub_poly_rat(&r->u.op2.operand2->u.poly.poly,
-                                 r->u.op2.operand2->u.poly.poly,
-                                 r->u.op2.operand1->u.rat.value);
+                    sub_poly_rat(&r->u.op2.operand2->u.poly,
+                                 r->u.op2.operand2->u.poly,
+                                 r->u.op2.operand1->u.rat);
                     *root = r->u.op2.operand2;
                     r->u.op2.operand2 = NULL;
                     free_tree(r);
@@ -344,7 +345,7 @@ void extract_polys(node_type **root)
           /* deal with unary minus */
           if (r->u.op1.operator == UMINUS
               && r->u.op1.operand->type == poly_type) {
-               negate_polynomial(&r->u.op1.operand->u.poly.poly);
+               negate_polynomial(&r->u.op1.operand->u.poly);
                *root = r->u.op1.operand;
                r->u.op1.operand = NULL;
                free_tree(r);
@@ -353,7 +354,7 @@ void extract_polys(node_type **root)
           break;
      case var_type:
           /* this is a monomial */
-          *root = add_poly(make_mono_poly(r->u.var.name,1));
+          *root = add_poly(make_mono_poly(r->u.var,1));
           free_tree(r);
           break;
      default:
