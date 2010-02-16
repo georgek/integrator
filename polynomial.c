@@ -33,6 +33,17 @@ Polynomial make_one_poly(char variable)
      return t;
 }
 
+Polynomial make_const_poly(char variable, BigRat r)
+{
+     Polynomial t = make_zero_poly(variable);
+     t.head->next = malloc(sizeof(Monomial));
+     t.head->next->next = t.head;
+     t.head->next->degree = 0;
+     t.head->next->coeff.type = rational;
+     bigrat_copy(&t.head->next->coeff.u.rat, r);
+     return t;
+}
+
 Polynomial make_mono_poly(char variable, int degree)
 {
      Polynomial t = make_one_poly(variable);
@@ -288,6 +299,18 @@ int coef_one2(Coefficient c)
      }
 }
 
+int coef_deg(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          return 0;
+     case polynomial:
+          return poly_deg(c.u.poly);
+     default:
+          return 0;
+     }
+}
+
 void negate_coefficient(Coefficient *c)
 {
      switch (c->type) {
@@ -302,6 +325,8 @@ void negate_coefficient(Coefficient *c)
      }
 }
 
+/* TODO: after poly operations, check for constants and turn in to
+ * rationals */
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
@@ -342,10 +367,11 @@ void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           res->u.poly.head = NULL;
           sub_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {
+     else {                     /* rat - poly */
           res->type = polynomial;
           res->u.poly.head = NULL;
           sub_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
+          negate_coefficient(res);
      }
      free_coefficient(&old_res);
 }
@@ -403,9 +429,7 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           div_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
      else {
-          res->type = polynomial;
-          res->u.poly.head = NULL;
-          exact_div_polynomials(&res->u.poly, left.u.poly, right.u.poly);
+          printf("div\n");
      }
      free_coefficient(&old_res);
 }
@@ -420,6 +444,43 @@ void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
           div_bigrats2(&res->u.rat, left.u.rat, right);
      }
      free_coefficient(&old_res);
+}
+
+void div_coefficients3(Coefficient *q, Coefficient *r,
+                       Coefficient left, Coefficient right)
+{
+     Coefficient old_q = *q;
+     Coefficient old_r = *r;
+     if (left.type == rational && right.type == rational) {
+          q->type = rational;
+          q->u.rat.num = NULL;
+          q->u.rat.den = NULL;
+          rat_coef_op(q, left, right, &div_bigrats);
+          r->type = rational;
+          r->u.rat = make_bigrat3(0);
+     }
+     else if (left.type == polynomial && right.type == polynomial) {
+          q->type = polynomial;
+          q->u.poly.head = NULL;
+          r->type = polynomial;
+          r->u.poly.head = NULL;
+          div_polynomials(&q->u.poly, &r->u.poly, left.u.poly, right.u.poly);
+     }
+     else if (left.type == polynomial && right.type == rational) {
+          q->type = polynomial;
+          q->u.poly.head = NULL;
+          div_poly_rat(&q->u.poly, left.u.poly, right.u.rat);
+          r->type = rational;
+          r->u.rat = make_bigrat3(0);
+     }
+     else {                     /* rational / poly */
+          q->type = rational;
+          q->u.rat = make_bigrat3(0);
+          r->type = special;
+          copy_coefficient(r, left);
+     }
+     free_coefficient(&old_q);
+     free_coefficient(&old_r);
 }
 
 void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
@@ -460,7 +521,7 @@ void coef_gcd(Coefficient *res, Coefficient a, Coefficient b)
           SubResultantGCD(&res->u.poly, a.u.poly, b.u.poly);
      }
      else {
-          printf("Coefficient GCD not fully implemented.\n");
+          res->u.rat = make_bigrat3(1);
      }
      free_coefficient(&old_res);
 }
@@ -509,6 +570,26 @@ BigRat coef_rat_part(Coefficient c)
      default:
           return r;
      }
+}
+
+void coef_differentiate(Coefficient *cd, Coefficient c)
+{
+     switch (c.type)  {
+     case rational:
+          free_bigrat(&cd->u.rat);
+          cd->type = rational;
+          cd->u.rat = make_bigrat3(0);
+          break;
+
+     case polynomial:
+          cd->type = polynomial;
+          poly_differentiate(&cd->u.poly, c.u.poly);
+          break;
+
+     default:
+          break;
+     }
+     
 }
 
 int poly_zero(Polynomial p)
@@ -707,7 +788,7 @@ void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right)
      MonoPtr p;
      
      if (left.variable != right.variable) {
-          printf("Error! Multivariate polynomials are not supported yet.\n");
+          printf("Error! Multivariate polynomials are not supported yet (sub).\n");
           return;
      }
 
@@ -789,7 +870,7 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
           return;
      }
      if (A.variable != B.variable) {
-          printf("Error! Multivariate polynomials are not supported yet.\n");
+          printf("Error! Multivariate polynomials are not supported yet (div).\n");
           return;
      }
 

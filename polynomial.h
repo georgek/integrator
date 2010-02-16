@@ -48,6 +48,7 @@ typedef struct monomial
  * zero monomial */
 Polynomial make_zero_poly(char variable);
 Polynomial make_one_poly(char variable);
+Polynomial make_const_poly(char variable, BigRat r);
 
 /* makes a polynomial with one unit monomial */
 Polynomial make_mono_poly(char variable, int degree);
@@ -83,6 +84,8 @@ int coef_one(Coefficient c);
 /* returns true for 1 or -1 */
 int coef_one2(Coefficient c);
 
+int coef_deg(Coefficient c);
+
 /* general coefficient arithmetic functions */
 void negate_coefficient(Coefficient *c);
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right);
@@ -91,6 +94,8 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
 void div_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
+void div_coefficients3(Coefficient *q, Coefficient *r,
+                       Coefficient left, Coefficient right);
 
 void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power);
 
@@ -99,6 +104,8 @@ void coef_gcd(Coefficient *res, Coefficient a, Coefficient b);
 int coef_neg(Coefficient c);
 
 BigRat coef_rat_part(Coefficient c);
+
+void coef_differentiate(Coefficient *cd, Coefficient c);
 
 /* polynomials */
 int poly_zero(Polynomial p);
