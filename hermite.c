@@ -71,6 +71,7 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
 
           copy_coefficient(&Dm, Dm2);
           PRINTC(Dm);
+          printf("-----\n");
      }
 
      h->num = A;
@@ -94,6 +95,7 @@ void HermiteReduceI(node_type *root)
 
      HermiteReduce(&g, &h, root->u.ratfun);
 
+     printf("\n");
      print_ratfun(g);
      printf(" + int(");
      print_ratfun(h);
