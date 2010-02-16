@@ -15,6 +15,7 @@
 #include "coef_array.h"
 #include "prs.h"
 #include "squarefree.h"
+#include "hermite.h"
 
 #define YYERROR_VERBOSE
 
@@ -59,10 +60,15 @@ statement:      expression
                              print_prefix_lisp(root);
                              print_infix(root);
                              extract_polys(&root);
+                             extract_ratfuns(&root);
+                             printf("---\n");
+                             print_prefix_lisp(root);
+                             printf("Integral:\n");
+                             HermiteReduceI(root);
                              /* printf("Squarefree factorisation:\n"); */
                              /* SquarefreeI(root); */
-                             printf("GCD:\n");
-                             GCDI(root);
+                             /* printf("GCD:\n"); */
+                             /* GCDI(root); */
                              free_tree(root);
                              root = NULL;
                         }
