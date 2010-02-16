@@ -85,6 +85,27 @@ node_type *add_ratfun(Polynomial num, Polynomial den)
      return p;
 }
 
+node_type *add_ratfun2(BigRat num, Polynomial den)
+{
+     node_type *p;
+     size_t node_size;
+
+     node_size = SIZEOF_NODE + sizeof(ratfun_node_type);
+     if ((p = malloc(node_size)) == NULL) {
+          yyerror("out of memory");
+     }
+     
+     /* copy information */
+     p->type = ratfun_type;
+     p->u.ratfun.num.type = rational;
+     p->u.ratfun.den.type = polynomial;
+     p->u.ratfun.num.u.rat = num;
+     p->u.ratfun.den.u.poly = den;
+     canonicalise_ratfun(&p->u.ratfun);
+     
+     return p;
+}
+
 node_type *add_op1(int operator, node_type *operand)
 {
      node_type *p;

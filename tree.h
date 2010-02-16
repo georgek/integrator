@@ -56,6 +56,7 @@ node_type *add_rat(BigNum value);
 node_type *add_var(char name);
 node_type *add_poly(Polynomial poly);
 node_type *add_ratfun(Polynomial num, Polynomial den);
+node_type *add_ratfun2(BigRat num, Polynomial den);
 node_type *add_op1(int operator, node_type *operand);
 node_type *add_op2(int operator, node_type *operand1, node_type *operand2);
 
