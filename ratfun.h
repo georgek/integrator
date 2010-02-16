@@ -12,6 +12,8 @@ typedef struct ratfun
      Coefficient den;
 } RatFun;
 
+void init_ratfun(RatFun *r);
+
 /* the canonical form of a rational function has a non-zero positive
  * denominator, is in lowest terms and has only integer
  * coefficients */
@@ -29,6 +31,7 @@ void mul_ratfuns(RatFun *res, RatFun left, RatFun right);
 void div_ratfuns(RatFun *res, RatFun left, RatFun right);
 
 void negate_ratfun(RatFun *r);
+void invert_ratfun(RatFun *r);
 
 void ratfun_power(RatFun *res, RatFun p, SHORT_INT_T power);
 

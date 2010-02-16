@@ -7,6 +7,12 @@
 #include "bigrat.h"
 #include "prs.h"
 
+void init_ratfun(RatFun *r)
+{
+     r->num.type = special;
+     r->num.type = special;
+}
+
 void canonicalise_ratfun(RatFun *r)
 {
      Coefficient t = {rational, {{NULL, NULL}}},
@@ -47,6 +53,10 @@ void canonicalise_ratfun(RatFun *r)
 
 void print_ratfun(RatFun r)
 {
+     if (coef_zero(r.num)) {
+          printf("zero");
+          return;
+     }
      print_coefficient(r.num);
      printf("/");
      print_coefficient(r.den);
@@ -134,6 +144,13 @@ void div_ratfuns(RatFun *res, RatFun left, RatFun right)
 void negate_ratfun(RatFun *r)
 {
      negate_coefficient(&r->num);
+}
+
+void invert_ratfun(RatFun *r)
+{
+     Coefficient t = r->num;
+     r->num = r->den;
+     r->den = t;
 }
 
 /* TODO this is probably really inefficient, would be more
