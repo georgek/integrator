@@ -396,7 +396,7 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
      SHORT_INT_T little_r;
 
      if (bn_zero(right)) {         /* divide by zero */
-          printf("ERROR: division by zero");
+          printf("ERROR: division by zero\n");
           return;
      }
      
