@@ -33,7 +33,7 @@ node_type *root = NULL;         /* root of parse tree */
 
 %token <ival> INTEGER
 %token <var> VARIABLE
-%token LN EXP COS SIN TAN EVAL DIFF
+%token LN EXP COS SIN TAN EVAL DIFF QUIT
 
 %left ','
 %left '+' '-'
@@ -71,10 +71,15 @@ statement:      expression
                              /* GCDI(root); */
                              free_tree(root);
                              root = NULL;
+                             printf("-> ");
                         }
         |       error
                         {
                              printf("error\n");
+                        }
+        |       QUIT
+                        {
+                             exit(0);
                         }
         ;
 
@@ -324,6 +329,7 @@ int main (int argc, char *argv[])
      /* free_poly(&poly4); */
      /* free_poly(&poly5); */
 
+     printf("-> ");
      yyparse();
      return 0;
 }

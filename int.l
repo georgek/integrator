@@ -51,6 +51,15 @@ UINT 0|[1-9][0-9]*
      return EVAL;
 }
 
+"exit"|"quit" {
+     return QUIT;
+}
+
+<<EOF>> {
+     printf("\n");
+     return QUIT;
+}
+
 [-+*/^(),\n] {
      return *yytext;
 }
