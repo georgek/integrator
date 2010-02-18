@@ -15,9 +15,16 @@ void init_ratfun(RatFun *r)
 
 void canonicalise_ratfun(RatFun *r)
 {
-     Coefficient t = {rational, {{NULL, NULL}}},
-          s = {rational, {{NULL, NULL}}};
-     
+     Coefficient t = {rational, {{NULL, NULL}}};
+     Coefficient s = {rational, {{NULL, NULL}}};
+
+     if (coef_zero(r->num)){
+          free_coefficient(&r->den);
+          r->den.type = rational;
+          r->den.u.rat = make_bigrat3(1);
+          return;
+     }
+
      if (coef_neg(r->den)) {
           negate_coefficient(&r->num);
           negate_coefficient(&r->den);
