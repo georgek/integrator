@@ -2,15 +2,16 @@
 
 %option nounput
 %option noinput
+%option noyywrap
+%option always-interactive
 
 %{
 #include <math.h>
 
 #include "bignum.h"
 #include "tree.h"
-#include "y.tab.h"
+#include "parser.h"
 
-void yyerror(char *s);
 %}
 
 UINT 0|[1-9][0-9]*
@@ -73,8 +74,7 @@ UINT 0|[1-9][0-9]*
 }
 
 . {
-     fprintf(stdout,"Character '%c' not allowed in expression.\n",*yytext);
-     yyerror("Unknown character found by lexical analyser.");
+     printf("Character '%c' not allowed in expression.\n",*yytext);
 }
 
 %%

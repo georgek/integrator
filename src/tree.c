@@ -4,9 +4,7 @@
 
 #include "bignum.h"
 #include "tree.h"
-#include "y.tab.h"
-
-void yyerror(char *s);
+#include "parser.h"
 
 /* size of node without contents */
 #define SIZEOF_NODE ((char *)&p->u.rat - (char *)p)
@@ -18,7 +16,7 @@ node_type *add_rat(BigNum value)
 
      node_size = SIZEOF_NODE + sizeof(rat_node_type);
      if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
+          printf("out of memory\n");
      }
 
      /* initialise */
@@ -36,7 +34,7 @@ node_type *add_var(char name)
 
      node_size = SIZEOF_NODE + sizeof(var_node_type);
      if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
+          printf("out of memory\n");
      }
      
      /* copy information */
@@ -53,7 +51,7 @@ node_type *add_poly(Polynomial poly)
 
      node_size = SIZEOF_NODE + sizeof(poly_node_type);
      if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
+          printf("out of memory\n");
      }
      
      /* copy information */
@@ -71,7 +69,7 @@ node_type *add_ratfun(Polynomial num, Polynomial den)
 
      node_size = SIZEOF_NODE + sizeof(ratfun_node_type);
      if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
+          printf("out of memory\n");
      }
      
      /* copy information */
@@ -92,7 +90,7 @@ node_type *add_ratfun2(BigRat num, Polynomial den)
 
      node_size = SIZEOF_NODE + sizeof(ratfun_node_type);
      if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
+          printf("out of memory\n");
      }
      
      /* copy information */
@@ -113,7 +111,7 @@ node_type *add_op1(int operator, node_type *operand)
 
      node_size = SIZEOF_NODE + sizeof(op1_node_type);
      if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
+          printf("out of memory\n");
      }
      
      /* copy information */
@@ -131,7 +129,7 @@ node_type *add_op2(int operator, node_type *operand1, node_type *operand2)
 
      node_size = SIZEOF_NODE + sizeof(op2_node_type);
      if ((p = malloc(node_size)) == NULL) {
-          yyerror("out of memory");
+          printf("out of memory\n");
      }
      
      /* copy information */

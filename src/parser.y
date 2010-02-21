@@ -17,10 +17,12 @@
 #include "squarefree.h"
 #include "hermite.h"
 
-#define YYERROR_VERBOSE
-
-void yyerror(char *s);
 int yylex(void);
+
+void yyerror(char *s)
+{
+     fprintf(stderr, "%s\n", s);
+}
 
 node_type *root = NULL;         /* root of parse tree */
 %}

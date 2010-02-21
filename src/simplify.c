@@ -5,7 +5,7 @@
 
 #include "bignum.h"
 #include "simplify.h"
-#include "y.tab.h"
+#include "parser.h"
 #include "polynomial.h"
 #include "ratfun.h"
 
