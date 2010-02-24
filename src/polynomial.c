@@ -1086,15 +1086,17 @@ void poly_splice_add(Polynomial *left, Polynomial *right)
      while (r->coeff.type != special) {
           /* find place for this monomial in left */
           for (; q->degree > r->degree; q1 = q, q = q->next);
-          if (r->degree == q->degree) {
+          printf("add: %d,%d\n",r->degree,q->degree);
+          if (r->degree == q->degree && q->coeff.type != special) {
                /* add coefficients */
                add_coefficients(&q->coeff, q->coeff, r->coeff);
                /* remove zero coefficient */
                if (coef_zero(q->coeff)) {
+                    printf("removing: %d\n", q->degree);
                     q1->next = q->next;
                     free_coefficient(&q->coeff);
                     free(q);
-                    q = NULL;
+                    q = q1->next;
                }
                /* advance right pointer */
                r1 = r;
@@ -1116,7 +1118,7 @@ void poly_splice_sub(Polynomial *left, Polynomial *right)
      MonoPtr q, q1, r, r1;
 
      if (left->variable != right->variable) {
-          printf("Error! Multivariate polynomials are not supported yet.\n");
+          sub_polynomials(left, *left, *right);
           return;
      }
 
@@ -1130,17 +1132,18 @@ void poly_splice_sub(Polynomial *left, Polynomial *right)
      while (r->coeff.type != special) {
           /* find place for this monomial in left */
           for (; q->degree > r->degree; q1 = q, q = q->next);
-          if (r->degree == q->degree) {
-               printf("%d,%d\n",r->degree,q->degree);
+          printf("sub: %d,%d\n",r->degree,q->degree);
+          if (r->degree == q->degree && q->coeff.type != special) {
                /* sub coefficients */
                sub_coefficients(&q->coeff, q->coeff, r->coeff);
 
                /* remove zero coefficient */
                if (coef_zero(q->coeff)) {
+                    printf("removing: %d\n", q->degree);
                     q1->next = q->next;
                     free_coefficient(&q->coeff);
                     free(q);
-                    q = NULL;
+                    q = q1->next;
                }
                /* advance right pointer */
                r1 = r;
