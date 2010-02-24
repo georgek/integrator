@@ -363,10 +363,29 @@ void traverse_infix(node_type *p)
                traverse_infix(p->u.op2.operand2);
                printf(")");
           }
+          /* same priority but different operator, must have had brackets */
+          else if ((p->u.op2.operand2->type == op2_type)
+                   && (higher_priority(p->u.op2.operator,
+                                       p->u.op2.operand2->u.op2.operator)
+                       == 0)
+                   && p->u.op2.operator != p->u.op2.operand2->u.op2.operator) {
+               printf("(");
+               traverse_infix(p->u.op2.operand2);
+               printf(")");
+          }
           else if ((p->u.op2.operand2->type == op1_type)
                    && (higher_priority(p->u.op2.operator,
                                        p->u.op2.operand2->u.op1.operator)
                         == 1)) {
+               printf("(");
+               traverse_infix(p->u.op2.operand2);
+               printf(")");
+          }
+          else if ((p->u.op2.operand2->type == op1_type)
+                   && (higher_priority(p->u.op2.operator,
+                                       p->u.op2.operand2->u.op1.operator)
+                       == 0)
+                   && p->u.op2.operator != p->u.op2.operand2->u.op1.operator) {
                printf("(");
                traverse_infix(p->u.op2.operand2);
                printf(")");
@@ -388,7 +407,7 @@ int op_priority(int i)
      case '-': p=1; break;
      case '+': p=1; break;
      case '*': p=2; break; 
-     case '/': p=3; break;
+     case '/': p=2; break;
      case UMINUS: p=4; break;
      case '^': p=5; break;
      default: p=6;break;       
