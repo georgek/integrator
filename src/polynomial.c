@@ -91,6 +91,23 @@ void copy_poly(Polynomial *p, Polynomial s)
      free_poly(&old_res);
 }
 
+void print_poly_simple(Polynomial p)
+{
+     MonoPtr m = p.head->next;
+     /* check for zero polynomial */
+     if (m->coeff.type == special) {
+          printf("zero");
+          return;
+     }
+     /* iterate through monomials */
+     do {
+          print_coefficient_simple(m->coeff);
+          printf("*");
+          printf("%c^%d", p.variable, m->degree);
+          m = m->next;
+     } while (m->coeff.type != special && printf(" + "));
+}
+
 void print_poly(Polynomial p)
 {
      if (poly_neg(p)) {
@@ -137,6 +154,29 @@ void print_poly3(Polynomial p)
 void print_poly_sign(Polynomial p)
 {
      print_coef_sign(poly_lc(p));
+}
+
+void print_coefficient_simple(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          if (bn_one(c.u.rat.den)) {
+               print_bigrat(c.u.rat);
+          }
+          else {
+               printf("(");
+               print_bigrat(c.u.rat);
+               printf(")");
+          }
+          break;
+     case polynomial:
+          printf("(");
+          print_poly_simple(c.u.poly);
+          printf(")");
+          break;
+     default:
+          break;
+     }
 }
 
 void print_coefficient(Coefficient c)
