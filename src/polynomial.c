@@ -108,6 +108,35 @@ void print_poly_simple(Polynomial p)
      } while (m->coeff.type != special && printf(" + "));
 }
 
+void print_poly_nonpretty(Polynomial p)
+{
+     MonoPtr m = p.head->next;
+     /* check for zero polynomial */
+     if (m->coeff.type == special) {
+          printf("zero");
+          return;
+     }
+     /* iterate through monomials */
+     do {
+          /* don't print unit coefficient, unless we won't print variable */
+          if (!coef_one2(m->coeff) || m->degree == 0) {
+               print_coefficient_nonpretty(m->coeff);
+          }
+          /* coefficient and variable printed? */
+          if (!coef_one2(m->coeff) && m->degree != 0) {
+               printf("*");
+          }
+          /* print variable if degree > 0 */
+          if (m->degree > 1) {
+               printf("%c^%d", p.variable, m->degree);
+          }
+          else if (m->degree == 1) {
+               printf("%c", p.variable);
+          }
+          m = m->next;
+     } while (m->coeff.type != special && printf(" + "));
+}
+
 void print_poly(Polynomial p)
 {
      if (poly_neg(p)) {
@@ -172,6 +201,29 @@ void print_coefficient_simple(Coefficient c)
      case polynomial:
           printf("(");
           print_poly_simple(c.u.poly);
+          printf(")");
+          break;
+     default:
+          break;
+     }
+}
+
+void print_coefficient_nonpretty(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          if (bn_one(c.u.rat.den)) {
+               print_bigrat(c.u.rat);
+          }
+          else {
+               printf("(");
+               print_bigrat(c.u.rat);
+               printf(")");
+          }
+          break;
+     case polynomial:
+          printf("(");
+          print_poly_nonpretty(c.u.poly);
           printf(")");
           break;
      default:

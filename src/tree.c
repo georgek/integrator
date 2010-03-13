@@ -176,7 +176,7 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
           printf("%c", p->u.var);
           break;
      case poly_type:
-          print_poly(p->u.poly);
+          print_poly_nonpretty(p->u.poly);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -226,7 +226,7 @@ void traverse_prefix(node_type *p)
           printf("%c", p->u.var);
           break;
      case poly_type:
-          print_poly(p->u.poly);
+          print_poly_nonpretty(p->u.poly);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -263,7 +263,7 @@ void traverse_postfix(node_type *p)
           printf("%c", p->u.var);
           break;
      case poly_type:
-          print_poly(p->u.poly);
+          print_poly_nonpretty(p->u.poly);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -300,7 +300,7 @@ void traverse_infix(node_type *p)
           printf("%c", p->u.var);
           break;
      case poly_type:
-          print_poly(p->u.poly);
+          print_poly_nonpretty(p->u.poly);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);

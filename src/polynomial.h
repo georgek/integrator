@@ -60,6 +60,9 @@ void copy_poly(Polynomial *p, Polynomial s);
 /* for testing, not pretty */
 void print_poly_simple(Polynomial p);
 
+/* prettier but not fully pretty */
+void print_poly_nonpretty(Polynomial p);
+
 /* pretty printing */
 void print_poly(Polynomial p);
 void print_poly2(Polynomial p);
@@ -72,6 +75,9 @@ void sub_monomial(Polynomial* p, int degree, Coefficient coef);
 /* general coefficient functions */
 /* non-pretty testing version */
 void print_coefficient_simple(Coefficient c);
+/* prettier but not very pretty version, for now until the pretty version is
+ * done properly */
+void print_coefficient_nonpretty(Coefficient c);
 /* print coefficient with its sign if negative */
 void print_coefficient(Coefficient c);
 /* print coefficient without its sign */
