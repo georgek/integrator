@@ -7,18 +7,12 @@
 #include "ratfun.h"
 
 typedef enum node_types {
-     rat_type, var_type, poly_type, ratfun_type, op1_type, op2_type
+     coef_type, ratfun_type, op1_type, op2_type
 } node_types;
 
 /* contents of nodes for each type */
-/* rational */
-typedef BigRat rat_node_type;
-
-/* variable */
-typedef char var_node_type;
-
-/* monomial */
-typedef Polynomial poly_node_type;
+/* coefficient */
+typedef Coefficient coef_node_type;
 
 /* rational function */
 typedef RatFun ratfun_node_type;
@@ -40,9 +34,7 @@ typedef struct node_type {
      node_types type;
      /* node contents */
      union {
-          rat_node_type rat;
-          var_node_type var;
-          poly_node_type poly;
+          coef_node_type coef;
           ratfun_node_type ratfun;
           op1_node_type op1;
           op2_node_type op2;
@@ -82,6 +74,8 @@ int higher_priority(int i, int j);
 
 void print_operator(int id);
 
+/* simplifiy tree as far as polynomials */
+void extract_polys(node_type **root);
 
 
 #endif /* _TREE_H_ */

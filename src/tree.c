@@ -7,22 +7,23 @@
 #include "parser.h"
 
 /* size of node without contents */
-#define SIZEOF_NODE ((char *)&p->u.rat - (char *)p)
+#define SIZEOF_NODE ((char *)&p->u.coef - (char *)p)
 
 node_type *add_rat(BigNum value)
 {
      node_type *p;
      size_t node_size;
 
-     node_size = SIZEOF_NODE + sizeof(rat_node_type);
+     node_size = SIZEOF_NODE + sizeof(coef_node_type);
      if ((p = malloc(node_size)) == NULL) {
           printf("out of memory\n");
      }
 
      /* initialise */
-     p->type = rat_type;
-     p->u.rat.num = value;
-     p->u.rat.den = make_bignum2(1);
+     p->type = coef_type;
+     p->u.coef.type = rational;
+     p->u.coef.u.rat.num = value;
+     p->u.coef.u.rat.den = make_bignum2(1);
 
      return p;
 }
@@ -32,14 +33,15 @@ node_type *add_var(char name)
      node_type *p;
      size_t node_size;
 
-     node_size = SIZEOF_NODE + sizeof(var_node_type);
+     node_size = SIZEOF_NODE + sizeof(coef_node_type);
      if ((p = malloc(node_size)) == NULL) {
           printf("out of memory\n");
      }
-     
-     /* copy information */
-     p->type = var_type;
-     p->u.var = name;
+
+     /* initialise */
+     p->type = coef_type;
+     p->u.coef.type = polynomial;
+     p->u.coef.u.poly = make_mono_poly(name, 1);
      
      return p;
 }
@@ -49,15 +51,15 @@ node_type *add_poly(Polynomial poly)
      node_type *p;
      size_t node_size;
 
-     node_size = SIZEOF_NODE + sizeof(poly_node_type);
+     node_size = SIZEOF_NODE + sizeof(coef_node_type);
      if ((p = malloc(node_size)) == NULL) {
           printf("out of memory\n");
      }
-     
-     /* copy information */
-     p->type = poly_type;
-     p->u.poly.variable = poly.variable;
-     p->u.poly.head = poly.head;
+
+     /* initialise */
+     p-> type = coef_type;
+     p->u.coef.type = polynomial;
+     p->u.coef.u.poly = poly;
      
      return p;
 }
@@ -146,8 +148,8 @@ void free_tree(node_type *p)
      if (!p) {
           return;
      }
-     else if (p->type == rat_type) {
-          free_bigrat(&p->u.rat);
+     else if (p->type == coef_type) {
+          free_coefficient(&p->u.coef);
      }
      else if (p->type == op1_type) {
           free_tree(p->u.op1.operand);
@@ -169,14 +171,8 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
 {
      if (!p) return;
      switch (p->type) {
-     case rat_type:
-          print_bigrat(p->u.rat);
-          break;
-     case var_type:
-          printf("%c", p->u.var);
-          break;
-     case poly_type:
-          print_poly_nonpretty(p->u.poly);
+     case coef_type:
+          print_coefficient_nonpretty(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -219,14 +215,8 @@ void traverse_prefix(node_type *p)
 {
      if (!p) return;
      switch (p->type) {
-     case rat_type:
-          print_bigrat(p->u.rat);
-          break;
-     case var_type:
-          printf("%c", p->u.var);
-          break;
-     case poly_type:
-          print_poly_nonpretty(p->u.poly);
+     case coef_type:
+          print_coefficient_nonpretty(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -256,14 +246,8 @@ void traverse_postfix(node_type *p)
 {
      if (!p) return;
      switch (p->type) {
-     case rat_type:
-          print_bigrat(p->u.rat);
-          break;
-     case var_type:
-          printf("%c", p->u.var);
-          break;
-     case poly_type:
-          print_poly_nonpretty(p->u.poly);
+     case coef_type:
+          print_coefficient_nonpretty(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -293,14 +277,8 @@ void traverse_infix(node_type *p)
 {
      if (!p) return;
      switch (p->type) {
-     case rat_type:
-          print_bigrat(p->u.rat);
-          break;
-     case var_type:
-          printf("%c", p->u.var);
-          break;
-     case poly_type:
-          print_poly_nonpretty(p->u.poly);
+     case coef_type:
+          print_coefficient_nonpretty(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -334,7 +312,7 @@ void traverse_infix(node_type *p)
           if ((p->u.op2.operand1->type == op2_type)
               && (higher_priority(p->u.op2.operator,
                                   p->u.op2.operand1->u.op2.operator)
-                   == 1)) {
+                  == 1)) {
                printf("(");
                traverse_infix(p->u.op2.operand1);
                printf(")");
@@ -342,7 +320,7 @@ void traverse_infix(node_type *p)
           else if ((p->u.op2.operand1->type == op1_type)
                    && (higher_priority(p->u.op2.operator,
                                        p->u.op2.operand1->u.op1.operator)
-                        == 1)) {
+                       == 1)) {
                printf("(");
                traverse_infix(p->u.op2.operand1);
                printf(")");
@@ -358,7 +336,7 @@ void traverse_infix(node_type *p)
           if ((p->u.op2.operand2->type == op2_type)
               && (higher_priority(p->u.op2.operator,
                                   p->u.op2.operand2->u.op2.operator)
-                   == 1)) {
+                  == 1)) {
                printf("(");
                traverse_infix(p->u.op2.operand2);
                printf(")");
@@ -376,7 +354,7 @@ void traverse_infix(node_type *p)
           else if ((p->u.op2.operand2->type == op1_type)
                    && (higher_priority(p->u.op2.operator,
                                        p->u.op2.operand2->u.op1.operator)
-                        == 1)) {
+                       == 1)) {
                printf("(");
                traverse_infix(p->u.op2.operand2);
                printf(")");
@@ -418,11 +396,11 @@ int op_priority(int i)
 /* compares operator priority for infix mode */
 int higher_priority(int i, int j)
 {
-        int p1, p2;
-        p1=op_priority(i); p2=op_priority(j);
-        if (p1>p2) return 1 ;
-        else if (p1<p2) return -1 ;
-        else return 0;
+     int p1, p2;
+     p1=op_priority(i); p2=op_priority(j);
+     if (p1>p2) return 1 ;
+     else if (p1<p2) return -1 ;
+     else return 0;
 }
 
 void print_operator(int id)
@@ -461,3 +439,110 @@ void print_operator(int id)
      }
 }
 
+void extract_polys(node_type **root)
+{
+     node_type *r = *root;
+     Coefficient tq = {special}, tr = {special};
+
+     switch (r->type) {
+     case op2_type:
+          extract_polys(&(r->u.op2.operand1));
+          extract_polys(&(r->u.op2.operand2));
+
+          if (r->u.op2.operand1->type != coef_type
+              && r->u.op2.operand2->type != coef_type) {
+               /* nothing to do here */
+               return;
+          }
+
+          switch (r->u.op2.operator) {
+          case '^':
+               if (r->u.op2.operand2->u.coef.type != rational
+                   || real_length(r->u.op2.operand2->u.coef.u.rat.num) != 1) {
+                    printf("Error! "
+                           "Indices must be single precision integers!\n");
+                    exit(1);
+               }
+
+               coef_power(&r->u.op2.operand1->u.coef,
+                          r->u.op2.operand1->u.coef,
+                          *(r->u.op2.operand2->u.coef.u.rat.num+1));
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+               
+          case '+':
+               add_coefficients(&r->u.op2.operand1->u.coef,
+                                r->u.op2.operand1->u.coef,
+                                r->u.op2.operand2->u.coef);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+
+          case '-':
+               sub_coefficients(&r->u.op2.operand1->u.coef,
+                                r->u.op2.operand1->u.coef,
+                                r->u.op2.operand2->u.coef);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+
+          case '*':
+               mul_coefficients(&r->u.op2.operand1->u.coef,
+                                r->u.op2.operand1->u.coef,
+                                r->u.op2.operand2->u.coef);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+
+          case '/':
+               /* see if division will be exact */
+               div_coefficients3(&tq, &tr,
+                                 r->u.op2.operand1->u.coef,
+                                 r->u.op2.operand2->u.coef);
+               if (!coef_zero(tr)) {
+                    /* division is not exact so do nothing */
+                    free_coefficient(&tq);
+                    free_coefficient(&tr);
+                    break;
+               }
+
+               /* division is exact */
+               copy_coefficient(&r->u.op2.operand1->u.coef, tq);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               free_coefficient(&tq);
+               free_coefficient(&tr);
+               break;
+          }
+          break;
+
+     case op1_type:
+          extract_polys(&r->u.op1.operand);
+
+          if (r->u.op1.operand->type != coef_type) {
+               /* nothing to do here */
+               return;
+          }
+
+          switch (r->u.op1.operator) {
+          case UMINUS:
+               negate_coefficient(&r->u.op1.operand->u.coef);
+               *root = r->u.op1.operand;
+               r->u.op1.operand = NULL;
+               free_tree(r);
+               break;
+          }
+          break;
+
+     case coef_type:
+     case ratfun_type:
+          break;
+     }
+     
+}
