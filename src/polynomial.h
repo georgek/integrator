@@ -117,6 +117,9 @@ int coef_neg(Coefficient c);
 
 BigRat coef_rat_part(Coefficient c);
 
+/* reduces polynomial to rational if it is constant */
+void coef_const_canonicalise(Coefficient *c);
+
 void coef_differentiate(Coefficient *cd, Coefficient c);
 
 /* polynomials */

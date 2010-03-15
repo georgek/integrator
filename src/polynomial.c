@@ -417,8 +417,6 @@ void negate_coefficient(Coefficient *c)
      }
 }
 
-/* TODO: after poly operations, check for constants and turn in to
- * rationals */
 void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
@@ -435,11 +433,12 @@ void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           res->u.poly.head = NULL;
           add_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {
+     else {                     /* rat + poly */
           res->type = polynomial;
           res->u.poly.head = NULL;
           add_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
      }
+     coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
@@ -465,6 +464,7 @@ void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           sub_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
           negate_coefficient(res);
      }
+     coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
@@ -484,11 +484,12 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           res->u.poly.head = NULL;
           mul_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {
+     else {                     /* rat * poly */
           res->type = polynomial;
           res->u.poly.head = NULL;
           mul_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
      }
+     coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
@@ -501,6 +502,7 @@ void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
           res->u.rat.den = NULL;
           mul_bigrats2(&res->u.rat, left.u.rat, right);
      }
+     coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
@@ -520,9 +522,10 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           res->u.poly.head = NULL;
           div_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {
-          printf("div\n");
+     else {                     /* rat / poly */
+          printf("Error: rat/poly\n");
      }
+     coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
@@ -535,6 +538,7 @@ void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
           res->u.rat.den = NULL;
           div_bigrats2(&res->u.rat, left.u.rat, right);
      }
+     coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
@@ -571,6 +575,8 @@ void div_coefficients3(Coefficient *q, Coefficient *r,
           r->type = special;
           copy_coefficient(r, left);
      }
+     coef_const_canonicalise(q);
+     coef_const_canonicalise(r);
      free_coefficient(&old_q);
      free_coefficient(&old_r);
 }
@@ -662,6 +668,31 @@ BigRat coef_rat_part(Coefficient c)
      default:
           return r;
      }
+}
+
+void coef_const_canonicalise(Coefficient *c)
+{
+     Coefficient t;
+     
+     if (c->type == rational) {
+          return;
+     }
+
+     if (poly_deg(c->u.poly) > 0) {
+          return;
+     }
+
+     if (poly_zero(c->u.poly)) {
+          free_coefficient(c);
+          c->type = rational;
+          c->u.rat = make_bigrat3(0);
+          return;
+     }
+
+     t = poly_lc(c->u.poly);
+     c->u.poly.head->next->coeff.type = special;
+     free_poly(&c->u.poly);
+     *c = t;
 }
 
 void coef_differentiate(Coefficient *cd, Coefficient c)
