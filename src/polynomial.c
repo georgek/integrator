@@ -119,11 +119,11 @@ void print_poly_nonpretty(Polynomial p)
      /* iterate through monomials */
      do {
           /* don't print unit coefficient, unless we won't print variable */
-          if (!coef_one2(m->coeff) || m->degree == 0) {
+          if (!coef_one(m->coeff) || m->degree == 0) {
                print_coefficient_nonpretty(m->coeff);
           }
           /* coefficient and variable printed? */
-          if (!coef_one2(m->coeff) && m->degree != 0) {
+          if (!coef_one(m->coeff) && m->degree != 0) {
                printf("*");
           }
           /* print variable if degree > 0 */
