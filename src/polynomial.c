@@ -690,6 +690,7 @@ int coef_neg(Coefficient c)
 BigRat coef_rat_part(Coefficient c)
 {
      BigRat r = {NULL, NULL}, t = {NULL, NULL};
+     BigRat t1 = {NULL, NULL}, t2 = {NULL, NULL};
      MonoPtr p, q;
      
      switch (c.type) {
@@ -702,16 +703,22 @@ BigRat coef_rat_part(Coefficient c)
                return make_bigrat3(0);
           }
           if (q->coeff.type == special) { /* one coefficient */
-               return make_bigrat2(p->coeff.u.rat.den);
+               return coef_rat_part(p->coeff);
           }
           /* at least two coefficients */
           init_bigrat(&r);
-          gcd(&t.num, p->coeff.u.rat.den, q->coeff.u.rat.den);
-          mul_bignums(&r.num, p->coeff.u.rat.den, q->coeff.u.rat.den);
+          t1 = coef_rat_part(p->coeff);
+          t2 = coef_rat_part(q->coeff);
+          gcd(&t.num, t1.num, t2.num);
+          mul_bignums(&r.num, t1.num, t1.num);
           div_bignums(&r.num, &t.den, r.num, t.num);
+          free_bigrat(&t1);
+          free_bigrat(&t2);
           for (p = q->next; p->coeff.type != special; p = p->next) {
-               gcd(&t.num, r.num, p->coeff.u.rat.den);
-               mul_bignums(&r.num, r.num, p->coeff.u.rat.den);
+               t1 = coef_rat_part(p->coeff);
+               gcd(&t.num, r.num, t1.num);
+               mul_bignums(&r.num, r.num, t1.num);
+               free_bigrat(&t1);
                div_bignums(&r.num, &t.den, r.num, t.num);
           }
           free_bigrat(&t);
