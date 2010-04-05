@@ -739,7 +739,7 @@ void coef_differentiate(Coefficient *cd, Coefficient c)
 {
      switch (c.type)  {
      case rational:
-          free_bigrat(&cd->u.rat);
+          free_coefficient(cd);
           cd->type = rational;
           cd->u.rat = make_bigrat3(0);
           break;
