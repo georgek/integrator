@@ -759,9 +759,7 @@ void coef_content(Coefficient *cont, Coefficient p)
 {
      switch (p.type) {
      case rational:
-          free_coefficient(cont);
-          cont->type = rational;
-          cont->u.rat = make_bigrat3(1);
+          copy_coefficient(cont, p);
           break;
 
      case polynomial:
@@ -779,7 +777,9 @@ void coef_pp(Coefficient *pp, Coefficient p)
      
      switch (p.type) {
      case rational:
-          copy_coefficient(pp, p);
+          free_coefficient(pp);
+          pp->type = rational;
+          pp->u.rat = make_bigrat3(1);
           break;
 
      case polynomial:
@@ -1239,9 +1239,9 @@ void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
      while (!poly_zero(*R)
             && (s_degree = poly_deg2(*R, A.variable)-poly_deg2(B, A.variable))
             >= 0) {
-          printf("pseudo div: %d\n", s_degree);
-          print_poly(*R);
-          printf("\n");
+          /* printf("pseudo div: %d\n", s_degree); */
+          /* print_poly(*R); */
+          /* printf("\n"); */
           t->degree = s_degree;
           copy_coefficient(&t->coeff, poly_lc2(*R, A.variable));
           --N;
