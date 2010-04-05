@@ -64,7 +64,49 @@ node_type *add_poly(Polynomial poly)
      return p;
 }
 
-node_type *add_ratfun(Polynomial num, Polynomial den)
+/* node_type *add_ratfun(Polynomial num, Polynomial den) */
+/* { */
+/*      node_type *p; */
+/*      size_t node_size; */
+
+/*      node_size = SIZEOF_NODE + sizeof(ratfun_node_type); */
+/*      if ((p = malloc(node_size)) == NULL) { */
+/*           printf("out of memory\n"); */
+/*      } */
+     
+/*      /\* copy information *\/ */
+/*      p->type = ratfun_type; */
+/*      p->u.ratfun.num.type = polynomial; */
+/*      p->u.ratfun.den.type = polynomial; */
+/*      p->u.ratfun.num.u.poly = num; */
+/*      p->u.ratfun.den.u.poly = den; */
+/*      canonicalise_ratfun(&p->u.ratfun); */
+     
+/*      return p; */
+/* } */
+
+/* node_type *add_ratfun2(BigRat num, Polynomial den) */
+/* { */
+/*      node_type *p; */
+/*      size_t node_size; */
+
+/*      node_size = SIZEOF_NODE + sizeof(ratfun_node_type); */
+/*      if ((p = malloc(node_size)) == NULL) { */
+/*           printf("out of memory\n"); */
+/*      } */
+     
+/*      /\* copy information *\/ */
+/*      p->type = ratfun_type; */
+/*      p->u.ratfun.num.type = rational; */
+/*      p->u.ratfun.den.type = polynomial; */
+/*      p->u.ratfun.num.u.rat = num; */
+/*      p->u.ratfun.den.u.poly = den; */
+/*      canonicalise_ratfun(&p->u.ratfun); */
+     
+/*      return p; */
+/* } */
+
+node_type *add_ratfun(Coefficient num, Coefficient den)
 {
      node_type *p;
      size_t node_size;
@@ -76,31 +118,8 @@ node_type *add_ratfun(Polynomial num, Polynomial den)
      
      /* copy information */
      p->type = ratfun_type;
-     p->u.ratfun.num.type = polynomial;
-     p->u.ratfun.den.type = polynomial;
-     p->u.ratfun.num.u.poly = num;
-     p->u.ratfun.den.u.poly = den;
-     canonicalise_ratfun(&p->u.ratfun);
-     
-     return p;
-}
-
-node_type *add_ratfun2(BigRat num, Polynomial den)
-{
-     node_type *p;
-     size_t node_size;
-
-     node_size = SIZEOF_NODE + sizeof(ratfun_node_type);
-     if ((p = malloc(node_size)) == NULL) {
-          printf("out of memory\n");
-     }
-     
-     /* copy information */
-     p->type = ratfun_type;
-     p->u.ratfun.num.type = rational;
-     p->u.ratfun.den.type = polynomial;
-     p->u.ratfun.num.u.rat = num;
-     p->u.ratfun.den.u.poly = den;
+     p->u.ratfun.num = num;
+     p->u.ratfun.den = den;
      canonicalise_ratfun(&p->u.ratfun);
      
      return p;
@@ -450,7 +469,7 @@ void extract_polys(node_type **root)
           extract_polys(&(r->u.op2.operand2));
 
           if (r->u.op2.operand1->type != coef_type
-              && r->u.op2.operand2->type != coef_type) {
+              || r->u.op2.operand2->type != coef_type) {
                /* nothing to do here */
                return;
           }
@@ -505,9 +524,20 @@ void extract_polys(node_type **root)
                                  r->u.op2.operand1->u.coef,
                                  r->u.op2.operand2->u.coef);
                if (!coef_zero(tr)) {
-                    /* division is not exact so do nothing */
+                    /* division is not exact so this is a ratfun */
+                    printf("Not an exact division, so this is a rational function.\n");
+                    print_coefficient(tq);
+                    printf("\n");
+                    print_coefficient(tr);
+                    printf("\n");
                     free_coefficient(&tq);
                     free_coefficient(&tr);
+
+                    *root = add_ratfun(r->u.op2.operand1->u.coef,
+                                       r->u.op2.operand2->u.coef);
+                    r->u.op2.operand1->u.coef.type = special;
+                    r->u.op2.operand2->u.coef.type = special;
+                    free_tree(r);
                     break;
                }
 
@@ -533,6 +563,102 @@ void extract_polys(node_type **root)
           switch (r->u.op1.operator) {
           case UMINUS:
                negate_coefficient(&r->u.op1.operand->u.coef);
+               *root = r->u.op1.operand;
+               r->u.op1.operand = NULL;
+               free_tree(r);
+               break;
+          }
+          break;
+
+     case coef_type:
+     case ratfun_type:
+          break;
+     }
+     
+}
+
+void extract_ratfuns(node_type **root)
+{
+     node_type *r = *root;
+
+     switch (r->type) {
+     case op2_type:
+          extract_ratfuns(&(r->u.op2.operand1));
+          extract_ratfuns(&(r->u.op2.operand2));
+
+          if (r->u.op2.operand1->type != ratfun_type
+              || r->u.op2.operand2->type != ratfun_type) {
+               /* nothing to do here */
+               return;
+          }
+
+
+          switch (r->u.op2.operator) {
+          case '^':
+               if (r->u.op2.operand2->u.coef.type != rational
+                   || real_length(r->u.op2.operand2->u.coef.u.rat.num) != 1) {
+                    printf("Error! "
+                           "Indices must be single precision integers!\n");
+                    exit(1);
+               }
+
+               ratfun_power(&r->u.op2.operand1->u.ratfun,
+                            r->u.op2.operand1->u.ratfun,
+                            *(r->u.op2.operand2->u.coef.u.rat.num+1));
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+               
+          case '+':
+               add_ratfuns(&r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand2->u.ratfun);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+
+          case '-':
+               sub_ratfuns(&r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand2->u.ratfun);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+
+          case '*':
+               mul_ratfuns(&r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand2->u.ratfun);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+
+          case '/':
+               div_ratfuns(&r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand1->u.ratfun,
+                           r->u.op2.operand2->u.ratfun);
+               *root = r->u.op2.operand1;
+               r->u.op2.operand1 = NULL;
+               free_tree(r);
+               break;
+          }
+          break;
+
+     case op1_type:
+          extract_polys(&r->u.op1.operand);
+
+          if (r->u.op1.operand->type != ratfun_type) {
+               /* nothing to do here */
+               return;
+          }
+
+          switch (r->u.op1.operator) {
+          case UMINUS:
+               negate_ratfun(&r->u.op1.operand->u.ratfun);
                *root = r->u.op1.operand;
                r->u.op1.operand = NULL;
                free_tree(r);

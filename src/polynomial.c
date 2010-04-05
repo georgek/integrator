@@ -523,7 +523,7 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           div_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
      else {                     /* rat / poly */
-          printf("Error: rat/poly\n");
+          printf("Error: division was not exact: rat/poly\n");
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
@@ -581,6 +581,46 @@ void div_coefficients3(Coefficient *q, Coefficient *r,
      free_coefficient(&old_r);
 }
 
+void pseudo_div_coefficients(Coefficient *q, Coefficient *r,
+                             Coefficient left, Coefficient right)
+{
+     Coefficient old_q = *q;
+     Coefficient old_r = *r;
+     if (left.type == rational && right.type == rational) {
+          q->type = rational;
+          q->u.rat.num = NULL;
+          q->u.rat.den = NULL;
+          rat_coef_op(q, left, right, &div_bigrats);
+          r->type = rational;
+          r->u.rat = make_bigrat3(0);
+     }
+     else if (left.type == polynomial && right.type == polynomial) {
+          q->type = polynomial;
+          q->u.poly.head = NULL;
+          r->type = polynomial;
+          r->u.poly.head = NULL;
+          pseudo_div_polynomials(&q->u.poly, &r->u.poly,
+                                 left.u.poly, right.u.poly);
+     }
+     else if (left.type == polynomial && right.type == rational) {
+          q->type = polynomial;
+          q->u.poly.head = NULL;
+          div_poly_rat(&q->u.poly, left.u.poly, right.u.rat);
+          r->type = rational;
+          r->u.rat = make_bigrat3(0);
+     }
+     else {                     /* rational / poly */
+          q->type = rational;
+          q->u.rat = make_bigrat3(0);
+          r->type = special;
+          copy_coefficient(r, left);
+     }
+     coef_const_canonicalise(q);
+     coef_const_canonicalise(r);
+     free_coefficient(&old_q);
+     free_coefficient(&old_r);
+}
+
 void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
 {
      Coefficient old_res = *res;
@@ -616,7 +656,7 @@ void coef_gcd(Coefficient *res, Coefficient a, Coefficient b)
      else if (a.type == polynomial && b.type == polynomial) {
           res->type = polynomial;
           res->u.poly.head = NULL;
-          SubResultantGCD(&res->u.poly, a.u.poly, b.u.poly);
+          SubResultantGCD(res, a, b);
      }
      else {
           res->u.rat = make_bigrat3(1);
@@ -715,6 +755,62 @@ void coef_differentiate(Coefficient *cd, Coefficient c)
      
 }
 
+void coef_content(Coefficient *cont, Coefficient p)
+{
+     switch (p.type) {
+     case rational:
+          free_coefficient(cont);
+          cont->type = rational;
+          cont->u.rat = make_bigrat3(1);
+          break;
+
+     case polynomial:
+          poly_content(cont, p.u.poly);
+          break;
+
+     default:
+          break;
+     }
+}
+
+void coef_pp(Coefficient *pp, Coefficient p)
+{
+     Coefficient old_pp;
+     
+     switch (p.type) {
+     case rational:
+          copy_coefficient(pp, p);
+          break;
+
+     case polynomial:
+          old_pp = *pp;
+          pp->type = polynomial;
+          pp->u.poly.head = NULL;
+          poly_pp(&pp->u.poly, p.u.poly);
+          free_coefficient(&old_pp);
+          break;
+
+     default:
+          break;
+     }
+}
+
+const Coefficient coef_lc(Coefficient c)
+{
+     Coefficient f = {special};
+     
+     switch (c.type) {
+     case rational:
+          return c;
+
+     case polynomial:
+          return poly_lc(c.u.poly);
+
+     default:
+          return f;
+     }
+}
+
 int poly_zero(Polynomial p)
 {
      if (p.head->next->coeff.type == special) {
@@ -750,9 +846,40 @@ int poly_deg(Polynomial p)
      return p.head->next->degree;
 }
 
+int poly_deg2(Polynomial p, char var)
+{
+     if (var == p.variable) {
+          return p.head->next->degree;
+     }
+     else if (var < p.variable) {
+          return 0;
+     }
+     else {
+          printf("Error! Trying to get deg in higher ranking variable!\n");
+          return p.head->next->degree;
+     }
+}
+
 const Coefficient poly_lc(Polynomial p)
 {
      return p.head->next->coeff;
+}
+
+const Coefficient poly_lc2(Polynomial p, char var)
+{
+     Coefficient c;
+     if (var == p.variable) {
+          return p.head->next->coeff;
+     }
+     else if (var < p.variable) {
+          c.type = polynomial;
+          c.u.poly = p;
+          return c;
+     }
+     else {
+          printf("Error! Trying to get lc in higher ranking variable!\n");
+          return p.head->next->coeff;
+     }
 }
 
 void add_monomial(Polynomial *p, int degree, Coefficient coef)
@@ -873,7 +1000,7 @@ void add_polynomials(Polynomial *res, Polynomial left, Polynomial right)
 
      /* different variables */
      if (left.variable < right.variable) {
-          *res = make_zero_poly('x');
+          res->head = NULL;
           copy_poly(res, left);
           t.type = polynomial;
           t.u.poly = right;
@@ -882,7 +1009,7 @@ void add_polynomials(Polynomial *res, Polynomial left, Polynomial right)
           return;
      }
      else if (right.variable < left.variable) {
-          *res = make_zero_poly('x');
+          res->head = NULL;
           copy_poly(res, right);
           t.type = polynomial;
           t.u.poly = left;
@@ -909,14 +1036,31 @@ void sub_polynomials(Polynomial *res, Polynomial left, Polynomial right)
 {
      Polynomial old_res;
      MonoPtr p;
-     
-     if (left.variable != right.variable) {
-          printf("Error! Multivariate polynomials are not supported yet (sub).\n");
-          return;
-     }
+     Coefficient t;
 
      old_res = *res;
 
+     /* different variables */
+     if (left.variable < right.variable) {
+          res->head = NULL;
+          copy_poly(res, left);
+          t.type = polynomial;
+          t.u.poly = right;
+          sub_monomial(res, 0, t);
+          free_poly(&old_res);          
+          return;
+     }
+     else if (right.variable < left.variable) {
+          res->head = NULL;
+          copy_poly(res, right);
+          t.type = polynomial;
+          t.u.poly = left;
+          sub_monomial(res, 0, t);
+          free_poly(&old_res);          
+          return;
+     }
+
+     /* same variable */
      *res = make_zero_poly(left.variable);
 
      for (p = left.head->next; p->coeff.type != special; p = p->next) {
@@ -941,7 +1085,7 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
 
      /* different variables */
      if (left.variable < right.variable) {
-          *res = make_zero_poly('x');
+          res->head = NULL;
           copy_poly(res, left);
           t.type = polynomial;
           t.u.poly = right;
@@ -953,7 +1097,7 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
           return;
      }
      else if (right.variable < left.variable) {
-          *res = make_zero_poly('x');
+          res->head = NULL;
           copy_poly(res, right);
           t.type = polynomial;
           t.u.poly = left;
@@ -985,6 +1129,7 @@ void mul_polynomials(Polynomial *res, Polynomial left, Polynomial right)
 void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
 {
      Polynomial old_Q, old_R, T, BT;
+     Coefficient tc, tr;
      int s_degree;
      MonoPtr t;
 
@@ -992,13 +1137,47 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
           printf("Error! Polynomial division by zero!\n");
           return;
      }
-     if (A.variable != B.variable) {
-          printf("Error! Multivariate polynomials are not supported yet (div).\n");
-          return;
-     }
 
      old_Q = *Q;
      old_R = *R;
+
+     /* different variables */
+     if (A.variable < B.variable) {
+          /* this might divide - divide each coefficient of the LHS by the
+           * RHS, if one or more does not divide then the whole thing does not
+           * divide */
+          T.head = NULL;
+          copy_poly(&T, A);
+          tc.type = polynomial;
+          tc.u.poly = B;
+          tr.type = special;
+
+          for (t = T.head->next; t->coeff.type != special; t = t->next) {
+               div_coefficients3(&t->coeff, &tr, t->coeff, tc);
+               if (!coef_zero(tr)) {
+                    /* doesn't divide */
+                    *Q = make_zero_poly(A.variable);
+                    free_poly(&old_Q);
+                    copy_poly(R, A);
+                    return;
+               }
+          }
+          /* divided */
+          copy_poly(Q, T);
+          *R = make_zero_poly(A.variable);
+          free_poly(&old_R);
+          return;
+     }
+     else if (B.variable < A.variable) {
+          /* this definitely does not divide */
+          *Q = make_zero_poly('x');
+          copy_poly(R, A);
+          free_poly(&old_Q);
+          return;
+     }
+
+     /* same variables */
+     
      T = make_zero_poly(A.variable);
      BT = make_zero_poly(A.variable);
      /* setup T, it will contain only one monomial */
@@ -1036,10 +1215,6 @@ void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
           printf("Error! Polynomial division by zero!\n");
           return;
      }
-     if (A.variable != B.variable) {
-          printf("Error! Multivariate polynomials are not supported yet.\n");
-          return;
-     }
 
      old_Q = *Q;
      old_R = *R;
@@ -1055,15 +1230,20 @@ void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
      t->coeff.u.rat.den = NULL;
 
      b = make_zero_poly(A.variable);
-     add_monomial(&b, 0, poly_lc(B));
+     add_monomial(&b, 0, poly_lc2(B, A.variable));
 
-     N = poly_deg(A) - poly_deg(B) + 1;
+     N = poly_deg(A) - poly_deg2(B, A.variable) + 1;
      
      *Q = make_zero_poly(A.variable);
      copy_poly(R, A);
-     while (!poly_zero(*R) && (s_degree = poly_deg(*R)-poly_deg(B)) >= 0) {
+     while (!poly_zero(*R)
+            && (s_degree = poly_deg2(*R, A.variable)-poly_deg2(B, A.variable))
+            >= 0) {
+          printf("pseudo div: %d\n", s_degree);
+          print_poly(*R);
+          printf("\n");
           t->degree = s_degree;
-          copy_coefficient(&t->coeff, poly_lc(*R));
+          copy_coefficient(&t->coeff, poly_lc2(*R, A.variable));
           --N;
           mul_polynomials(Q, *Q, b);
           add_monomial(Q, s_degree, T.head->next->coeff);
@@ -1094,6 +1274,7 @@ void exact_div_polynomials(Polynomial *Q, Polynomial A, Polynomial B)
      if (!poly_zero(R)) {
           printf("Error! Exact division not exact!\n");
      }
+     free_poly(&R);
 }
 
 void add_poly_rat(Polynomial *res, Polynomial left, BigRat right)
@@ -1193,7 +1374,7 @@ void poly_power(Polynomial *res, Polynomial p, SHORT_INT_T power)
 void poly_splice_add(Polynomial *left, Polynomial *right)
 {
      MonoPtr q, q1, r, r1;
-     
+
      if (left->variable != right->variable) {
           add_polynomials(left, *left, *right);
           return;
@@ -1209,13 +1390,13 @@ void poly_splice_add(Polynomial *left, Polynomial *right)
      while (r->coeff.type != special) {
           /* find place for this monomial in left */
           for (; q->degree > r->degree; q1 = q, q = q->next);
-          printf("add: %d,%d\n",r->degree,q->degree);
+          /* printf("add: %d,%d\n",r->degree,q->degree); */
           if (r->degree == q->degree && q->coeff.type != special) {
                /* add coefficients */
                add_coefficients(&q->coeff, q->coeff, r->coeff);
                /* remove zero coefficient */
                if (coef_zero(q->coeff)) {
-                    printf("removing: %d\n", q->degree);
+                    /* printf("removing: %d\n", q->degree); */
                     q1->next = q->next;
                     free_coefficient(&q->coeff);
                     free(q);
@@ -1255,14 +1436,14 @@ void poly_splice_sub(Polynomial *left, Polynomial *right)
      while (r->coeff.type != special) {
           /* find place for this monomial in left */
           for (; q->degree > r->degree; q1 = q, q = q->next);
-          printf("sub: %d,%d\n",r->degree,q->degree);
+          /* printf("sub: %d,%d\n",r->degree,q->degree); */
           if (r->degree == q->degree && q->coeff.type != special) {
                /* sub coefficients */
                sub_coefficients(&q->coeff, q->coeff, r->coeff);
 
                /* remove zero coefficient */
                if (coef_zero(q->coeff)) {
-                    printf("removing: %d\n", q->degree);
+                    /* printf("removing: %d\n", q->degree); */
                     q1->next = q->next;
                     free_coefficient(&q->coeff);
                     free(q);

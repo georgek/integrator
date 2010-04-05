@@ -12,7 +12,7 @@
  * Integration I_ p. 24 */
 void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B);
 /* uses the subresultant PRS algorithm to calculate just the GCD */
-void SubResultantGCD(Polynomial *gcd, Polynomial A, Polynomial B);
+void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B);
 void GCDI(node_type *root);
 
 #endif /* _PRS_H_ */

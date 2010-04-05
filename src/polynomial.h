@@ -108,6 +108,8 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
 void div_coefficients3(Coefficient *q, Coefficient *r,
                        Coefficient left, Coefficient right);
+void pseudo_div_coefficients(Coefficient *q, Coefficient *r,
+                             Coefficient left, Coefficient right);
 
 void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power);
 
@@ -122,6 +124,13 @@ void coef_const_canonicalise(Coefficient *c);
 
 void coef_differentiate(Coefficient *cd, Coefficient c);
 
+/* content and primitive part */
+void coef_content(Coefficient *cont, Coefficient p);
+void coef_pp(Coefficient *pp, Coefficient p);
+
+/* leading coefficient */
+const Coefficient coef_lc(Coefficient c);
+
 /* polynomials */
 int poly_zero(Polynomial p);
 int poly_one(Polynomial p);
@@ -129,7 +138,9 @@ int poly_one(Polynomial p);
 int poly_one2(Polynomial p);
 
 int poly_deg(Polynomial p);
+int poly_deg2(Polynomial p, char var);
 const Coefficient poly_lc(Polynomial p);
+const Coefficient poly_lc2(Polynomial p, char var);
 
 /* polynomial arithmetic */
 void negate_polynomial(Polynomial *p);
