@@ -520,9 +520,9 @@ void extract_polys(node_type **root)
 
           case '/':
                /* see if division will be exact */
-               div_coefficients3(&tq, &tr,
-                                 r->u.op2.operand1->u.coef,
-                                 r->u.op2.operand2->u.coef);
+               polydiv_coefficients(&tq, &tr,
+                                    r->u.op2.operand1->u.coef,
+                                    r->u.op2.operand2->u.coef);
                if (!coef_zero(tr)) {
                     /* division is not exact so this is a ratfun */
                     printf("Not an exact division, so this is a rational function.\n");

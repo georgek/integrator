@@ -506,7 +506,8 @@ void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
      free_coefficient(&old_res);
 }
 
-void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
+void exact_div_coefficients(Coefficient *res,
+                            Coefficient left, Coefficient right)
 {
      Coefficient old_res = *res;
      if (left.type == rational && right.type == rational) {
@@ -523,13 +524,20 @@ void div_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           div_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
      else {                     /* rat / poly */
-          printf("Error: division was not exact: rat/poly\n");
+          if (coef_zero(left)) {
+               res->type = rational;
+               res->u.rat = make_bigrat3(0);
+          }
+          else {
+               printf("Error: division was not exact: rat/poly\n");
+          }
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
-void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
+void exact_div_coefficients2(Coefficient *res,
+                             Coefficient left, SHORT_INT_T right)
 {
      Coefficient old_res = *res;
      if (left.type == rational) {
@@ -538,12 +546,15 @@ void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
           res->u.rat.den = NULL;
           div_bigrats2(&res->u.rat, left.u.rat, right);
      }
+     else {
+          printf("Warning.. multivariate not supported (div coefs 2)!\n");
+     }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
 
-void div_coefficients3(Coefficient *q, Coefficient *r,
-                       Coefficient left, Coefficient right)
+void polydiv_coefficients(Coefficient *q, Coefficient *r,
+                          Coefficient left, Coefficient right)
 {
      Coefficient old_q = *q;
      Coefficient old_r = *r;
@@ -1153,7 +1164,7 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
           tr.type = special;
 
           for (t = T.head->next; t->coeff.type != special; t = t->next) {
-               div_coefficients3(&t->coeff, &tr, t->coeff, tc);
+               polydiv_coefficients(&t->coeff, &tr, t->coeff, tc);
                if (!coef_zero(tr)) {
                     /* doesn't divide */
                     *Q = make_zero_poly(A.variable);
@@ -1193,7 +1204,7 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
      copy_poly(R, A);
      while (!poly_zero(*R) && (s_degree = poly_deg(*R)-poly_deg(B)) >= 0) {
           t->degree = s_degree;
-          div_coefficients(&t->coeff, poly_lc(*R), poly_lc(B));
+          exact_div_coefficients(&t->coeff, poly_lc(*R), poly_lc(B));
           add_monomial(Q, s_degree, T.head->next->coeff);
           mul_polynomials(&BT, B, T);
           sub_polynomials(R, *R, BT);
@@ -1335,7 +1346,7 @@ void div_poly_rat(Polynomial *res, Polynomial left, BigRat right)
 
      /* divide each coefficient by the rational */
      for (q = res->head->next; q->coeff.type != special; q = q->next) {
-          div_coefficients(&q->coeff, q->coeff, coef);
+          exact_div_coefficients(&q->coeff, q->coeff, coef);
      }
 }
 
@@ -1550,7 +1561,7 @@ void poly_integrate(Polynomial *pi, Polynomial p)
      copy_poly(pi, p);
      for (q = pi->head->next; q->coeff.type != special; q = q->next) {
           /* increase power by one and divide by new power */
-          div_coefficients2(&q->coeff, q->coeff, ++q->degree);
+          exact_div_coefficients2(&q->coeff, q->coeff, ++q->degree);
      }
 }
 

@@ -36,7 +36,7 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
      PRINTC(Dd);
      coef_gcd(&Dm, D, Dd);
      PRINTC(Dm);
-     div_coefficients(&Ds, D, Dm);
+     exact_div_coefficients(&Ds, D, Dm);
      PRINTC(Ds);
 
      while (coef_deg(Dm) > 0) {
@@ -44,19 +44,21 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
           PRINTC(Dmd);
           coef_gcd(&Dm2, Dm, Dmd);
           PRINTC(Dm2);
-          div_coefficients(&Dms, Dm, Dm2);
+          exact_div_coefficients(&Dms, Dm, Dm2);
           PRINTC(Dms);
 
           mul_coefficients(&mDsDmd, Ds, Dmd);
-          div_coefficients(&mDsDmd, mDsDmd, Dm);
+          exact_div_coefficients(&mDsDmd, mDsDmd, Dm);
           negate_coefficient(&mDsDmd);
           PRINTC(mDsDmd);
 
+          PRINTC(Dms);
+          PRINTC(A);
           SolveDiophantineEquation(&B, &C, mDsDmd, Dms, A);
           PRINTC(B);
           PRINTC(C);
 
-          div_coefficients(&A, Ds, Dms);
+          exact_div_coefficients(&A, Ds, Dms);
           coef_differentiate(&Bd, B);
           mul_coefficients(&A, A, Bd);
           sub_coefficients(&A, C, A);

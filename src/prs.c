@@ -48,8 +48,8 @@ void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
           pseudo_div_polynomials(&Q, &R, ca_get(prs, i-1).u.poly,
                                  ca_get(prs, i).u.poly);
           ca_poly_push_back(prs, R);
-          div_coefficients(prs->head+i+1, *(prs->head+i+1),
-                           ca_get(&betas, i));
+          exact_div_coefficients(prs->head+i+1, *(prs->head+i+1),
+                                 ca_get(&betas, i));
           ++i;
           copy_coefficient(&rt, r);
           negate_coefficient(&rt);
@@ -57,12 +57,12 @@ void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
           if (delta > 0) {
                coef_power(&rt, rt, delta);
                coef_power(&gammat, gammat, delta-1);
-               div_coefficients(&gamma, rt, gammat);
+               exact_div_coefficients(&gamma, rt, gammat);
           }
           else {
                coef_power(&rt, rt, -delta);
                coef_power(&gammat, gammat, -delta);
-               div_coefficients(&gamma, gammat, rt);
+               exact_div_coefficients(&gamma, gammat, rt);
           }
           delta = poly_deg(ca_get(prs, i-1).u.poly) -
                poly_deg(ca_get(prs, i).u.poly);
@@ -75,7 +75,7 @@ void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
           }
           else if (delta < 0) {
                coef_power(&gammat, gamma, -delta);
-               div_coefficients(&beta, beta, gammat);
+               exact_div_coefficients(&beta, beta, gammat);
           }
           ca_push_back(&betas, beta);
      }
@@ -166,7 +166,7 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
           copy_coefficient(&r, coef_lc(b));
           pseudo_div_coefficients(&Q, &R, a, b);
 
-          div_coefficients(&R, R, beta);
+          exact_div_coefficients(&R, R, beta);
           copy_coefficient(&a, b);
           copy_coefficient(&b, R);
           if (coef_zero(b)) {
@@ -179,12 +179,12 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
           if (delta > 0) {
                coef_power(&rt, rt, delta);
                coef_power(&gammat, gammat, delta-1);
-               div_coefficients(&gamma, rt, gammat);
+               exact_div_coefficients(&gamma, rt, gammat);
           }
           else {
                coef_power(&rt, rt, -delta);
                coef_power(&gammat, gammat, -delta);
-               div_coefficients(&gamma, gammat, rt);
+               exact_div_coefficients(&gamma, gammat, rt);
           }
           delta = coef_deg(a) - coef_deg(b);
           
@@ -196,7 +196,7 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
           }
           else if (delta < 0) {
                coef_power(&gammat, gamma, -delta);
-               div_coefficients(&beta, beta, gammat);
+               exact_div_coefficients(&beta, beta, gammat);
           }
      }
 

@@ -104,10 +104,17 @@ void add_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right);
 void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
-void div_coefficients(Coefficient *res, Coefficient left, Coefficient right);
-void div_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right);
-void div_coefficients3(Coefficient *q, Coefficient *r,
-                       Coefficient left, Coefficient right);
+/* exact division of coefficients, always works for rationals, might not for
+ * polys, fails if the division is not exact */
+void exact_div_coefficients(Coefficient *res,
+                            Coefficient left, Coefficient right);
+/* mainly for dividing coefs by powers ie. in integration */
+void div_coefficients2(Coefficient *res,
+                       Coefficient left, SHORT_INT_T right);
+/* Euclidean division with remainder, might not work for multivariate polys */
+void polydiv_coefficients(Coefficient *q, Coefficient *r,
+                          Coefficient left, Coefficient right);
+/* pseudo-division with pseudo-remainder */
 void pseudo_div_coefficients(Coefficient *q, Coefficient *r,
                              Coefficient left, Coefficient right);
 
