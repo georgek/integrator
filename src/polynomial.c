@@ -1532,8 +1532,8 @@ void poly_pp(Polynomial *pp, Polynomial p)
      if (content.type == rational) {
           div_poly_rat(pp, p, content.u.rat);
      }
-     else {
-          printf("Polynomial coefficients not supported.\n");
+     else if (content.type == polynomial) {
+          exact_div_polynomials(pp, p, content.u.poly);
      }
 
      free_coefficient(&content);
