@@ -775,6 +775,13 @@ void coef_differentiate(Coefficient *cd, Coefficient c)
 
 void coef_content(Coefficient *cont, Coefficient p)
 {
+     if (coef_zero(p)) {
+          free_coefficient(cont);
+          cont->type = rational;
+          cont->u.rat = make_bigrat3(0);
+          return;
+     }
+          
      switch (p.type) {
      case rational:
           copy_coefficient(cont, p);
@@ -792,6 +799,13 @@ void coef_content(Coefficient *cont, Coefficient p)
 void coef_pp(Coefficient *pp, Coefficient p)
 {
      Coefficient old_pp;
+
+     if (coef_zero(p)) {
+          free_coefficient(pp);
+          pp->type = rational;
+          pp->u.rat = make_bigrat3(0);
+          return;
+     }
      
      switch (p.type) {
      case rational:
