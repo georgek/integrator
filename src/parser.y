@@ -30,7 +30,10 @@ void yyerror(char *s)
 
 char *rl_gets(int lineno);
 void initialise_readline();
+void finish_readline();
 void flex_get_rl_input();
+/* history file */
+static const char* history_file = ".gk_integrator_history";
 
 node_type *root = NULL;         /* root of parse tree */
 
@@ -95,7 +98,6 @@ statement:      expression '\n'
                         }
         |       QUIT
                         {
-                             /* exit(0); */
                              return 1;
                         }
         ;
@@ -180,8 +182,9 @@ int main (int argc, char *argv[])
      while (1) {
           input_line = rl_gets(lineno);
           if (input_line == NULL) {
+               /* EOF entered, normal exit */
                printf("\n");
-               return 0;
+               break;
           }
           input_line = strcat(input_line, "\n"); /* put nl back on */
           flex_get_rl_input();
@@ -191,7 +194,7 @@ int main (int argc, char *argv[])
                ++lineno;
           }
           else if (parseret == 1) {
-               /* exit */
+               /* normal exit */
                break;
           }
           else if (parseret == 2) {
@@ -203,6 +206,7 @@ int main (int argc, char *argv[])
      free(input_line);
      input_line = NULL;
 
+     finish_readline();
      return 0;
 }
 
@@ -234,4 +238,17 @@ void initialise_readline()
 {
      /* make tab just insert a tab */
      rl_bind_key ('\t', rl_insert);
+
+     /* history stuff */
+     using_history();
+     /* read from file */
+     read_history(history_file);
+}
+
+void finish_readline()
+{
+     int n;
+     
+     /* write history to file */
+     n = write_history(history_file);
 }
