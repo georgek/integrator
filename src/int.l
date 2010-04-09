@@ -23,7 +23,7 @@ UINT 0|[1-9][0-9]*
      return INTEGER;
 }
 
-[xyz] {
+[a-zA-Z] {
      yylval.var = *yytext;
      return VARIABLE;
 }
