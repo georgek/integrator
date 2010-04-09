@@ -80,4 +80,7 @@ void extract_polys(node_type **root);
 /* extract rational functions */
 void extract_ratfuns(node_type **root);
 
+/* sets the main variable if the user gives one */
+void set_main_var(node_type **root);
+
 #endif /* _TREE_H_ */

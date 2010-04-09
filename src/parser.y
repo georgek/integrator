@@ -9,13 +9,13 @@
 #include "bignum.h"
 #include "bigrat.h"
 #include "tree.h"
-#include "simplify.h"
 #include "polynomial.h"
 #include "euclidean.h"
 #include "coef_array.h"
 #include "prs.h"
 #include "squarefree.h"
 #include "hermite.h"
+#include "variables.h"
 
 int yylex(void);
 

@@ -25,15 +25,15 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
      copy_coefficient(&D, AD.den);
      PRINTC(D);
 
-     coef_differentiate(&Dd, D);
+     coef_differentiate(&Dd, D, 'x'); /* TODO vars */
      PRINTC(Dd);
      coef_gcd(&Dm, D, Dd);
      PRINTC(Dm);
      exact_div_coefficients(&Ds, D, Dm);
      PRINTC(Ds);
 
-     while (coef_deg(Dm) > 0) {
-          coef_differentiate(&Dmd, Dm);
+     while (coef_deg(Dm, 'x') > 0) { /* TODO vars */
+          coef_differentiate(&Dmd, Dm, 'x'); /* TODO vars */
           PRINTC(Dmd);
           coef_gcd(&Dm2, Dm, Dmd);
           PRINTC(Dm2);
@@ -52,7 +52,9 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
           PRINTC(C);
 
           exact_div_coefficients(&A, Ds, Dms);
-          coef_differentiate(&Bd, B);
+          PRINTC(B);
+          coef_differentiate(&Bd, B, 'x'); /* TODO vars */
+          PRINTC(Bd);
           mul_coefficients(&A, A, Bd);
           sub_coefficients(&A, C, A);
           PRINTC(A);

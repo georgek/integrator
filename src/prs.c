@@ -130,7 +130,7 @@ void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B)
      free_coefficient(&rest);
 }
 
-void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
+void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B, char var)
 {
      Coefficient Q = {special}, a = {special}, b = {special};
      Coefficient beta = {special}, gamma = {special}, gammat = {special};
@@ -142,6 +142,8 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
      /*      return; */
      /* } */
 
+     /* printf("*** begin subresultant PRS ***, var: %c\n", var); */
+
      copy_coefficient(&a, A);
      copy_coefficient(&b, B);
 
@@ -150,7 +152,7 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
      init_bigrat2(&gamma.u.rat, 1);
      negate_bigrat(&gamma.u.rat);
      
-     delta = coef_deg(A)-coef_deg(B);
+     delta = coef_deg(A, var)-coef_deg(B, var);
 
      /* beta <-- (-1)^(delta+1) */
      beta.type = rational;
@@ -164,7 +166,11 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
 
      while (!coef_zero(b)) {
           copy_coefficient(&r, coef_lc(b));
+          /* PRINTC(a); */
+          /* PRINTC(b); */
           pseudo_div_coefficients(&Q, &R, a, b);
+          /* PRINTC(Q); */
+          /* PRINTC(R); */
 
           exact_div_coefficients(&R, R, beta);
           copy_coefficient(&a, b);
@@ -180,13 +186,18 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
                coef_power(&rt, rt, delta);
                coef_power(&gammat, gammat, delta-1);
                exact_div_coefficients(&gamma, rt, gammat);
+               /* PRINTC(rt); */
+               /* PRINTC(gammat); */
           }
           else {
                coef_power(&rt, rt, -delta);
                coef_power(&gammat, gammat, -delta);
                exact_div_coefficients(&gamma, gammat, rt);
           }
-          delta = coef_deg(a) - coef_deg(b);
+          /* PRINTC(a); */
+          /* PRINTC(b); */
+          delta = coef_deg(a, var) - coef_deg(b, var);
+          /* printf("delta: %d\n",delta); */
           
           copy_coefficient(&beta, r);
           negate_coefficient(&beta);
@@ -196,20 +207,26 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
           }
           else if (delta < 0) {
                coef_power(&gammat, gamma, -delta);
+               /* PRINTC(beta); */
+               /* PRINTC(gammat); */
                exact_div_coefficients(&beta, beta, gammat);
+               /* PRINTC(beta); */
           }
      }
 
      copy_coefficient(gcd, a);
-     /* make monic, only works for rational coefs TODO */
-     /* div_poly_rat(gcd, *gcd, poly_lc(a).u.rat); */
 
      /* make primitive */
-     coef_pp(gcd, *gcd);
+     /* printf("*** the answer:\n"); */
+     /* PRINTC(*gcd); */
+     coef_pp(gcd, *gcd, var);
+     /* PRINTC(*gcd); */
      /* take the positive gcd */
      if (coef_neg(*gcd)) {
           negate_coefficient(gcd);
      }
+
+     /* printf("*** end subresultant PRS ***\n"); */
 
      free_coefficient(&Q);
      free_coefficient(&beta);
@@ -220,40 +237,48 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B)
      free_coefficient(&c);
 }
 
-/* void GCDI(node_type *root) */
-/* { */
-/*      Polynomial res = {'x', NULL}; */
-/*      BigNum res2 = NULL; */
+void GCDI(node_type *root)
+{
+     /* Polynomial res = {'x', NULL}; */
+     /* BigNum res2 = NULL; */
+     Coefficient res;
      
-/*      if (root->type != op2_type || root->u.op2.operator != ',') { */
-/*           printf("Error. GCD requires two inputs.\n"); */
-/*           return; */
-/*      } */
+     if (root->type != op2_type || root->u.op2.operator != ',') {
+          printf("Error. GCD requires two inputs.\n");
+          return;
+     }
 
-/*      if (root->u.op2.operand1->type == poly_type */
-/*          && root->u.op2.operand2->type == poly_type) { */
-/*           /\* polynomials *\/ */
-/*           SubResultantGCD(&res, root->u.op2.operand1->u.coef, */
-/*                           root->u.op2.operand2->u.coef); */
-/*           print_poly(res); */
-/*           printf("\n"); */
-/*           free_poly(&res); */
-/*      } */
-/*      else if (root->u.op2.operand1->type == rat_type */
-/*               && root->u.op2.operand2->type == rat_type */
-/*               && bn_one(root->u.op2.operand1->u.rat.den) */
-/*               && bn_one(root->u.op2.operand2->u.rat.den)) { */
-/*           /\* integers *\/ */
-/*           gcd(&res2, root->u.op2.operand1->u.rat.num, */
-/*               root->u.op2.operand2->u.rat.num); */
-/*           print_bignum(res2); */
-/*           printf("\n"); */
-/*           free_bignum(res2); */
-/*           res2 = NULL; */
-/*      } */
-/*      else { */
-/*           printf("Error. Input to GCD should be two polynomials " */
-/*                  "or two integers.\n"); */
-/*           return; */
-/*      } */
-/* } */
+     /* if (root->u.op2.operand1->type == coef_type */
+     /*     && root->u.op2.operand2->type == coef_type) { */
+     /*      /\* polynomials *\/ */
+     /*      SubResultantGCD(&res, root->u.op2.operand1->u.coef, */
+     /*                      root->u.op2.operand2->u.coef, 'x'); */
+     /*      print_poly(res); */
+     /*      printf("\n"); */
+     /*      free_poly(&res); */
+     /* } */
+     /* else if (root->u.op2.operand1->type == rat_type */
+     /*          && root->u.op2.operand2->type == rat_type */
+     /*          && bn_one(root->u.op2.operand1->u.rat.den) */
+     /*          && bn_one(root->u.op2.operand2->u.rat.den)) { */
+     /*      /\* integers *\/ */
+     /*      gcd(&res2, root->u.op2.operand1->u.rat.num, */
+     /*          root->u.op2.operand2->u.rat.num); */
+     /*      print_bignum(res2); */
+     /*      printf("\n"); */
+     /*      free_bignum(res2); */
+     /*      res2 = NULL; */
+     /* } */
+     if (root->u.op2.operand1->type != coef_type
+         || root->u.op2.operand2->type != coef_type) {
+          printf("Error. Input to GCD should be two polynomials "
+                 "or two integers.\n");
+          return;
+     }
+
+     coef_gcd(&res, root->u.op2.operand1->u.coef,
+              root->u.op2.operand2->u.coef);
+     print_coefficient_nonpretty(res);
+     printf("\n");
+     free_coefficient(&res);
+}

@@ -114,7 +114,7 @@ int coef_one(Coefficient c);
 /* returns true for 1 or -1 */
 int coef_one2(Coefficient c);
 
-int coef_deg(Coefficient c);
+int coef_deg(Coefficient c, char var);
 
 /* general coefficient arithmetic functions */
 void negate_coefficient(Coefficient *c);
@@ -147,11 +147,11 @@ BigRat coef_rat_part(Coefficient c);
 /* reduces polynomial to rational if it is constant */
 void coef_const_canonicalise(Coefficient *c);
 
-void coef_differentiate(Coefficient *cd, Coefficient c);
+void coef_differentiate(Coefficient *cd, Coefficient c, char var);
 
 /* content and primitive part */
-void coef_content(Coefficient *cont, Coefficient p);
-void coef_pp(Coefficient *pp, Coefficient p);
+void coef_content(Coefficient *cont, Coefficient p, char var);
+void coef_pp(Coefficient *pp, Coefficient p, char var);
 
 /* leading coefficient */
 const Coefficient coef_lc(Coefficient c);
@@ -192,10 +192,10 @@ void poly_splice_sub(Polynomial *left, Polynomial *right);
 int poly_neg(Polynomial p);
 
 /* content and primitive part */
-void poly_content(Coefficient *cont, Polynomial p);
-void poly_pp(Polynomial *pp, Polynomial p);
+void poly_content(Coefficient *cont, Polynomial p, char var);
+void poly_pp(Polynomial *pp, Polynomial p, char var);
 
-void poly_differentiate(Polynomial *pd, Polynomial p);
+void poly_differentiate(Polynomial *pd, Polynomial p, char var);
 void poly_integrate(Polynomial *pi, Polynomial p);
 
 /* rational part of polynomial ie. lcm of coef denominators */

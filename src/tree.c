@@ -5,6 +5,7 @@
 #include "bignum.h"
 #include "tree.h"
 #include "parser.h"
+#include "variables.h"
 
 /* size of node without contents */
 #define SIZEOF_NODE ((char *)&p->u.coef - (char *)p)
@@ -63,48 +64,6 @@ node_type *add_poly(Polynomial poly)
      
      return p;
 }
-
-/* node_type *add_ratfun(Polynomial num, Polynomial den) */
-/* { */
-/*      node_type *p; */
-/*      size_t node_size; */
-
-/*      node_size = SIZEOF_NODE + sizeof(ratfun_node_type); */
-/*      if ((p = malloc(node_size)) == NULL) { */
-/*           printf("out of memory\n"); */
-/*      } */
-     
-/*      /\* copy information *\/ */
-/*      p->type = ratfun_type; */
-/*      p->u.ratfun.num.type = polynomial; */
-/*      p->u.ratfun.den.type = polynomial; */
-/*      p->u.ratfun.num.u.poly = num; */
-/*      p->u.ratfun.den.u.poly = den; */
-/*      canonicalise_ratfun(&p->u.ratfun); */
-     
-/*      return p; */
-/* } */
-
-/* node_type *add_ratfun2(BigRat num, Polynomial den) */
-/* { */
-/*      node_type *p; */
-/*      size_t node_size; */
-
-/*      node_size = SIZEOF_NODE + sizeof(ratfun_node_type); */
-/*      if ((p = malloc(node_size)) == NULL) { */
-/*           printf("out of memory\n"); */
-/*      } */
-     
-/*      /\* copy information *\/ */
-/*      p->type = ratfun_type; */
-/*      p->u.ratfun.num.type = rational; */
-/*      p->u.ratfun.den.type = polynomial; */
-/*      p->u.ratfun.num.u.rat = num; */
-/*      p->u.ratfun.den.u.poly = den; */
-/*      canonicalise_ratfun(&p->u.ratfun); */
-     
-/*      return p; */
-/* } */
 
 node_type *add_ratfun(Coefficient num, Coefficient den)
 {
@@ -526,10 +485,8 @@ void extract_polys(node_type **root)
                if (!coef_zero(tr)) {
                     /* division is not exact so this is a ratfun */
                     printf("Not an exact division, so this is a rational function.\n");
-                    print_coefficient(tq);
-                    printf("\n");
-                    print_coefficient(tr);
-                    printf("\n");
+                    PRINTC(tq);
+                    PRINTC(tr);
                     free_coefficient(&tq);
                     free_coefficient(&tr);
 
@@ -669,6 +626,27 @@ void extract_ratfuns(node_type **root)
      case coef_type:
      case ratfun_type:
           break;
+     }
+     
+}
+
+void set_main_var(node_type **root)
+{
+     node_type *r = *root;
+     
+     if (r->type != op2_type || r->u.op2.operator != ',') {
+          return;
+     }
+
+     if (r->u.op2.operand2->type == coef_type) {
+          set_top_var(r->u.op2.operand2->u.coef.u.poly.variable);
+          *root = r->u.op2.operand1;
+          r->u.op2.operand1 = NULL;
+          free_tree(r);
+          return;
+     }
+     else if (r->u.op2.operand2->type == op2_type) {
+          set_main_var(&r->u.op2.operand2);
      }
      
 }

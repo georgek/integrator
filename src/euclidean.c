@@ -216,7 +216,7 @@ void HalfSolveDiophantineEquation(Coefficient *s,
      }
 
      mul_coefficients(s, q, *s);
-     if (!coef_zero(*s) && coef_deg(*s) >= coef_deg(b)) {
+     if (!coef_zero(*s) && coef_deg(*s, 'x') >= coef_deg(b, 'x')) { /* TODO vars */
           polydiv_coefficients(&q, &r, *s, b);
           copy_coefficient(s, r);
      }
