@@ -506,6 +506,8 @@ void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
      }
      else if (left.type == polynomial) {
           temp = make_bigrat3(right);
+          res->type = polynomial;
+          res->u.poly.head = NULL;
           mul_poly_rat(&res->u.poly, left.u.poly, temp);
           free_bigrat(&temp);
      }
@@ -800,6 +802,8 @@ void coef_const_canonicalise(Coefficient *c)
 
 void coef_differentiate(Coefficient *cd, Coefficient c, char var)
 {
+     Coefficient old_cd;
+     
      switch (c.type)  {
      case rational:
           free_coefficient(cd);
@@ -808,15 +812,17 @@ void coef_differentiate(Coefficient *cd, Coefficient c, char var)
           break;
 
      case polynomial:
+          old_cd = *cd;
           cd->type = polynomial;
+          cd->u.poly.head = NULL;
           poly_differentiate(&cd->u.poly, c.u.poly, var);
+          free_coefficient(&old_cd);
           break;
 
      default:
           break;
      }
      coef_const_canonicalise(cd);
-     
 }
 
 void coef_content(Coefficient *cont, Coefficient p, char var)
