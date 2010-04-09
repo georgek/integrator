@@ -693,15 +693,13 @@ void coef_gcd(Coefficient *res, Coefficient a, Coefficient b)
                var = b.u.poly.variable;
           }
           
-          /* TODO we should only calculate contents once, then divide to get
-           * pp */
           coef_content(&ac, a, var);
           /* PRINTC(ac); */
           coef_content(&bc, b, var);
           /* PRINTC(bc); */
-          coef_pp(&app, a, var);
+          exact_div_coefficients(&app, a, ac);
           /* PRINTC(app); */
-          coef_pp(&bpp, b, var);
+          exact_div_coefficients(&bpp, b, bc);
           /* PRINTC(bpp); */
 
           coef_gcd(&cgcd, ac, bc);
