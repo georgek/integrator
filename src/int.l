@@ -11,7 +11,6 @@
 #include "bignum.h"
 #include "tree.h"
 #include "parser.h"
-
 %}
 
 UINT 0|[1-9][0-9]*
@@ -79,3 +78,12 @@ UINT 0|[1-9][0-9]*
 
 %%
 
+extern char *input_line;
+
+void flex_get_rl_input()
+{
+     /* delete old buffer */
+     yy_delete_buffer(YY_CURRENT_BUFFER);
+     /* make new buffer which scans string and switch to it */
+     yy_scan_string(input_line);
+}

@@ -4,7 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+#include <string.h>
 #include <limits.h>
+
+#include <readline/readline.h>
+#include <readline/history.h>
 
 #include "bignum.h"
 #include "bigrat.h"
@@ -24,7 +28,13 @@ void yyerror(char *s)
      fprintf(stderr, "%s\n", s);
 }
 
+char *rl_gets(int lineno);
+void initialise_readline();
+void flex_get_rl_input();
+
 node_type *root = NULL;         /* root of parse tree */
+
+char* input_line = NULL;        /* line of input from readline */
 %}
 
 %union {
@@ -48,11 +58,11 @@ node_type *root = NULL;         /* root of parse tree */
 
 %%
 
-statement_list: statement '\n'
-        |       statement_list statement '\n'
-        ;
+/* statement_list: statement '\n' */
+/*         |       statement_list statement '\n' */
+/*         ; */
 
-statement:      expression
+statement:      expression '\n'
                         {
                              root = $1;
                              /* simple_simplify(&root); */
@@ -77,15 +87,16 @@ statement:      expression
                              free_tree(root);
                              root = NULL;
                              make_var_tab();
-                             printf("-> ");
+                             return 0;
                         }
         |       error
                         {
-                             printf("-> ");
+                             return 2;
                         }
         |       QUIT
                         {
-                             exit(0);
+                             /* exit(0); */
+                             return 1;
                         }
         ;
 
@@ -156,10 +167,71 @@ expression:     expression '+' expression
 
 int main (int argc, char *argv[])
 {
-     printf("Integrator.\n"
-            "Enter some expressions in x:\n");
+     int parseret = 0;
+     unsigned lineno = 1;
 
-     printf("-> ");
-     yyparse();
+     initialise_readline();
+
+     printf("Integrator.\n"
+            "Enter expressions in x (by default).\n"
+            "Type quit, or enter an EOF to quit.\n");
+
+     /* user input prompt */
+     while (1) {
+          input_line = rl_gets(lineno);
+          if (input_line == NULL) {
+               printf("\n");
+               return 0;
+          }
+          input_line = strcat(input_line, "\n"); /* put nl back on */
+          flex_get_rl_input();
+          parseret = yyparse();
+          if (parseret == 0) {
+               /* normal input */
+               ++lineno;
+          }
+          else if (parseret == 1) {
+               /* exit */
+               break;
+          }
+          else if (parseret == 2) {
+               /* error, delete rest of line */
+               free(input_line);
+               input_line = NULL;
+          }
+     }
+     free(input_line);
+     input_line = NULL;
+
      return 0;
+}
+
+/* Read a string, and return a pointer to it.  Returns NULL on EOF. */
+char *rl_gets (int lineno)
+{
+     char prompt[12];
+     
+     /* If the buffer has already been allocated, return the memory to the
+        free pool. */
+     if (input_line) {
+          free(input_line);
+          input_line = NULL;
+     }
+
+     /* Get a line from the user. */
+     sprintf(prompt, "(%d) -> ", lineno);
+     input_line = readline(prompt);
+
+     /* If the line has any text in it, save it on the history. */
+     if (input_line && *input_line) {
+          add_history(input_line);
+     }
+
+     return input_line;
+}
+
+void initialise_readline()
+{
+     /* make tab just insert a tab */
+     rl_bind_key ('\t', rl_insert);
 }
