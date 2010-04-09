@@ -18,6 +18,10 @@ void canonicalise_ratfun(RatFun *r)
      Coefficient t = {rational, {{NULL, NULL}}};
      Coefficient s = {rational, {{NULL, NULL}}};
 
+     printf("canonicalising ratfun...\n");
+     PRINTC(r->num);
+     PRINTC(r->den);
+
      if (coef_zero(r->num)){
           free_coefficient(&r->den);
           r->den.type = rational;
@@ -43,18 +47,24 @@ void canonicalise_ratfun(RatFun *r)
 
      /* reduce */
      if (r->num.type == polynomial && r->den.type == polynomial) {
+          printf("reducing ratfun...\n");
+          PRINTC(r->num);
+          PRINTC(r->den);
           coef_gcd(&t, r->num, r->den);
-          div_coefficients(&r->num, r->num, t);
-          div_coefficients(&r->den, r->den, t);
+          PRINTC(r->num);
+          PRINTC(r->den);
+          PRINTC(t);
+          exact_div_coefficients(&r->num, r->num, t);
+          exact_div_coefficients(&r->den, r->den, t);
           free_coefficient(&t);
           /* divide through by gcd of poly contents */
-          poly_content(&t, r->num.u.poly);
-          poly_content(&s, r->den.u.poly);
-          coef_gcd(&t, t, s);
-          div_coefficients(&r->num, r->num, t);
-          div_coefficients(&r->den, r->den, t);
-          free_coefficient(&t);
-          free_coefficient(&s);
+          /* coef_content(&t, r->num); */
+          /* coef_content(&s, r->den); */
+          /* coef_gcd(&t, t, s); */
+          /* exact_div_coefficients(&r->num, r->num, t); */
+          /* exact_div_coefficients(&r->den, r->den, t); */
+          /* free_coefficient(&t); */
+          /* free_coefficient(&s); */
      }
 }
 
@@ -64,9 +74,9 @@ void print_ratfun(RatFun r)
           printf("zero");
           return;
      }
-     print_coefficient(r.num);
+     print_coefficient_nonpretty(r.num);
      printf("/");
-     print_coefficient(r.den);
+     print_coefficient_nonpretty(r.den);
 }
 
 void copy_ratfun(RatFun *r, RatFun s)

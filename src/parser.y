@@ -55,14 +55,17 @@ statement_list: statement '\n'
 statement:      expression
                         {
                              root = $1;
-                             simple_simplify(&root);
+                             /* simple_simplify(&root); */
+                             set_main_var(&root);
+                             printf("Variable table:\n");
+                             print_var_tab();
                              printf("Input:\n");
                              print_prefix(root);
                              print_postfix(root);
                              print_prefix_lisp(root);
                              print_infix(root);
                              extract_polys(&root);
-                             extract_ratfuns(&root);
+                             /* extract_ratfuns(&root); */
                              printf("---\n");
                              print_prefix_lisp(root);
                              printf("Integral:\n");
@@ -73,11 +76,12 @@ statement:      expression
                              /* GCDI(root); */
                              free_tree(root);
                              root = NULL;
+                             make_var_tab();
                              printf("-> ");
                         }
         |       error
                         {
-                             printf("error\n");
+                             printf("-> ");
                         }
         |       QUIT
                         {
@@ -144,6 +148,7 @@ expression:     expression '+' expression
         |       VARIABLE
                         {
                              $$ = add_var($1);
+                             add_var_cell($1);
                         }
         ;
 
@@ -330,6 +335,9 @@ int main (int argc, char *argv[])
      /* free_poly(&poly3); */
      /* free_poly(&poly4); */
      /* free_poly(&poly5); */
+
+     printf("Integrator.\n"
+            "Enter some expressions in x:\n");
 
      printf("-> ");
      yyparse();
