@@ -3,6 +3,12 @@
 #ifndef _RATFUN_H_
 #define _RATFUN_H_
 
+/* useful macro */
+#define PRINTR(r) printf(#r ": ");              \
+     print_ratfun(r);                           \
+     printf("\t\t(rational function)");         \
+     printf("\n")
+
 #include "bigrat.h"
 #include "polynomial.h"
 

@@ -1,10 +1,3 @@
-#define PRINTC(c) printf(#c ": ");              \
-     print_coefficient(c);                      \
-     printf("\n")
-#define PRINTR(r) printf(#r ": ");              \
-     print_ratfun(r);                           \
-     printf("\n")
-
 #include <stdio.h>
 
 #include "euclidean.h"

@@ -10,6 +10,24 @@
 #ifndef _POLYNOMIAL_H_
 #define _POLYNOMIAL_H_
 
+/* useful macro for printing polys */
+#define PRINTP(p) printf(#p ": ");              \
+     printf("\t\t");                            \
+     print_poly_nonpretty(p);                   \
+     printf("\n")
+
+
+/* useful macro for printing coefficients */
+#define PRINTC(c) printf(#c ": ");              \
+     printf("\t\t");                            \
+     print_coefficient_nonpretty(c);            \
+     printf("\t\t");                            \
+     if ((c).type == rational)                  \
+     printf("(rational)");                      \
+     else if ((c).type == polynomial)           \
+          printf("(polynomial)");               \
+     printf("\n")
+
 #include "bigrat.h"
 
 typedef enum coef_types {
