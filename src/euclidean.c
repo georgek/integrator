@@ -37,8 +37,6 @@ void Euclidean(Coefficient *res, Coefficient a, Coefficient b)
      res->type = polynomial;
      res->u.poly.head = NULL;
      copy_poly(&res->u.poly, na);
-     /* make monic */
-     div_poly_rat(&res->u.poly, res->u.poly, poly_lc(na).u.rat);
 
      free_poly(&na);
      free_poly(&nb);

@@ -154,7 +154,7 @@ void coef_content(Coefficient *cont, Coefficient p, char var);
 void coef_pp(Coefficient *pp, Coefficient p, char var);
 
 /* leading coefficient */
-const Coefficient coef_lc(Coefficient c);
+const Coefficient coef_lc(Coefficient c, char var);
 
 /* polynomials */
 int poly_zero(Polynomial p);
@@ -164,8 +164,7 @@ int poly_one2(Polynomial p);
 
 int poly_deg(Polynomial p);
 int poly_deg2(Polynomial p, char var);
-const Coefficient poly_lc(Polynomial p);
-const Coefficient poly_lc2(Polynomial p, char var);
+const Coefficient poly_lc(Polynomial p, char var);
 
 /* polynomial arithmetic */
 void negate_polynomial(Polynomial *p);
