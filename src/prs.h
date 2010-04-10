@@ -10,9 +10,11 @@
 
 /* implementation of subresultant algorithm from Bronstein's _Symbolic
  * Integration I_ p. 24 */
-void SubResultant(Polynomial *res, CoefArray *prs, Polynomial A, Polynomial B);
+void SubResultant(Coefficient *res, CoefArray *prs,
+                  Coefficient A, Coefficient B, char var);
 /* uses the subresultant PRS algorithm to calculate just the GCD */
 void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B, char var);
 void GCDI(node_type *root);
+void SubResultantPRSI(node_type *root, char var);
 
 #endif /* _PRS_H_ */

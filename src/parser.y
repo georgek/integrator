@@ -36,7 +36,7 @@ void flex_get_rl_input();
 static const char* history_file = ".gk_integrator_history";
 
 node_type *root = NULL;         /* root of parse tree */
-char main_var;
+char main_var = 'x';
 
 char* input_line = NULL;        /* line of input from readline */
 %}
@@ -88,8 +88,8 @@ statement:      expression '\n'
                              /* SquarefreeI(root, main_var); */
                              printf("GCD:\n");
                              GCDI(root);
-                             /* printf("Subresultant PRS:\n"); */
-                             /* SubResultantPRSI(root, main_var); */
+                             printf("Subresultant PRS:\n");
+                             SubResultantPRSI(root, main_var);
                              free_tree(root);
                              root = NULL;
                              make_var_tab();
