@@ -630,6 +630,8 @@ void extract_ratfuns(node_type **root)
      
 }
 
+extern char main_var;
+
 void set_main_var(node_type **root)
 {
      node_type *r = *root;
@@ -640,6 +642,7 @@ void set_main_var(node_type **root)
 
      if (r->u.op2.operand2->type == coef_type) {
           set_top_var(r->u.op2.operand2->u.coef.u.poly.variable);
+          main_var = r->u.op2.operand2->u.coef.u.poly.variable;
           *root = r->u.op2.operand1;
           r->u.op2.operand1 = NULL;
           free_tree(r);

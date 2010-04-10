@@ -36,6 +36,7 @@ void flex_get_rl_input();
 static const char* history_file = ".gk_integrator_history";
 
 node_type *root = NULL;         /* root of parse tree */
+char main_var;
 
 char* input_line = NULL;        /* line of input from readline */
 %}
@@ -81,12 +82,14 @@ statement:      expression '\n'
                              /* extract_ratfuns(&root); */
                              printf("---\n");
                              print_prefix_lisp(root);
-                             printf("Integral:\n");
-                             HermiteReduceI(root);
+                             /* printf("Integral:\n"); */
+                             /* HermiteReduceI(root); */
                              /* printf("Squarefree factorisation:\n"); */
-                             /* SquarefreeI(root); */
-                             /* printf("GCD:\n"); */
-                             /* GCDI(root); */
+                             /* SquarefreeI(root, main_var); */
+                             printf("GCD:\n");
+                             GCDI(root);
+                             /* printf("Subresultant PRS:\n"); */
+                             /* SubResultantPRSI(root, main_var); */
                              free_tree(root);
                              root = NULL;
                              make_var_tab();
@@ -228,7 +231,13 @@ char *rl_gets (int lineno)
 
      /* If the line has any text in it, save it on the history. */
      if (input_line && *input_line) {
+          /* if this line was from history, remove the old one */
+          if (current_history() != NULL) {
+               free_history_entry(remove_history(where_history()));
+          }
           add_history(input_line);
+          /* save history here as well in case program segfaults */
+          write_history(history_file);
      }
 
      return input_line;
@@ -248,7 +257,8 @@ void initialise_readline()
 void finish_readline()
 {
      int n;
-     
      /* write history to file */
      n = write_history(history_file);
+     /* trim file */
+     history_truncate_file(history_file, 400);
 }
