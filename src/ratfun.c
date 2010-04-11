@@ -16,11 +16,11 @@ void init_ratfun(RatFun *r)
 void canonicalise_ratfun(RatFun *r)
 {
      Coefficient t = {rational, {{NULL, NULL}}};
-     Coefficient s = {rational, {{NULL, NULL}}};
+     /* Coefficient s = {rational, {{NULL, NULL}}}; */
 
-     printf("canonicalising ratfun...\n");
-     PRINTC(r->num);
-     PRINTC(r->den);
+     /* printf("canonicalising ratfun...\n"); */
+     /* PRINTC(r->num); */
+     /* PRINTC(r->den); */
 
      if (coef_zero(r->num)){
           free_coefficient(&r->den);
@@ -47,13 +47,13 @@ void canonicalise_ratfun(RatFun *r)
 
      /* reduce */
      if (r->num.type == polynomial && r->den.type == polynomial) {
-          printf("reducing ratfun...\n");
-          PRINTC(r->num);
-          PRINTC(r->den);
+          /* printf("reducing ratfun...\n"); */
+          /* PRINTC(r->num); */
+          /* PRINTC(r->den); */
           coef_gcd(&t, r->num, r->den);
-          PRINTC(r->num);
-          PRINTC(r->den);
-          PRINTC(t);
+          /* PRINTC(r->num); */
+          /* PRINTC(r->den); */
+          /* PRINTC(t); */
           exact_div_coefficients(&r->num, r->num, t);
           exact_div_coefficients(&r->den, r->den, t);
           free_coefficient(&t);
@@ -94,6 +94,7 @@ void free_ratfun(RatFun *r)
 void add_ratfuns(RatFun *res, RatFun left, RatFun right)
 {
      RatFun t;
+     init_ratfun(&t);
 
      /* use t.num and t.den to hold temporary values */
      mul_coefficients(&t.num, left.num, right.den);
@@ -114,6 +115,7 @@ void add_ratfuns(RatFun *res, RatFun left, RatFun right)
 void sub_ratfuns(RatFun *res, RatFun left, RatFun right)
 {
      RatFun t;
+     init_ratfun(&t);
 
      /* use t.num and t.den to hold temporary values */
      mul_coefficients(&t.num, left.num, right.den);
@@ -134,6 +136,7 @@ void sub_ratfuns(RatFun *res, RatFun left, RatFun right)
 void mul_ratfuns(RatFun *res, RatFun left, RatFun right)
 {
      RatFun t;
+     init_ratfun(&t);
 
      mul_coefficients(&t.num, left.num, right.num);
      mul_coefficients(&t.den, left.den, right.den);
@@ -148,6 +151,7 @@ void div_ratfuns(RatFun *res, RatFun left, RatFun right)
 {
      /* same as multiply except inverts right */
      RatFun t;
+     init_ratfun(&t);
 
      mul_coefficients(&t.num, left.num, right.den);
      mul_coefficients(&t.den, left.den, right.num);
@@ -184,6 +188,7 @@ void add_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = polynomial;
      tc.u.poly = right;
 
@@ -207,6 +212,7 @@ void sub_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = polynomial;
      tc.u.poly = right;
 
@@ -230,6 +236,7 @@ void mul_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = polynomial;
      tc.u.poly = right;
 
@@ -247,6 +254,7 @@ void div_ratfun_poly(RatFun *res, RatFun left, Polynomial right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = polynomial;
      tc.u.poly = right;
 
@@ -264,6 +272,7 @@ void add_ratfun_rat(RatFun *res, RatFun left, BigRat right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = rational;
      tc.u.rat.den = make_bignum2(1);
 
@@ -292,6 +301,7 @@ void sub_ratfun_rat(RatFun *res, RatFun left, BigRat right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = rational;
      tc.u.rat.den = make_bignum2(1);
 
@@ -320,6 +330,7 @@ void mul_ratfun_rat(RatFun *res, RatFun left, BigRat right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = rational;
      tc.u.rat.den = make_bignum2(1);
 
@@ -340,6 +351,7 @@ void div_ratfun_rat(RatFun *res, RatFun left, BigRat right)
 {
      RatFun t;
      Coefficient tc;
+     init_ratfun(&t);
      tc.type = rational;
      tc.u.rat.den = make_bignum2(1);
 
