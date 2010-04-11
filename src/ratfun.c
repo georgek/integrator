@@ -10,7 +10,7 @@
 void init_ratfun(RatFun *r)
 {
      r->num.type = special;
-     r->num.type = special;
+     r->den.type = special;
 }
 
 void canonicalise_ratfun(RatFun *r)
