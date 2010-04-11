@@ -148,6 +148,7 @@ BigRat coef_rat_part(Coefficient c);
 void coef_const_canonicalise(Coefficient *c);
 
 void coef_differentiate(Coefficient *cd, Coefficient c, char var);
+void coef_integrate(Coefficient *ci, Coefficient c, char var);
 
 /* content and primitive part */
 void coef_content(Coefficient *cont, Coefficient p, char var);
@@ -195,7 +196,7 @@ void poly_content(Coefficient *cont, Polynomial p, char var);
 void poly_pp(Polynomial *pp, Polynomial p, char var);
 
 void poly_differentiate(Polynomial *pd, Polynomial p, char var);
-void poly_integrate(Polynomial *pi, Polynomial p);
+void poly_integrate(Polynomial *pi, Polynomial p, char var);
 
 /* rational part of polynomial ie. lcm of coef denominators */
 BigRat poly_rat_part(Polynomial p);

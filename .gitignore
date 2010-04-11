@@ -44,3 +44,4 @@ autom4te.cache/
 /ylwrap
 /INSTALL
 /.gk_integrator_history
+/src/.gk_integrator_history

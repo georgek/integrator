@@ -16,34 +16,34 @@ void Squarefree(CoefArray *f, Coefficient A, char var)
      Coefficient S = {special},Sd = {special},Sm = {special};
      Coefficient Ss = {special}, Ssd = {special}, Y = {special};
      Coefficient Z = {special}, At = {special};
-     unsigned i = 1;
+     /* unsigned i = 1; */
 
      /* c <-- content(A) */
      coef_content(&c, A, var);
-     PRINTC(c);
+     /* PRINTC(c); */
      /* S <-- pp(A) */
      exact_div_coefficients(&S, A, c);
      coef_differentiate(&Sd, S, var);
-     PRINTC(Sd);
+     /* PRINTC(Sd); */
      coef_gcd(&Sm, S, Sd);
-     PRINTC(Sm);
+     /* PRINTC(Sm); */
      exact_div_coefficients(&Ss, S, Sm);
      exact_div_coefficients(&Y, Sd, Sm);
-     PRINTC(Y);
+     /* PRINTC(Y); */
 
      coef_differentiate(&Ssd, Ss, var);
-     PRINTC(Ssd);
+     /* PRINTC(Ssd); */
      sub_coefficients(&Z, Y, Ssd);
      while (!coef_zero(Z)) {
           coef_gcd(&At, Ss, Z);
-          PRINTC(At);
+          /* PRINTC(At); */
           Ak = ca_push_back(f, At);
           
-          printf("%d\n", i++);
-          PRINTC(Ss);
-          PRINTC(Y);
-          PRINTC(Z);
-          PRINTC(*Ak);
+          /* printf("%d\n", i++); */
+          /* PRINTC(Ss); */
+          /* PRINTC(Y); */
+          /* PRINTC(Z); */
+          /* PRINTC(*Ak); */
           
           exact_div_coefficients(&Ss, Ss, *Ak);
           exact_div_coefficients(&Y, Z, *Ak);
@@ -52,13 +52,13 @@ void Squarefree(CoefArray *f, Coefficient A, char var)
           sub_coefficients(&Z, Y, Ssd);
      }
 
-     printf("%d\n", i++);
-     PRINTC(Ss);
-     PRINTC(Y);
-     PRINTC(Z);
-     if (Ak) {
-          PRINTC(*Ak);
-     }
+     /* printf("%d\n", i++); */
+     /* PRINTC(Ss); */
+     /* PRINTC(Y); */
+     /* PRINTC(Z); */
+     /* if (Ak) { */
+     /*      PRINTC(*Ak); */
+     /* } */
           
      ca_push_back(f, Ss);
      mul_coefficients(f->head, *f->head, c);

@@ -3,7 +3,7 @@
 #include "euclidean.h"
 #include "hermite.h"
 
-void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
+void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var)
 {
      Coefficient A = {special}, D = {special}, Dd = {special}, Dm = {special};
      Coefficient Ds = {special}, Dmd = {special}, Dm2 = {special};
@@ -21,54 +21,57 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
      C.u.poly = make_zero_poly('x');
 
      copy_coefficient(&A, AD.num);
-     PRINTC(A);
+     /* PRINTC(A); */
      copy_coefficient(&D, AD.den);
-     PRINTC(D);
+     /* PRINTC(D); */
 
-     coef_differentiate(&Dd, D, 'x'); /* TODO vars */
-     PRINTC(Dd);
+     coef_differentiate(&Dd, D, var);
+     /* PRINTC(Dd); */
      coef_gcd(&Dm, D, Dd);
-     PRINTC(Dm);
+     /* PRINTC(Dm); */
      exact_div_coefficients(&Ds, D, Dm);
-     PRINTC(Ds);
+     /* PRINTC(Ds); */
 
-     while (coef_deg(Dm, 'x') > 0) { /* TODO vars */
-          coef_differentiate(&Dmd, Dm, 'x'); /* TODO vars */
-          PRINTC(Dmd);
+     while (coef_deg(Dm, var) > 0) {
+          coef_differentiate(&Dmd, Dm, var);
+          /* PRINTC(Dmd); */
           coef_gcd(&Dm2, Dm, Dmd);
-          PRINTC(Dm2);
+          /* PRINTC(Dm2); */
           exact_div_coefficients(&Dms, Dm, Dm2);
-          PRINTC(Dms);
+          /* PRINTC(Dms); */
 
           mul_coefficients(&mDsDmd, Ds, Dmd);
           exact_div_coefficients(&mDsDmd, mDsDmd, Dm);
           negate_coefficient(&mDsDmd);
-          PRINTC(mDsDmd);
+          /* PRINTC(mDsDmd); */
 
-          PRINTC(Dms);
-          PRINTC(A);
+          /* PRINTC(Dms); */
+          /* PRINTC(A); */
           SolveDiophantineEquation(&B, &C, mDsDmd, Dms, A);
-          PRINTC(B);
-          PRINTC(C);
+          /* PRINTC(B); */
+          /* PRINTC(C); */
 
+          /* PRINTC(Ds); */
+          /* PRINTC(Dms); */
           exact_div_coefficients(&A, Ds, Dms);
-          PRINTC(B);
-          coef_differentiate(&Bd, B, 'x'); /* TODO vars */
-          PRINTC(Bd);
+          /* PRINTC(A); */
+          /* PRINTC(B); */
+          coef_differentiate(&Bd, B, var);
+          /* PRINTC(Bd); */
           mul_coefficients(&A, A, Bd);
           sub_coefficients(&A, C, A);
-          PRINTC(A);
+          /* PRINTC(A); */
 
           t.num = B;
           t.den = Dm;
-          PRINTR(*g);
-          PRINTR(t);
+          /* PRINTR(*g); */
+          /* PRINTR(t); */
           add_ratfuns(g, *g, t);
-          PRINTR(*g);
+          /* PRINTR(*g); */
 
           copy_coefficient(&Dm, Dm2);
-          PRINTC(Dm);
-          printf("-----\n");
+          /* PRINTC(Dm); */
+          /* printf("-----\n"); */
      }
 
      h->num = A;
@@ -79,7 +82,7 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD)
      free_ratfun(&old_h);
 }
 
-void HermiteReduceI(node_type *root)
+void HermiteReduceI(node_type *root, char var)
 {
      RatFun g, h;
      init_ratfun(&g);
@@ -90,7 +93,7 @@ void HermiteReduceI(node_type *root)
           return;
      }
 
-     HermiteReduce(&g, &h, root->u.ratfun);
+     HermiteReduce(&g, &h, root->u.ratfun, var);
 
      printf("\n");
      print_ratfun(g);

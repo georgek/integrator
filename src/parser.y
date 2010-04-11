@@ -20,6 +20,8 @@
 #include "squarefree.h"
 #include "hermite.h"
 #include "variables.h"
+#include "lrt.h"
+#include "integration.h"
 
 int yylex(void);
 
@@ -37,6 +39,7 @@ static const char* history_file = ".gk_integrator_history";
 
 node_type *root = NULL;         /* root of parse tree */
 char main_var = 'x';
+char new_var = 'a';
 
 char* input_line = NULL;        /* line of input from readline */
 %}
@@ -69,7 +72,6 @@ char* input_line = NULL;        /* line of input from readline */
 statement:      expression '\n'
                         {
                              root = $1;
-                             /* simple_simplify(&root); */
                              set_main_var(&root);
                              printf("Variable table:\n");
                              print_var_tab();
@@ -83,13 +85,17 @@ statement:      expression '\n'
                              printf("---\n");
                              print_prefix_lisp(root);
                              /* printf("Integral:\n"); */
-                             /* HermiteReduceI(root); */
+                             /* HermiteReduceI(root, main_var); */
                              /* printf("Squarefree factorisation:\n"); */
                              /* SquarefreeI(root, main_var); */
-                             printf("GCD:\n");
-                             GCDI(root);
-                             printf("Subresultant PRS:\n");
-                             SubResultantPRSI(root, main_var);
+                             /* printf("LRT algorithm:\n"); */
+                             /* IntRationalLogPartI(root, main_var, new_var); */
+                             printf("Integral:\n");
+                             IntegrateRationalFunction(root, main_var, new_var);
+                             /* printf("GCD:\n"); */
+                             /* GCDI(root); */
+                             /* printf("Subresultant PRS:\n"); */
+                             /* SubResultantPRSI(root, main_var); */
                              free_tree(root);
                              root = NULL;
                              make_var_tab();
@@ -191,6 +197,7 @@ int main (int argc, char *argv[])
           }
           input_line = strcat(input_line, "\n"); /* put nl back on */
           flex_get_rl_input();
+          add_var_cell(new_var);
           parseret = yyparse();
           if (parseret == 0) {
                /* normal input */

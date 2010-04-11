@@ -158,18 +158,18 @@ void SolveDiophantineEquation(Coefficient *s, Coefficient *t,
      Coefficient temp = {special};
 
      HalfSolveDiophantineEquation(s, a, b, c);
-     printf("diophantine:\n");
-     PRINTC(a);
-     PRINTC(b);
-     PRINTC(c);
-     PRINTC(*s);
+     /* printf("diophantine:\n"); */
+     /* PRINTC(a); */
+     /* PRINTC(b); */
+     /* PRINTC(c); */
+     /* PRINTC(*s); */
      mul_coefficients(&temp, *s, a);
-     PRINTC(temp);
+     /* PRINTC(temp); */
      sub_coefficients(&temp, c, temp);
-     PRINTC(temp);
+     /* PRINTC(temp); */
      exact_div_coefficients(t, temp, b);
-     PRINTC(*t);
-     printf("end dio\n");
+     /* PRINTC(*t); */
+     /* printf("end dio\n"); */
 
      free_coefficient(&temp);
 }

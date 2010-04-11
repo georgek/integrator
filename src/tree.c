@@ -484,9 +484,8 @@ void extract_polys(node_type **root)
                                     r->u.op2.operand2->u.coef);
                if (!coef_zero(tr)) {
                     /* division is not exact so this is a ratfun */
-                    printf("Not an exact division, so this is a rational function.\n");
-                    PRINTC(tq);
-                    PRINTC(tr);
+                    /* PRINTC(tq); */
+                    /* PRINTC(tr); */
                     free_coefficient(&tq);
                     free_coefficient(&tr);
 

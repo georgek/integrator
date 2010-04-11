@@ -829,6 +829,31 @@ void coef_differentiate(Coefficient *cd, Coefficient c, char var)
      coef_const_canonicalise(cd);
 }
 
+void coef_integrate(Coefficient *ci, Coefficient c, char var)
+{
+     Coefficient old_ci = *ci;
+     
+     switch (c.type)  {
+     case rational:
+          ci->type = polynomial;
+          ci->u.poly = make_mono_poly(var, 1);
+          mul_coefficients(ci, *ci, c);
+          break;
+
+     case polynomial:
+          ci->type = polynomial;
+          ci->u.poly.head = NULL;
+          poly_integrate(&ci->u.poly, c.u.poly, var);
+          break;
+
+     default:
+          break;
+     }
+     coef_const_canonicalise(ci);
+
+     free_coefficient(&old_ci);
+}
+
 void coef_content(Coefficient *cont, Coefficient p, char var)
 {
      /* cont(0)==pp(0)==0 by convention */
@@ -1415,17 +1440,11 @@ void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
 void exact_div_polynomials(Polynomial *Q, Polynomial A, Polynomial B)
 {
      Polynomial R = make_zero_poly(A.variable);
-     /* printf("** begin exact div pols **\n"); */
-     /* PRINTP(A); */
-     /* PRINTP(B); */
      div_polynomials(Q, &R, A, B);
-     /* PRINTP(*Q); */
-     /* PRINTP(R); */
      if (!poly_zero(R)) {
           printf("Error! Exact division not exact!\n");
      }
      free_poly(&R);
-     /* printf("** end exact div polys **\n"); */
 }
 
 void add_poly_rat(Polynomial *res, Polynomial left, BigRat right)
@@ -1727,9 +1746,21 @@ void poly_differentiate(Polynomial *pd, Polynomial p, char var)
      }
 }
 
-void poly_integrate(Polynomial *pi, Polynomial p)
+void poly_integrate(Polynomial *pi, Polynomial p, char var)
 {
      MonoPtr q;
+
+     if (var_rank(var) < var_rank(p.variable)) {
+          /* constant */
+          *pi = make_mono_poly(var, 1);
+          mul_polynomials(pi, *pi, p);
+          return;
+     }
+     else if (var_rank(var) > var_rank(p.variable)) {
+          /* TODO */
+          printf("Error! Trying to differentiate in higher ranking variable!\n");
+          return;
+     }
 
      copy_poly(pi, p);
      for (q = pi->head->next; q->coeff.type != special; q = q->next) {
