@@ -69,7 +69,7 @@ char* input_line = NULL;        /* line of input from readline */
 /*         |       statement_list statement '\n' */
 /*         ; */
 
-statement:      expression '\n'
+statement:      expression
                         {
                              root = $1;
                              set_main_var(&root);
@@ -195,7 +195,6 @@ int main (int argc, char *argv[])
                printf("\n");
                break;
           }
-          input_line = strcat(input_line, "\n"); /* put nl back on */
           flex_get_rl_input();
           add_var_cell(new_var);
           parseret = yyparse();
