@@ -6,5 +6,6 @@
 #include "tree.h"
 
 void IntegrateRationalFunction(node_type *root, char var, char newvar);
+void IntegrateRationalFunctionLaTeX(node_type *root, char var, char newvar);
 
 #endif /* H_INTEGRATION */

@@ -74,9 +74,35 @@ void print_ratfun(RatFun r)
           printf("zero");
           return;
      }
-     print_coefficient_nonpretty(r.num);
+     print_coefficient(r.num);
      printf("/");
-     print_coefficient_nonpretty(r.den);
+     print_coefficient(r.den);
+}
+
+void print_ratfun_LaTeX(RatFun r)
+{
+     Coefficient t = {special};
+     
+     if (coef_zero(r.num)) {
+          printf("0");
+          return;
+     }
+     if (coef_one(r.den)) {
+          print_coefficient_LaTeX(r.num);
+     }
+     else {
+          copy_coefficient(&t, r.num);
+          if (coef_neg(r.num)) {
+               negate_coefficient(&t);
+               printf("-");
+          }
+          printf("\\frac{");
+          print_coefficient_LaTeX(t);
+          printf("}{");
+          print_coefficient_LaTeX(r.den);
+          printf("}");
+     }
+     free_coefficient(&t);
 }
 
 void copy_ratfun(RatFun *r, RatFun s)
@@ -89,6 +115,11 @@ void free_ratfun(RatFun *r)
 {
      free_coefficient(&r->num);
      free_coefficient(&r->den);
+}
+
+int ratfun_zero(RatFun r)
+{
+     return coef_zero(r.num);
 }
 
 void add_ratfuns(RatFun *res, RatFun left, RatFun right)

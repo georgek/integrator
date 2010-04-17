@@ -26,9 +26,12 @@ void init_ratfun(RatFun *r);
 void canonicalise_ratfun(RatFun *r);
 
 void print_ratfun(RatFun r);
+void print_ratfun_LaTeX(RatFun r);
 
 void copy_ratfun(RatFun *r, RatFun s);
 void free_ratfun(RatFun *r);
+
+int ratfun_zero(RatFun r);
 
 /* arithmetic */
 void add_ratfuns(RatFun *res, RatFun left, RatFun right);

@@ -93,13 +93,13 @@ void SquarefreeI(node_type *root, char var)
 
      Squarefree(&arr, root->u.coef, var);
      printf("...\n");
-     print_coefficient_nonpretty(root->u.coef);
+     print_coefficient(root->u.coef);
      printf(" = ");
      for (i = 0; i < arr.size; ++i) {
           if (coef_one(ca_get(&arr, i))) {
                continue;
           }
-          print_coefficient_nonpretty(ca_get(&arr, i));
+          print_coefficient(ca_get(&arr, i));
           if (i > 0) {
                printf("^%u", i+1);
           }

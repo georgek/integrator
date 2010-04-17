@@ -264,7 +264,7 @@ void GCDI(node_type *root)
 
      coef_gcd(&res, root->u.op2.operand1->u.coef,
               root->u.op2.operand2->u.coef);
-     print_coefficient_nonpretty(res);
+     print_coefficient(res);
      printf("\n");
      free_coefficient(&res);
 }
@@ -294,12 +294,12 @@ void SubResultantPRSI(node_type *root, char var)
                   root->u.op2.operand2->u.coef,
                   var);
      printf("Resultant: ");
-     print_coefficient_nonpretty(res);
+     print_coefficient(res);
      printf("\n");
      printf("PRS:\n");
      for (i = 0; i < prs.size; ++i) {
           printf("R_%d: ", i);
-          print_coefficient_nonpretty(ca_get(&prs, i)); printf("\n");
+          print_coefficient(ca_get(&prs, i)); printf("\n");
      }
 
      printf("\n");

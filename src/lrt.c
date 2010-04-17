@@ -57,6 +57,7 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
           for (j = 1; j <= Ai.size; ++j) {
                coef_gcd(&AjQi, ca_get(&Ai, j-1), ca_get(Qi, i-1));
                coef_power(&AjQi, AjQi, j);
+               /* PRINTC(*St); */
                /* PRINTC(AjQi); */
                exact_div_coefficients(St, *St, AjQi);
           }
@@ -64,6 +65,13 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
           /* exact_div_coefficients(St, *St, ca_get(Qi, i-1)); */
           coef_pp(St, *St, var);
      }
+
+     free_coefficient(&t);
+     free_coefficient(&R);
+     free_coefficient(&AtDd);
+     free_coefficient(&AjQi);
+     ca_free(&Ri);
+     ca_free(&Ai);
 }
 
 void IntRationalLogPartI(node_type *root, char var, char newvar)
@@ -81,12 +89,12 @@ void IntRationalLogPartI(node_type *root, char var, char newvar)
 
      for (i = 0; i < Qi.size; ++i) {
           printf("Q_%d: ", i);
-          print_coefficient_nonpretty(ca_get(&Qi, i));
+          print_coefficient(ca_get(&Qi, i));
           printf("\n");
      }
      for (i = 0; i < Si.size; ++i) {
           printf("S_%d: ", i);
-          print_coefficient_nonpretty(ca_get(&Si, i));
+          print_coefficient(ca_get(&Si, i));
           printf("\n");
      }
 }

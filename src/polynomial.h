@@ -13,14 +13,14 @@
 /* useful macro for printing polys */
 #define PRINTP(p) printf(#p ": ");              \
      printf("\t\t");                            \
-     print_poly_nonpretty(p);                   \
+     print_poly(p);                             \
      printf("\n")
 
 
 /* useful macro for printing coefficients */
 #define PRINTC(c) printf(#c ": ");              \
      printf("\t\t");                            \
-     print_coefficient_nonpretty(c);            \
+     print_coefficient(c);                      \
      printf("\t\t");                            \
      if ((c).type == rational)                  \
      printf("(rational)");                      \
@@ -76,34 +76,41 @@ void free_poly(Polynomial *p);
 void copy_poly(Polynomial *p, Polynomial s);
 
 /* for testing, not pretty */
-void print_poly_simple(Polynomial p);
+/* void print_poly_simple(Polynomial p); */
 
 /* prettier but not fully pretty */
-void print_poly_nonpretty(Polynomial p);
+/* void print_poly_nonpretty(Polynomial p); */
 
 /* pretty printing */
 void print_poly(Polynomial p);
-void print_poly2(Polynomial p);
-void print_poly3(Polynomial p);
-void print_poly_sign(Polynomial p);
+void print_poly2(Polynomial p, int flip);
+/* void print_poly3(Polynomial p); */
+void print_poly_sign(Polynomial p, int flip);
+
+/* LaTeX printing */
+void print_poly_LaTeX(Polynomial p);
+void print_poly_LaTeX2(Polynomial p, int flip);
 
 void add_monomial(Polynomial* p, int degree, Coefficient coef);
 void sub_monomial(Polynomial* p, int degree, Coefficient coef);
 
 /* general coefficient functions */
 /* non-pretty testing version */
-void print_coefficient_simple(Coefficient c);
+/* void print_coefficient_simple(Coefficient c); */
 /* prettier but not very pretty version, for now until the pretty version is
  * done properly */
-void print_coefficient_nonpretty(Coefficient c);
+/* void print_coefficient_nonpretty(Coefficient c); */
 /* print coefficient with its sign if negative */
 void print_coefficient(Coefficient c);
 /* print coefficient without its sign */
-void print_coefficient2(Coefficient c);
+void print_coefficient2(Coefficient c, int flip);
 /* print coefficient with sign always */
-void print_coefficient3(Coefficient c);
+/* void print_coefficient3(Coefficient c); */
 /* print just sign */
-int print_coef_sign(Coefficient c);
+int print_coef_sign(Coefficient c, int flip);
+
+void print_coefficient_LaTeX(Coefficient c);
+void print_coefficient_LaTeX2(Coefficient c, int flip);
 
 void copy_coefficient(Coefficient *c, Coefficient s);
 
@@ -156,6 +163,7 @@ void coef_pp(Coefficient *pp, Coefficient p, char var);
 
 /* leading coefficient */
 const Coefficient coef_lc(Coefficient c, char var);
+unsigned coef_num_monomials(Coefficient c);
 
 /* polynomials */
 int poly_zero(Polynomial p);
@@ -166,6 +174,7 @@ int poly_one2(Polynomial p);
 int poly_deg(Polynomial p);
 int poly_deg2(Polynomial p, char var);
 const Coefficient poly_lc(Polynomial p, char var);
+unsigned poly_num_monomials(Polynomial p);
 
 /* polynomial arithmetic */
 void negate_polynomial(Polynomial *p);

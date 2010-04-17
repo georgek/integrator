@@ -92,73 +92,103 @@ void copy_poly(Polynomial *p, Polynomial s)
      free_poly(&old_res);
 }
 
-void print_poly_simple(Polynomial p)
-{
-     MonoPtr m = p.head->next;
-     /* check for zero polynomial */
-     if (m->coeff.type == special) {
-          printf("zero");
-          return;
-     }
-     /* iterate through monomials */
-     do {
-          print_coefficient_simple(m->coeff);
-          printf("*");
-          printf("%c^%d", p.variable, m->degree);
-          m = m->next;
-     } while (m->coeff.type != special && printf(" + "));
-}
+/* void print_poly_simple(Polynomial p) */
+/* { */
+/*      MonoPtr m = p.head->next; */
+/*      /\* check for zero polynomial *\/ */
+/*      if (m->coeff.type == special) { */
+/*           printf("zero"); */
+/*           return; */
+/*      } */
+/*      /\* iterate through monomials *\/ */
+/*      do { */
+/*           print_coefficient_simple(m->coeff); */
+/*           printf("*"); */
+/*           printf("%c^%d", p.variable, m->degree); */
+/*           m = m->next; */
+/*      } while (m->coeff.type != special && printf(" + ")); */
+/* } */
 
-void print_poly_nonpretty(Polynomial p)
-{
-     MonoPtr m = p.head->next;
-     /* check for zero polynomial */
-     if (m->coeff.type == special) {
-          printf("zero");
-          return;
-     }
-     /* iterate through monomials */
-     do {
-          /* don't print unit coefficient, unless we won't print variable */
-          if (!coef_one(m->coeff) || m->degree == 0) {
-               print_coefficient_nonpretty(m->coeff);
-          }
-          /* coefficient and variable printed? */
-          if (!coef_one(m->coeff) && m->degree != 0) {
-               printf("*");
-          }
-          /* print variable if degree > 0 */
-          if (m->degree > 1) {
-               printf("%c^%d", p.variable, m->degree);
-          }
-          else if (m->degree == 1) {
-               printf("%c", p.variable);
-          }
-          m = m->next;
-     } while (m->coeff.type != special && printf(" + "));
-}
+/* void print_poly_nonpretty(Polynomial p) */
+/* { */
+/*      MonoPtr m = p.head->next; */
+/*      /\* check for zero polynomial *\/ */
+/*      if (m->coeff.type == special) { */
+/*           printf("zero"); */
+/*           return; */
+/*      } */
+/*      /\* iterate through monomials *\/ */
+/*      do { */
+/*           /\* don't print unit coefficient, unless we won't print variable *\/ */
+/*           if (!coef_one(m->coeff) || m->degree == 0) { */
+/*                print_coefficient_nonpretty(m->coeff); */
+/*           } */
+/*           /\* coefficient and variable printed? *\/ */
+/*           if (!coef_one(m->coeff) && m->degree != 0) { */
+/*                printf("*"); */
+/*           } */
+/*           /\* print variable if degree > 0 *\/ */
+/*           if (m->degree > 1) { */
+/*                printf("%c^%d", p.variable, m->degree); */
+/*           } */
+/*           else if (m->degree == 1) { */
+/*                printf("%c", p.variable); */
+/*           } */
+/*           m = m->next; */
+/*      } while (m->coeff.type != special && printf(" + ")); */
+/* } */
 
 void print_poly(Polynomial p)
 {
-     if (poly_neg(p)) {
-          print_poly_sign(p);
-     }
-     print_poly2(p);
-}
-
-void print_poly2(Polynomial p)
-{
      MonoPtr m = p.head->next;
+     int flipt = 0;
      /* check for zero polynomial */
      if (m->coeff.type == special) {
           printf("zero");
           return;
      }
-     /* iterate through monomials */
-     do {
+     /* if (poly_neg(p)) { */
+     /*      flip = !flip; */
+     /* } */
+
+     /* print first monomial */
+     /* sign */
+     if (coef_neg(m->coeff)) {
+          flipt = 1;
+          printf("-");
+     }
+     /* don't print unit coefficient, unless we won't print variable */
+     if (!coef_one2(m->coeff) || m->degree == 0) {
+          print_coefficient2(m->coeff, flipt);
+     }
+     /* coefficient and variable printed? */
+     if (!coef_one2(m->coeff) && m->degree != 0) {
+          printf("*");
+     }
+     /* print variable if degree > 0 */
+     if (m->degree > 1) {
+          printf("%c^%d", p.variable, m->degree);
+     }
+     else if (m->degree == 1) {
+          printf("%c", p.variable);
+     }
+     m = m->next;
+
+     /* iterate through other monomials */
+     while (m->coeff.type != special) {
+          /* sign */
+          if (coef_neg(m->coeff)) {
+               flipt = 1;
+               printf(" - ");
+          }
+          else {
+               flipt = 0;
+               printf(" + ");
+          }
+          
           /* don't print unit coefficient, unless we won't print variable */
           if (!coef_one2(m->coeff) || m->degree == 0) {
-               print_coefficient2(m->coeff);
+               print_coefficient2(m->coeff, flipt);
           }
           /* coefficient and variable printed? */
           if (!coef_one2(m->coeff) && m->degree != 0) {
@@ -172,65 +202,256 @@ void print_poly2(Polynomial p)
                printf("%c", p.variable);
           }
           m = m->next;
-     } while (m->coeff.type != special && print_coef_sign(m->coeff));
-}
-
-void print_poly3(Polynomial p)
-{
-     print_poly_sign(p);
-     print_poly2(p);
-}
-
-void print_poly_sign(Polynomial p)
-{
-     print_coef_sign(poly_lc(p, p.variable));
-}
-
-void print_coefficient_simple(Coefficient c)
-{
-     switch (c.type) {
-     case rational:
-          if (bn_one(c.u.rat.den)) {
-               print_bigrat(c.u.rat);
-          }
-          else {
-               printf("(");
-               print_bigrat(c.u.rat);
-               printf(")");
-          }
-          break;
-     case polynomial:
-          printf("(");
-          print_poly_simple(c.u.poly);
-          printf(")");
-          break;
-     default:
-          break;
      }
 }
 
-void print_coefficient_nonpretty(Coefficient c)
+void print_poly2(Polynomial p, int flip)
 {
-     switch (c.type) {
-     case rational:
-          if (bn_one(c.u.rat.den)) {
-               print_bigrat(c.u.rat);
+     MonoPtr m = p.head->next;
+     int flipt = flip;
+     /* check for zero polynomial */
+     if (m->coeff.type == special) {
+          printf("zero");
+          return;
+     }
+
+     /* print first monomial */
+     /* don't print unit coefficient, unless we won't print variable */
+     if (!coef_one2(m->coeff) || m->degree == 0) {
+          print_coefficient2(m->coeff, flip);
+     }
+     /* coefficient and variable printed? */
+     if (!coef_one2(m->coeff) && m->degree != 0) {
+          printf("*");
+     }
+     /* print variable if degree > 0 */
+     if (m->degree > 1) {
+          printf("%c^%d", p.variable, m->degree);
+     }
+     else if (m->degree == 1) {
+          printf("%c", p.variable);
+     }
+     m = m->next;
+
+     /* iterate through other monomials */
+     while (m->coeff.type != special) {
+          /* sign */
+          if ((coef_neg(m->coeff) || flip) && !(coef_neg(m->coeff) && flip)) {
+               flipt = !flip;
+               printf(" - ");
           }
           else {
-               printf("(");
-               print_bigrat(c.u.rat);
-               printf(")");
+               printf(" + ");
           }
-          break;
-     case polynomial:
-          printf("(");
-          print_poly_nonpretty(c.u.poly);
-          printf(")");
-          break;
-     default:
-          break;
+          
+          /* don't print unit coefficient, unless we won't print variable */
+          if (!coef_one2(m->coeff) || m->degree == 0) {
+               print_coefficient2(m->coeff, flipt);
+          }
+          /* coefficient and variable printed? */
+          if (!coef_one2(m->coeff) && m->degree != 0) {
+               printf("*");
+          }
+          /* print variable if degree > 0 */
+          if (m->degree > 1) {
+               printf("%c^%d", p.variable, m->degree);
+          }
+          else if (m->degree == 1) {
+               printf("%c", p.variable);
+          }
+          m = m->next;
      }
 }
+
+void print_poly_sign(Polynomial p, int flip)
+{
+     print_coef_sign(poly_lc(p, p.variable), flip);
+}
+
+void print_poly_LaTeX(Polynomial p)
+{
+     MonoPtr m = p.head->next;
+     int flipt = 0;
+     /* check for zero polynomial */
+     if (m->coeff.type == special) {
+          printf("zero");
+          return;
+     }
+     /* if (poly_neg(p)) { */
+     /*      flip = !flip; */
+     /* } */
+
+     /* print first monomial */
+     /* sign */
+     if (coef_neg(m->coeff)) {
+          flipt = 1;
+          printf("-");
+     }
+     /* don't print unit coefficient, unless we won't print variable */
+     if (!coef_one2(m->coeff) || m->degree == 0) {
+          /* brackets around coefficient? */
+          if (coef_num_monomials(m->coeff) > 1 && m->degree > 0) {
+               printf("(");
+               print_coefficient_LaTeX2(m->coeff, flipt);
+               printf(")");
+          }
+          else {
+               print_coefficient_LaTeX2(m->coeff, flipt);
+          }
+     }
+     /* print variable if degree > 0 */
+     if (m->degree > 1) {
+          printf("%c^{%d}", p.variable, m->degree);
+     }
+     else if (m->degree == 1) {
+          printf("%c", p.variable);
+     }
+     m = m->next;
+
+     /* iterate through other monomials */
+     while (m->coeff.type != special) {
+          /* sign */
+          if (coef_neg(m->coeff)) {
+               flipt = 1;
+               printf(" - ");
+          }
+          else {
+               flipt = 0;
+               printf(" + ");
+          }
+          /* don't print unit coefficient, unless we won't print variable */
+          if (!coef_one2(m->coeff) || m->degree == 0) {
+               /* brackets around coefficient? */
+               if (coef_num_monomials(m->coeff) > 1 && m->degree > 0) {
+                    printf("(");
+                    print_coefficient_LaTeX2(m->coeff, flipt);
+                    printf(")");
+               }
+               else {
+                    print_coefficient_LaTeX2(m->coeff, flipt);
+               }
+          }
+          /* print variable if degree > 0 */
+          if (m->degree > 1) {
+               printf("%c^{%d}", p.variable, m->degree);
+          }
+          else if (m->degree == 1) {
+               printf("%c", p.variable);
+          }
+          m = m->next;
+     }
+}
+
+void print_poly_LaTeX2(Polynomial p, int flip)
+{
+     MonoPtr m = p.head->next;
+     int flipt = flip;
+     /* check for zero polynomial */
+     if (m->coeff.type == special) {
+          printf("zero");
+          return;
+     }
+
+     /* print first monomial */
+     /* don't print unit coefficient, unless we won't print variable */
+     if (!coef_one2(m->coeff) || m->degree == 0) {
+          /* brackets around coefficient? */
+          if (coef_num_monomials(m->coeff) > 1 && m->degree > 0) {
+               printf("(");
+               print_coefficient_LaTeX2(m->coeff, flipt);
+               printf(")");
+          }
+          else {
+               print_coefficient_LaTeX2(m->coeff, flipt);
+          }
+     }
+     /* print variable if degree > 0 */
+     if (m->degree > 1) {
+          printf("%c^{%d}", p.variable, m->degree);
+     }
+     else if (m->degree == 1) {
+          printf("%c", p.variable);
+     }
+     m = m->next;
+
+     /* iterate through other monomials */
+     while (m->coeff.type != special) {
+          /* sign */
+          if ((coef_neg(m->coeff) || flip) && !(coef_neg(m->coeff) && flip)) {
+               flipt = !flip;
+               printf(" - ");
+          }
+          else {
+               printf(" + ");
+          }
+          /* don't print unit coefficient, unless we won't print variable */
+          if (!coef_one2(m->coeff) || m->degree == 0) {
+               /* brackets around coefficient? */
+               if (coef_num_monomials(m->coeff) > 1 && m->degree > 0) {
+                    printf("(");
+                    print_coefficient_LaTeX2(m->coeff, flipt);
+                    printf(")");
+               }
+               else {
+                    print_coefficient_LaTeX2(m->coeff, flipt);
+               }
+          }
+          /* print variable if degree > 0 */
+          if (m->degree > 1) {
+               printf("%c^{%d}", p.variable, m->degree);
+          }
+          else if (m->degree == 1) {
+               printf("%c", p.variable);
+          }
+          m = m->next;
+     }
+}
+
+/* void print_coefficient_simple(Coefficient c) */
+/* { */
+/*      switch (c.type) { */
+/*      case rational: */
+/*           if (bn_one(c.u.rat.den)) { */
+/*                print_bigrat(c.u.rat); */
+/*           } */
+/*           else { */
+/*                printf("("); */
+/*                print_bigrat(c.u.rat); */
+/*                printf(")"); */
+/*           } */
+/*           break; */
+/*      case polynomial: */
+/*           printf("("); */
+/*           print_poly_simple(c.u.poly); */
+/*           printf(")"); */
+/*           break; */
+/*      default: */
+/*           break; */
+/*      } */
+/* } */
+
+/* void print_coefficient_nonpretty(Coefficient c) */
+/* { */
+/*      switch (c.type) { */
+/*      case rational: */
+/*           if (bn_one(c.u.rat.den)) { */
+/*                print_bigrat(c.u.rat); */
+/*           } */
+/*           else { */
+/*                printf("("); */
+/*                print_bigrat(c.u.rat); */
+/*                printf(")"); */
+/*           } */
+/*           break; */
+/*      case polynomial: */
+/*           printf("("); */
+/*           print_poly_nonpretty(c.u.poly); */
+/*           printf(")"); */
+/*           break; */
+/*      default: */
+/*           break; */
+/*      } */
+/* } */
 
 void print_coefficient(Coefficient c)
 {
@@ -255,7 +476,7 @@ void print_coefficient(Coefficient c)
      }
 }
 
-void print_coefficient2(Coefficient c)
+void print_coefficient2(Coefficient c, int flip)
 {
      switch (c.type) {
      case rational:
@@ -270,7 +491,7 @@ void print_coefficient2(Coefficient c)
           break;
      case polynomial:
           printf("(");
-          print_poly2(c.u.poly);
+          print_poly2(c.u.poly, flip);
           printf(")");
           break;
      default:
@@ -278,37 +499,65 @@ void print_coefficient2(Coefficient c)
      }
 }
 
-void print_coefficient3(Coefficient c)
+void print_coefficient_LaTeX(Coefficient c)
 {
      switch (c.type) {
      case rational:
-          if (bn_one(c.u.rat.den)) {
-               print_bigrat3(c.u.rat);
-          }
-          else {
-               printf("(");
-               print_bigrat3(c.u.rat);
-               printf(")");
-          }
+          print_bigrat_LaTeX(c.u.rat);
           break;
      case polynomial:
-          printf("(");
-          print_poly3(c.u.poly);
-          printf(")");
+          print_poly_LaTeX(c.u.poly);
           break;
      default:
           break;
      }
 }
 
-int print_coef_sign(Coefficient c)
+void print_coefficient_LaTeX2(Coefficient c, int flip)
 {
      switch (c.type) {
      case rational:
-          print_br_sign(c.u.rat);
+          print_bigrat_LaTeX2(c.u.rat);
           break;
      case polynomial:
-          print_poly_sign(c.u.poly);
+          print_poly_LaTeX2(c.u.poly, flip);
+          break;
+     default:
+          break;
+     }
+}
+
+/* void print_coefficient3(Coefficient c) */
+/* { */
+/*      switch (c.type) { */
+/*      case rational: */
+/*           if (bn_one(c.u.rat.den)) { */
+/*                print_bigrat3(c.u.rat); */
+/*           } */
+/*           else { */
+/*                printf("("); */
+/*                print_bigrat3(c.u.rat); */
+/*                printf(")"); */
+/*           } */
+/*           break; */
+/*      case polynomial: */
+/*           printf("("); */
+/*           print_poly3(c.u.poly); */
+/*           printf(")"); */
+/*           break; */
+/*      default: */
+/*           break; */
+/*      } */
+/* } */
+
+int print_coef_sign(Coefficient c, int flip)
+{
+     switch (c.type) {
+     case rational:
+          print_br_sign(c.u.rat, flip);
+          break;
+     case polynomial:
+          print_poly_sign(c.u.poly, flip);
           break;
      default:
           break;
@@ -550,6 +799,8 @@ void exact_div_coefficients2(Coefficient *res,
                              Coefficient left, SHORT_INT_T right)
 {
      Coefficient old_res = *res;
+     BigRat t = {NULL, NULL};
+     
      if (left.type == rational) {
           res->type = rational;
           res->u.rat.num = NULL;
@@ -557,7 +808,11 @@ void exact_div_coefficients2(Coefficient *res,
           div_bigrats2(&res->u.rat, left.u.rat, right);
      }
      else {
-          printf("Warning.. multivariate not supported (div coefs 2)!\n");
+          t = make_bigrat3(right);
+          res->type = polynomial;
+          res->u.poly.head = NULL;
+          div_poly_rat(&res->u.poly, left.u.poly, t);
+          free_bigrat(&t);
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
@@ -930,6 +1185,20 @@ const Coefficient coef_lc(Coefficient c, char var)
      }
 }
 
+unsigned coef_num_monomials(Coefficient c)
+{
+     switch (c.type) {
+     case rational:
+          return 1;
+
+     case polynomial:
+          return poly_num_monomials(c.u.poly);
+
+     default:
+          return 0;
+     }
+}
+
 int poly_zero(Polynomial p)
 {
      if (p.head->next->coeff.type == special) {
@@ -995,6 +1264,15 @@ const Coefficient poly_lc(Polynomial p, char var)
           printf("Error! Trying to get lc in higher ranking variable!\n");
           return p.head->next->coeff;
      }
+}
+
+unsigned poly_num_monomials(Polynomial p)
+{
+     MonoPtr q;
+     unsigned n = 0;
+     for (q = p.head->next; q->coeff.type != special; ++n, q = q->next);
+
+     return n;
 }
 
 void add_monomial(Polynomial *p, int degree, Coefficient coef)

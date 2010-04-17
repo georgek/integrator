@@ -47,9 +47,9 @@ void print_bignum(BigNum p);
 /* print without sign */
 void print_bignum2(BigNum p);
 /* print with sign always */
-void print_bignum3(BigNum p);
+/* void print_bignum3(BigNum p); */
 /* print just sign */
-void print_sign(BigNum p);
+void print_sign(BigNum p, int flip);
 
 void bignum_copy(BigNum *d, BigNum s);
 

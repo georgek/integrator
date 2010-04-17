@@ -85,21 +85,49 @@ void print_bigrat2(BigRat f)
      }
 }
 
-void print_bigrat3(BigRat f)
+void print_bigrat_LaTeX(BigRat f)
 {
      if (bn_one(f.den)) {
-          print_bignum3(f.num);
+          print_bignum(f.num);
      }
      else {
-          print_bignum3(f.num);
-          printf("/");
+          printf("\\frac{");
+          print_bignum(f.num);
+          printf("}{");
           print_bignum2(f.den);
+          printf("}");
      }
 }
 
-void print_br_sign(BigRat f)
+void print_bigrat_LaTeX2(BigRat f)
 {
-     print_sign(f.num);
+     if (bn_one(f.den)) {
+          print_bignum2(f.num);
+     }
+     else {
+          printf("\\frac{");
+          print_bignum2(f.num);
+          printf("}{");
+          print_bignum2(f.den);
+          printf("}");
+     }
+}
+
+/* void print_bigrat3(BigRat f) */
+/* { */
+/*      if (bn_one(f.den)) { */
+/*           print_bignum3(f.num); */
+/*      } */
+/*      else { */
+/*           print_bignum3(f.num); */
+/*           printf("/"); */
+/*           print_bignum2(f.den); */
+/*      } */
+/* } */
+
+void print_br_sign(BigRat f, int flip)
+{
+     print_sign(f.num, flip);
 }
 
 void bigrat_copy(BigRat *f, BigRat g)

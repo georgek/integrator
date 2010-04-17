@@ -129,13 +129,13 @@ void print_bignum2(BigNum p)
      }
 }
 
-void print_bignum3(BigNum p)
-{
-     print_sign(p);
-     print_bignum2(p);
-}
+/* void print_bignum3(BigNum p) */
+/* { */
+/*      print_sign(p); */
+/*      print_bignum2(p); */
+/* } */
 
-void print_sign(BigNum p)
+void print_sign(BigNum p, int flip)
 {
      int negative = is_neg(p) && !bn_zero(p);
 
@@ -143,7 +143,7 @@ void print_sign(BigNum p)
           return;
      }
 
-     if (negative) {
+     if ((negative || flip) && !(negative && flip)) {
           printf("%c", '-');
      }
      else {

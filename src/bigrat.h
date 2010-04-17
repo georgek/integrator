@@ -31,9 +31,12 @@ void print_bigrat(BigRat f);
 /* print bigrat without its sign */
 void print_bigrat2(BigRat f);
 /* print with sign */
-void print_bigrat3(BigRat f);
+/* void print_bigrat3(BigRat f); */
 /* print just sign */
-void print_br_sign(BigRat f);
+void print_br_sign(BigRat f, int flip);
+
+void print_bigrat_LaTeX(BigRat f);
+void print_bigrat_LaTeX2(BigRat f);
 
 void bigrat_copy(BigRat *f, BigRat g);
 

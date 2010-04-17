@@ -150,10 +150,12 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
      if (!p) return;
      switch (p->type) {
      case coef_type:
-          print_coefficient_nonpretty(p->u.coef);
+          print_coefficient(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
+          printf("\n");
+          print_ratfun_LaTeX(p->u.ratfun);
           break;
      case op1_type:
           printf("(");
@@ -194,7 +196,7 @@ void traverse_prefix(node_type *p)
      if (!p) return;
      switch (p->type) {
      case coef_type:
-          print_coefficient_nonpretty(p->u.coef);
+          print_coefficient(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -225,7 +227,7 @@ void traverse_postfix(node_type *p)
      if (!p) return;
      switch (p->type) {
      case coef_type:
-          print_coefficient_nonpretty(p->u.coef);
+          print_coefficient(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -256,7 +258,7 @@ void traverse_infix(node_type *p)
      if (!p) return;
      switch (p->type) {
      case coef_type:
-          print_coefficient_nonpretty(p->u.coef);
+          print_coefficient(p->u.coef);
           break;
      case ratfun_type:
           print_ratfun(p->u.ratfun);
@@ -399,12 +401,6 @@ void print_operator(int id)
      case TAN:
           printf("tan");
           break;
-     case EVAL:
-          printf("eval");
-          break;
-     case DIFF:
-          printf("diff");
-          break;
      case UMINUS:
           printf("~");
           break;
@@ -536,6 +532,7 @@ void extract_polys(node_type **root)
 void extract_ratfuns(node_type **root)
 {
      node_type *r = *root;
+     Coefficient t = {special};
 
      switch (r->type) {
      case op2_type:
@@ -605,7 +602,7 @@ void extract_ratfuns(node_type **root)
           break;
 
      case op1_type:
-          extract_polys(&r->u.op1.operand);
+          extract_ratfuns(&r->u.op1.operand);
 
           if (r->u.op1.operand->type != ratfun_type) {
                /* nothing to do here */
@@ -623,6 +620,12 @@ void extract_ratfuns(node_type **root)
           break;
 
      case coef_type:
+          /* turn into ratfun */
+          t.type = rational;
+          t.u.rat = make_bigrat3(1);
+          *root = add_ratfun(r->u.coef, t);
+          r->u.coef.type = special;
+          free_tree(r);
      case ratfun_type:
           break;
      }

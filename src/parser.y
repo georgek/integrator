@@ -81,7 +81,7 @@ statement:      expression
                              print_prefix_lisp(root);
                              print_infix(root);
                              extract_polys(&root);
-                             /* extract_ratfuns(&root); */
+                             extract_ratfuns(&root);
                              printf("---\n");
                              print_prefix_lisp(root);
                              /* printf("Integral:\n"); */
@@ -91,7 +91,7 @@ statement:      expression
                              /* printf("LRT algorithm:\n"); */
                              /* IntRationalLogPartI(root, main_var, new_var); */
                              printf("Integral:\n");
-                             IntegrateRationalFunction(root, main_var, new_var);
+                             IntegrateRationalFunctionLaTeX(root, main_var, new_var);
                              /* printf("GCD:\n"); */
                              /* GCDI(root); */
                              /* printf("Subresultant PRS:\n"); */
