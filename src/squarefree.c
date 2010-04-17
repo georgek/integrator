@@ -16,7 +16,10 @@ void Squarefree(CoefArray *f, Coefficient A, char var)
      Coefficient S = {special},Sd = {special},Sm = {special};
      Coefficient Ss = {special}, Ssd = {special}, Y = {special};
      Coefficient Z = {special}, At = {special};
+     CoefArray old_f = *f;
      /* unsigned i = 1; */
+
+     *f = new_coef_array();
 
      /* c <-- content(A) */
      coef_content(&c, A, var);
@@ -62,6 +65,17 @@ void Squarefree(CoefArray *f, Coefficient A, char var)
           
      ca_push_back(f, Ss);
      mul_coefficients(f->head, *f->head, c);
+
+     ca_free(&old_f);
+     free_coefficient(&c);
+     free_coefficient(&S);
+     free_coefficient(&Sd);
+     free_coefficient(&Sm);
+     free_coefficient(&Ss);
+     free_coefficient(&Ssd);
+     free_coefficient(&Y);
+     free_coefficient(&Z);
+     free_coefficient(&At);
 }
 
 void SquarefreeI(node_type *root, char var)
