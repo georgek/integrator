@@ -85,6 +85,7 @@ void copy_poly(Polynomial *p, Polynomial s)
           pq->next = malloc(sizeof(Monomial));
           pq = pq->next;
           pq->degree = q->degree;
+          pq->coeff.type = special;
           copy_coefficient(&pq->coeff, q->coeff);
      }
      pq->next = p->head;
@@ -1629,7 +1630,9 @@ void pseudo_div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A,
      /* } */
 
      old_Q = *Q;
+     Q->head = NULL;
      old_R = *R;
+     R->head = NULL;
 
      if (poly_zero(A)) {
           *Q = make_zero_poly(A.variable);

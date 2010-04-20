@@ -84,16 +84,21 @@ void IntegrateRationalFunctionLaTeX(node_type *root, char var, char newvar)
      }
 
      copy_ratfun(&A, root->u.ratfun);
+
+     printf("\\int \\! ");
+     print_ratfun_LaTeX(A);
+     printf("\\, d%c = ", var);
+
+     if (ratfun_zero(A)) {
+          printf("0\n");
+          return;
+     }
      
      /* make numerator and denominator primitive */
      coef_content(&content.num, A.num, var);
      exact_div_coefficients(&A.num, A.num, content.num);
      coef_content(&content.den, A.den, var);
      exact_div_coefficients(&A.den, A.den, content.den);
-
-     printf("\\int \\! ");
-     print_ratfun_LaTeX(A);
-     printf("\\, d%c = ", var);
 
      HermiteReduce(&g, &h, A, var);
      if (!ratfun_zero(g)){
