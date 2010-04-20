@@ -74,6 +74,10 @@ void print_ratfun(RatFun r)
           printf("zero");
           return;
      }
+     if (coef_one(r.den)) {
+          print_coefficient(r.num);
+          return;
+     }
      print_coefficient(r.num);
      printf("/");
      print_coefficient(r.den);

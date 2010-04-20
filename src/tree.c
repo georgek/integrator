@@ -153,8 +153,8 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
           print_coefficient(p->u.coef);
           break;
      case ratfun_type:
-          print_ratfun(p->u.ratfun);
-          printf("\n");
+          /* print_ratfun(p->u.ratfun); */
+          /* printf("\n"); */
           print_ratfun_LaTeX(p->u.ratfun);
           break;
      case op1_type:

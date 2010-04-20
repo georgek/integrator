@@ -73,17 +73,18 @@ statement:      expression
                         {
                              root = $1;
                              set_main_var(&root);
-                             printf("Variable table:\n");
-                             print_var_tab();
-                             printf("Input:\n");
-                             print_prefix(root);
-                             print_postfix(root);
-                             print_prefix_lisp(root);
-                             print_infix(root);
+                             /* printf("Variable table:\n"); */
+                             /* print_var_tab(); */
+                             /* printf("Input:\n"); */
+                             /* print_prefix(root); */
+                             /* print_postfix(root); */
+                             /* print_prefix_lisp(root); */
+                             /* print_infix(root); */
                              extract_polys(&root);
                              extract_ratfuns(&root);
-                             printf("---\n");
+                             /* printf("---\n"); */
                              print_prefix_lisp(root);
+                             printf("\n");
                              /* printf("Integral:\n"); */
                              /* HermiteReduceI(root, main_var); */
                              /* printf("Squarefree factorisation:\n"); */
@@ -91,7 +92,7 @@ statement:      expression
                              /* printf("LRT algorithm:\n"); */
                              /* IntRationalLogPartI(root, main_var, new_var); */
                              printf("Integral:\n");
-                             IntegrateRationalFunctionLaTeX(root, main_var, new_var);
+                             IntegrateRationalFunction(root, main_var, new_var);
                              /* printf("GCD:\n"); */
                              /* GCDI(root); */
                              /* printf("Subresultant PRS:\n"); */
@@ -169,6 +170,13 @@ expression:     expression '+' expression
                         }
         |       VARIABLE
                         {
+                             if ($1 == 'a') {
+                                  printf("Error. a is a reserved variable name.\n");
+                                  free_tree(root);
+                                  root = NULL;
+                                  make_var_tab();
+                                  return 0;
+                             }
                              $$ = add_var($1);
                              add_var_cell($1);
                         }
