@@ -245,8 +245,10 @@ char *rl_gets (int lineno)
 
      /* If the line has any text in it, save it on the history. */
      if (input_line && *input_line) {
-          /* if this line was from history, remove the old one */
-          if (current_history() != NULL) {
+          /* if this line was from history, remove the old one, unless it was
+           * edited */
+          if (current_history() != NULL &&
+              strcmp(input_line,current_history()->line) == 0) {
                free_history_entry(remove_history(where_history()));
           }
           add_history(input_line);
