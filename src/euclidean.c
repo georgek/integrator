@@ -123,7 +123,7 @@ void HalfExtendedEuclidean(Coefficient *g, Coefficient *s,
                  "(Extended Euclidean)\n");
           return;
      }
-     
+
      copy_coefficient(&na, a);
      copy_coefficient(&nb, b);
 

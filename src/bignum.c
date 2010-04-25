@@ -45,7 +45,7 @@ BigNum make_bignum(char *string, int length)
      bignum_length = (length%DIGPERWORD) ? length/DIGPERWORD+2 :
           length/DIGPERWORD+1;
      bignum = malloc(sizeof(SHORT_INT_T)*bignum_length);
-     
+
      /* set length */
      p = bignum;
      *p = negative ? -(bignum_length-1) : bignum_length-1;
@@ -104,7 +104,7 @@ void print_bignum(BigNum p)
      if (negative) {
           printf("%c", '-');
      }
-     
+
      print_bignum2(p);
 }
 
@@ -215,7 +215,7 @@ int bignum_lt(BigNum left, BigNum right)
           else {
                return lt(right, left);
           }
-     }     
+     }
 }
 
 int bignum_gt(BigNum left, BigNum right)
@@ -235,7 +235,7 @@ int bignum_gt(BigNum left, BigNum right)
           else {
                return lt(left, right);
           }
-     }     
+     }
 }
 
 int bignum_lte(BigNum left, BigNum right)
@@ -255,7 +255,7 @@ int bignum_lte(BigNum left, BigNum right)
           else {
                return !lt(left, right);
           }
-     }     
+     }
 }
 
 int bignum_gte(BigNum left, BigNum right)
@@ -275,7 +275,7 @@ int bignum_gte(BigNum left, BigNum right)
           else {
                return !lt(right, left);
           }
-     }     
+     }
 }
 
 void add_bignums(BigNum *res, BigNum left, BigNum right)
@@ -399,7 +399,7 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
           printf("ERROR: division by zero\n");
           return;
      }
-     
+
      if (real_length(right) == 1) { /* short division */
           dyv2(q, &little_r, left, get_dig(right, 0));
           *r = make_bignum2(little_r);
@@ -437,7 +437,7 @@ void div_bignums(BigNum *q, BigNum *r, BigNum left, BigNum right)
 
           return;
      }
-     
+
      /* long division */
      dyv(q, r, left, right);
 
@@ -481,7 +481,7 @@ void bn_power(BigNum *res, BigNum p, SHORT_INT_T power)
           *res = make_bignum2(1);
           return;
      }
-     
+
      mask = ~(~mask>>1);        /* MSB of short int */
 
      bignum_copy(&temp, p);
@@ -554,7 +554,7 @@ void double_bignum(BigNum *res, BigNum u)
 
 /* greatest common divisor
  * implements binary GCD algorithm */
-void gcd(BigNum *gcd, BigNum u, BigNum v) 
+void gcd(BigNum *gcd, BigNum u, BigNum v)
 {
      BigNum nu = NULL, nv = NULL, t = NULL;
      int k = 0;
@@ -622,10 +622,10 @@ void gcd(BigNum *gcd, BigNum u, BigNum v)
 }
 
 /* Euclid's algorithm */
-void gcd2(BigNum *gcd, BigNum u, BigNum v) 
+void gcd2(BigNum *gcd, BigNum u, BigNum v)
 {
      BigNum onu = NULL, nu = NULL, nv = NULL, q = NULL, r = NULL;
-     
+
      copy(&nu, u);
      copy(&nv, v);
      /* make both positive */
@@ -642,7 +642,7 @@ void gcd2(BigNum *gcd, BigNum u, BigNum v)
           nu = nv;
           nv = r;
           r = NULL;
-          
+
           free_bignum(onu);
           onu = NULL;
      }
@@ -670,7 +670,7 @@ void lcm(BigNum *lcm, BigNum u, BigNum v)
           bignum_copy(lcm, u);
           return;
      }
-     
+
      gcd(&t, u, v);
      div_bignums(&t, NULL, u, t);
      mul_bignums(lcm, v, t);
@@ -691,7 +691,7 @@ static int length(BigNum p)
 int real_length(BigNum p)
 {
      int i = length(p);
-     
+
      /* skip leading zeros */
      while (*(p+i) == 0 && i > 1) {
           --i;
@@ -722,7 +722,7 @@ static void set_dig(BigNum p, int i, SHORT_INT_T val)
 /* the classical algorithms */
 
 /* does an actual addition of two nonnegative bignums */
-static BigNum add(BigNum left, BigNum right) 
+static BigNum add(BigNum left, BigNum right)
 {
      /* result length could be one longer than the longest operand */
      int result_length = (length(left) > length(right)) ? length(left)+1 :
@@ -731,7 +731,7 @@ static BigNum add(BigNum left, BigNum right)
      int j = 0;                 /* j runs through digit positions */
      SHORT_INT_T k = 0;                 /* k holds carry */
      BigNum result;
-     
+
      result = make_zero_bignum(result_length);
 
      while (j < (length(result)-1)) {
@@ -741,7 +741,7 @@ static BigNum add(BigNum left, BigNum right)
           ++j;
      }
      *(result+j+1) = k;
-     
+
      return result;
 }
 
@@ -755,7 +755,7 @@ static BigNum sub(BigNum left, BigNum right)
      int j = 0;                 /* j runs through digit positions */
      SHORT_INT_T k = 1;                 /* k holds carry+1 */
      BigNum result;
-     
+
      result = make_zero_bignum(result_length);
 
      while (j < (length(result))) {
@@ -765,8 +765,8 @@ static BigNum sub(BigNum left, BigNum right)
           ++j;
      }
      *(result+j+1) = k;
-     
-     return result;     
+
+     return result;
 }
 
 static BigNum mul(BigNum left, BigNum right)
@@ -813,7 +813,7 @@ static BigNum mul2(BigNum left, SHORT_INT_T right)
           result = make_zero_bignum(1);
           return result;
      }
-     
+
      result = make_zero_bignum(result_length);
      i = 0;
      k = 0;
@@ -933,7 +933,7 @@ static void dyv2(BigNum *q, SHORT_INT_T *r, BigNum left, SHORT_INT_T right)
      int j = real_length(left)-1;
      SHORT_INT_T rt = 0;
      *q = make_zero_bignum(j+1);
-     
+
      for(; j >= 0; --j) {
           t = (LONG_INT_T) rt*RADIX + get_dig(left,j);
           if (q) *(*q+j+1) = (SHORT_INT_T) (t/right);

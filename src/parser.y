@@ -65,38 +65,20 @@ char* input_line = NULL;        /* line of input from readline */
 
 %%
 
-/* statement_list: statement '\n' */
-/*         |       statement_list statement '\n' */
-/*         ; */
-
 statement:      expression
                         {
                              root = $1;
                              set_main_var(&root);
-                             /* printf("Variable table:\n"); */
-                             /* print_var_tab(); */
-                             /* printf("Input:\n"); */
-                             /* print_prefix(root); */
-                             /* print_postfix(root); */
-                             /* print_prefix_lisp(root); */
-                             /* print_infix(root); */
                              extract_polys(&root);
                              extract_ratfuns(&root);
-                             /* printf("---\n"); */
+
+                             printf("Input:\n");
                              print_prefix_lisp(root);
                              printf("\n");
-                             /* printf("Integral:\n"); */
-                             /* HermiteReduceI(root, main_var); */
-                             /* printf("Squarefree factorisation:\n"); */
-                             /* SquarefreeI(root, main_var); */
-                             /* printf("LRT algorithm:\n"); */
-                             /* IntRationalLogPartI(root, main_var, new_var); */
-                             printf("Integral:\n");
+
                              IntegrateRationalFunction(root, main_var, new_var);
-                             /* printf("GCD:\n"); */
-                             /* GCDI(root); */
-                             /* printf("Subresultant PRS:\n"); */
-                             /* SubResultantPRSI(root, main_var); */
+                             printf("--------\n");
+
                              free_tree(root);
                              root = NULL;
                              make_var_tab();
@@ -231,7 +213,7 @@ int main (int argc, char *argv[])
 char *rl_gets (int lineno)
 {
      char prompt[12];
-     
+
      /* If the buffer has already been allocated, return the memory to the
         free pool. */
      if (input_line) {

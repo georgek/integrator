@@ -43,7 +43,7 @@ node_type *add_var(char name)
      p->type = coef_type;
      p->u.coef.type = polynomial;
      p->u.coef.u.poly = make_mono_poly(name, 1);
-     
+
      return p;
 }
 
@@ -61,7 +61,7 @@ node_type *add_poly(Polynomial poly)
      p-> type = coef_type;
      p->u.coef.type = polynomial;
      p->u.coef.u.poly = poly;
-     
+
      return p;
 }
 
@@ -74,13 +74,13 @@ node_type *add_ratfun(Coefficient num, Coefficient den)
      if ((p = malloc(node_size)) == NULL) {
           printf("out of memory\n");
      }
-     
+
      /* copy information */
      p->type = ratfun_type;
      p->u.ratfun.num = num;
      p->u.ratfun.den = den;
      canonicalise_ratfun(&p->u.ratfun);
-     
+
      return p;
 }
 
@@ -93,12 +93,12 @@ node_type *add_op1(int operator, node_type *operand)
      if ((p = malloc(node_size)) == NULL) {
           printf("out of memory\n");
      }
-     
+
      /* copy information */
      p->type = op1_type;
      p->u.op1.operator = operator;
      p->u.op1.operand = operand;
-     
+
      return p;
 }
 
@@ -111,17 +111,17 @@ node_type *add_op2(int operator, node_type *operand1, node_type *operand2)
      if ((p = malloc(node_size)) == NULL) {
           printf("out of memory\n");
      }
-     
+
      /* copy information */
      p->type = op2_type;
      p->u.op2.operator = operator;
      p->u.op2.operand1 = operand1;
      p->u.op2.operand2 = operand2;
-     
+
      return p;
 }
 
-void free_tree(node_type *p) 
+void free_tree(node_type *p)
 {
      if (!p) {
           return;
@@ -155,7 +155,7 @@ void traverse_prefix_lisp(node_type *p, int prev_op)
      case ratfun_type:
           /* print_ratfun(p->u.ratfun); */
           /* printf("\n"); */
-          print_ratfun_LaTeX(p->u.ratfun);
+          print_ratfun(p->u.ratfun);
           break;
      case op1_type:
           printf("(");
@@ -360,16 +360,16 @@ void traverse_infix(node_type *p)
 int op_priority(int i)
 {
      int p;
-     switch (i) 
+     switch (i)
      {
      case '-': p=1; break;
      case '+': p=1; break;
-     case '*': p=2; break; 
+     case '*': p=2; break;
      case '/': p=2; break;
      case UMINUS: p=4; break;
      case '^': p=5; break;
-     default: p=6;break;       
-     }                   
+     default: p=6;break;
+     }
      return (p);
 }
 
@@ -437,6 +437,10 @@ void extract_polys(node_type **root)
                            "Indices must be single precision integers!\n");
                     exit(1);
                }
+               if (coef_neg(r->u.op2.operand2->u.coef)) {
+                    /* this is a rational function */
+                    break;
+               }
 
                coef_power(&r->u.op2.operand1->u.coef,
                           r->u.op2.operand1->u.coef,
@@ -445,7 +449,7 @@ void extract_polys(node_type **root)
                r->u.op2.operand1 = NULL;
                free_tree(r);
                break;
-               
+
           case '+':
                add_coefficients(&r->u.op2.operand1->u.coef,
                                 r->u.op2.operand1->u.coef,
@@ -526,7 +530,6 @@ void extract_polys(node_type **root)
      case ratfun_type:
           break;
      }
-     
 }
 
 void extract_ratfuns(node_type **root)
@@ -558,11 +561,14 @@ void extract_ratfuns(node_type **root)
                ratfun_power(&r->u.op2.operand1->u.ratfun,
                             r->u.op2.operand1->u.ratfun,
                             *(r->u.op2.operand2->u.coef.u.rat.num+1));
+               if (coef_neg(r->u.op2.operand2->u.coef)) {
+                    invert_ratfun(&r->u.op2.operand1->u.ratfun);
+               }
                *root = r->u.op2.operand1;
                r->u.op2.operand1 = NULL;
                free_tree(r);
                break;
-               
+
           case '+':
                add_ratfuns(&r->u.op2.operand1->u.ratfun,
                            r->u.op2.operand1->u.ratfun,
@@ -629,7 +635,6 @@ void extract_ratfuns(node_type **root)
      case ratfun_type:
           break;
      }
-     
 }
 
 extern char main_var;
@@ -637,8 +642,10 @@ extern char main_var;
 void set_main_var(node_type **root)
 {
      node_type *r = *root;
-     
+
      if (r->type != op2_type || r->u.op2.operator != ',') {
+          /* x by default */
+          main_var = 'x';
           return;
      }
 
@@ -653,5 +660,4 @@ void set_main_var(node_type **root)
      else if (r->u.op2.operand2->type == op2_type) {
           set_main_var(&r->u.op2.operand2);
      }
-     
 }

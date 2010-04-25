@@ -41,13 +41,13 @@ void Squarefree(CoefArray *f, Coefficient A, char var)
           coef_gcd(&At, Ss, Z);
           /* PRINTC(At); */
           Ak = ca_push_back(f, At);
-          
+
           /* printf("%d\n", i++); */
           /* PRINTC(Ss); */
           /* PRINTC(Y); */
           /* PRINTC(Z); */
           /* PRINTC(*Ak); */
-          
+
           exact_div_coefficients(&Ss, Ss, *Ak);
           exact_div_coefficients(&Y, Z, *Ak);
 
@@ -62,7 +62,7 @@ void Squarefree(CoefArray *f, Coefficient A, char var)
      /* if (Ak) { */
      /*      PRINTC(*Ak); */
      /* } */
-          
+
      ca_push_back(f, Ss);
      mul_coefficients(f->head, *f->head, c);
 
@@ -82,7 +82,7 @@ void SquarefreeI(node_type *root, char var)
 {
      CoefArray arr;
      int i;
-     
+
      /* input must be one polynomial */
      if (root->type != coef_type) {
           printf("Error. Input to Squarefree must be a polynomial.\n");

@@ -39,7 +39,7 @@ void canonicalise_ratfun(RatFun *r)
      mul_coefficients(&r->num, r->num, t);
      mul_coefficients(&r->den, r->den, t);
      free_coefficient(&t);
-     
+
      t.u.rat = coef_rat_part(r->den);
      mul_coefficients(&r->num, r->num, t);
      mul_coefficients(&r->den, r->den, t);
@@ -86,7 +86,7 @@ void print_ratfun(RatFun r)
 void print_ratfun_LaTeX(RatFun r)
 {
      Coefficient t = {special};
-     
+
      if (coef_zero(r.num)) {
           printf("0");
           return;

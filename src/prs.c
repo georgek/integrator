@@ -34,7 +34,7 @@ void SubResultant(Coefficient *res, CoefArray *prs,
      gamma.type = rational;
      gamma.u.rat = make_bigrat3(1);
      negate_coefficient(&gamma);
-     
+
      delta = coef_deg(A, var)-coef_deg(B, var);
 
      /* beta <-- (-1)^(delta+1) */
@@ -50,7 +50,7 @@ void SubResultant(Coefficient *res, CoefArray *prs,
           /* printf("***** i: %d *****\n", i); */
           /* PRINTC(ca_get(prs, i)); */
           /* PRINTC(gamma); */
-          
+
           copy_coefficient(&r, coef_lc(ca_get(prs, i), var));
           pseudo_div_coefficients(&Q, &R, ca_get(prs, i-1), ca_get(prs, i));
           ca_push_back(prs, R);
@@ -60,7 +60,7 @@ void SubResultant(Coefficient *res, CoefArray *prs,
           copy_coefficient(&rt, r);
           negate_coefficient(&rt);
           copy_coefficient(&gammat, gamma);
-          
+
           if (delta > 0) {
                coef_power(&rt, rt, delta);
                coef_power(&gammat, gammat, delta-1);
@@ -73,7 +73,7 @@ void SubResultant(Coefficient *res, CoefArray *prs,
           }
           delta = coef_deg(ca_get(prs, i-1), var) -
                coef_deg(ca_get(prs, i), var);
-          
+
           copy_coefficient(&beta, r);
           negate_coefficient(&beta);
           if (delta > 0) {
@@ -91,7 +91,7 @@ void SubResultant(Coefficient *res, CoefArray *prs,
           /* PRINTC(r); */
      }
      k = i - 1;
-     
+
      if (coef_deg(ca_get(prs, k), var) > 0) {
           copy_coefficient(res, zero);
           return;
@@ -163,7 +163,7 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B, char var)
      gamma.type = rational;
      init_bigrat2(&gamma.u.rat, 1);
      negate_bigrat(&gamma.u.rat);
-     
+
      delta = coef_deg(A, var)-coef_deg(B, var);
 
      /* beta <-- (-1)^(delta+1) */
@@ -207,7 +207,7 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B, char var)
           /* PRINTC(b); */
           delta = coef_deg(a, var) - coef_deg(b, var);
           /* printf("delta: %d\n",delta); */
-          
+
           copy_coefficient(&beta, r);
           negate_coefficient(&beta);
           if (delta > 0) {
@@ -249,7 +249,7 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B, char var)
 void GCDI(node_type *root)
 {
      Coefficient res = {special};
-     
+
      if (root->type != op2_type || root->u.op2.operator != ',') {
           printf("Error. GCD requires two inputs.\n");
           return;
@@ -274,7 +274,7 @@ void SubResultantPRSI(node_type *root, char var)
      Coefficient res = {special};
      CoefArray prs = {0,0,NULL};
      int i;
-     
+
      if (root->type != op2_type || root->u.op2.operator != ',') {
           printf("Error. PRS requires two inputs.\n");
           return;
