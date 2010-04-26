@@ -67,12 +67,16 @@
 void IntegrateRationalFunction(node_type *root, char var, char newvar)
 {
      RatFun A, h, content;
-     Coefficient R = {special};
+     Coefficient R = {special}, rat_part = {rational};
+     Coefficient *Qit = NULL, *Sit = NULL;
      Integral integral;
+     unsigned i, j;
 
      init_ratfun(&A);
      init_ratfun(&h);
      init_ratfun(&content);
+
+     init_bigrat(&rat_part.u.rat);
 
      init_integral(&integral);
 
@@ -91,18 +95,18 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
      }
      
      /* make numerator and denominator primitive */
-     coef_content(&content.num, integral.integrand.num, var);
-     exact_div_coefficients(&integral.integrand.num,
-                            integral.integrand.num,
+     coef_content(&content.num, root->u.ratfun.num, var);
+     exact_div_coefficients(&root->u.ratfun.num,
+                            root->u.ratfun.num,
                             content.num);
-     coef_content(&content.den, integral.integrand.den, var);
-     exact_div_coefficients(&integral.integrand.den,
-                            integral.integrand.den,
+     coef_content(&content.den, root->u.ratfun.den, var);
+     exact_div_coefficients(&root->u.ratfun.den,
+                            root->u.ratfun.den,
                             content.den);
 
      HermiteReduce(&integral.rational_part,
                    &h,
-                   integral.integrand,
+                   root->u.ratfun,
                    var);
 
      /* put contents back on */
@@ -117,6 +121,25 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
 
      if (!coef_zero(R)) {
           IntRationalLogPart(&integral.Qi, &integral.Si, R, h.den, var, newvar);
+          /* make Qi and Si primitive */
+          for (i = 0, j = 0; i < integral.Qi.size; ++i) {
+               if (coef_deg(ca_get(&integral.Qi, i), integral.newvar) == 0) {
+                    continue;
+               }
+               Qit = ca_get2(&integral.Qi, i);
+               Sit = ca_get2(&integral.Si, j++);
+               
+               rat_part.u.rat = coef_rat_part(*Qit);
+               mul_coefficients(Qit, *Qit, rat_part);
+               free_bigrat(&rat_part.u.rat);
+               
+               rat_part.u.rat = coef_rat_part(*Sit);
+               mul_coefficients(Sit, *Sit, rat_part);
+               free_bigrat(&rat_part.u.rat);
+
+               coef_pp(Qit, *Qit, newvar);
+               coef_pp(Sit, *Sit, var);
+          }
      }
 
      print_integral(integral);
@@ -151,7 +174,7 @@ void free_integral(Integral *integral)
 void print_integral(Integral integral)
 {
      int plus = 0;
-     unsigned i, j = 0;
+     unsigned i, j;
      
      if (ratfun_zero(integral.integrand)) {
           printf("0\n");
@@ -172,7 +195,7 @@ void print_integral(Integral integral)
      }
 
      if (integral.Qi.size > 0) {
-          for (i = 0; i < integral.Qi.size; ++i) {
+          for (i = 0, j = 0; i < integral.Qi.size; ++i) {
                if (coef_deg(ca_get(&integral.Qi, i), integral.newvar) == 0) {
                     continue;
                }

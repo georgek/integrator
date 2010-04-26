@@ -57,14 +57,6 @@ void canonicalise_ratfun(RatFun *r)
           exact_div_coefficients(&r->num, r->num, t);
           exact_div_coefficients(&r->den, r->den, t);
           free_coefficient(&t);
-          /* divide through by gcd of poly contents */
-          /* coef_content(&t, r->num); */
-          /* coef_content(&s, r->den); */
-          /* coef_gcd(&t, t, s); */
-          /* exact_div_coefficients(&r->num, r->num, t); */
-          /* exact_div_coefficients(&r->den, r->den, t); */
-          /* free_coefficient(&t); */
-          /* free_coefficient(&s); */
      }
 }
 
