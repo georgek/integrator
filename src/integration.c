@@ -5,65 +5,6 @@
 #include "hermite.h"
 #include "lrt.h"
 
-/* TODO input to hermite must have a primitive denominator so we should remove
- * the content from the rational and/or polynomial part from the rational
- * function first */
-/* void IntegrateRationalFunction(node_type *root, char var, char newvar) */
-/* { */
-/*      RatFun g, h; */
-/*      Coefficient Q = {special}, R = {special}; */
-/*      CoefArray Qi = new_coef_array(), Si = new_coef_array(); */
-/*      unsigned i, j = 0; */
-     
-/*      init_ratfun(&g); */
-/*      init_ratfun(&h); */
-
-/*      if (root->type != ratfun_type) { */
-/*           printf("Error! IntegrateRationalFunction" */
-/*                  "requires a rational function.\n"); */
-/*           return; */
-/*      } */
-
-/*      HermiteReduce(&g, &h, root->u.ratfun, var); */
-/*      print_ratfun(g); */
-/*      printf(" +\n"); */
-
-/*      polydiv_coefficients(&Q, &R, h.num, h.den); */
-     
-/*      coef_integrate(&Q, Q, var); */
-/*      print_coefficient(Q); */
-
-/*      if (!coef_zero(R)) { */
-/*           printf(" +\n"); */
-/*           IntRationalLogPart(&Qi, &Si, R, h.den, var, newvar); */
-
-/*           for (i = 0; i < Qi.size; ++i) { */
-/*                if (coef_deg(ca_get(&Qi, i), newvar) == 0) { */
-/*                     continue; */
-/*                } */
-/*                printf("("); */
-
-/*                printf("sum(%c*ln(", newvar); */
-/*                print_coefficient(ca_get(&Si, j++)); */
-/*                printf("), %c = rootsOf(", newvar); */
-/*                print_coefficient(ca_get(&Qi, i)); */
-/*                printf(" = 0))\n"); */
-
-/*                /\* printf(")\n"); *\/ */
-               
-/*                /\* printf("Q_%d: ", i); *\/ */
-/*                /\* print_coefficient_nonpretty(ca_get(&Qi, i)); *\/ */
-/*                /\* printf("\n"); *\/ */
-/*           } */
-/*           /\* for (i = 0; i < Si.size; ++i) { *\/ */
-/*           /\*      printf("S_%d: ", i); *\/ */
-/*           /\*      print_coefficient_nonpretty(ca_get(&Si, i)); *\/ */
-/*           /\*      printf("\n"); *\/ */
-/*           /\* } *\/ */
-/*      } */
-/*      printf("\n"); */
-/* } */
-
 void IntegrateRationalFunction(node_type *root, char var, char newvar)
 {
      RatFun A, h, content;
@@ -145,10 +86,7 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
                    || !poly_univar(ca_get(&integral.Qi, i).u.poly)) {
                     continue;
                }
-               printf("Solving:\n");
-               PRINTC(ca_get(&integral.Qi, i));
                solve_linear_poly(&solution, ca_get(&integral.Qi, i).u.poly);
-               PRINTC(solution);
                subst_var_coef(ca_get2(&integral.Si, i), solution, newvar);
 
                /* move to solved arrays */
