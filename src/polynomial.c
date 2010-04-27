@@ -2122,6 +2122,19 @@ void subst_var_poly(Polynomial *p, Coefficient sol, char var)
      free_coefficient(&tsol);
 }
 
+int poly_univar(Polynomial p)
+{
+     MonoPtr q;
+
+     for (q = p.head->next; q->coeff.type != special; q = q->next) {
+          if (q->coeff.type == polynomial) {
+               return 0;
+          }
+     }
+
+     return 1;
+}
+
 BigRat poly_rat_part(Polynomial p)
 {
      Coefficient c;

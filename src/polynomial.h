@@ -215,6 +215,9 @@ void solve_linear_poly(Coefficient *sol, Polynomial p);
 /* substitute solution */
 void subst_var_poly(Polynomial *p, Coefficient sol, char var);
 
+/* is poly univariate? */
+int poly_univar(Polynomial p);
+
 /* rational part of polynomial ie. lcm of coef denominators */
 BigRat poly_rat_part(Polynomial p);
 

@@ -141,11 +141,8 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
 
           /* solve linear univariate Qis */
           for (i = 0; i < integral.Qi.size; ++i) {
-               if (ca_get(&integral.Qi, i).type != polynomial
-                   || ca_get(&integral.Qi, i).u.poly.head->next->coeff.type
-                   != rational
-                   || ca_get(&integral.Qi, i).u.poly.head->next->next->coeff.type
-                   != rational) {
+               if (coef_deg(ca_get(&integral.Qi, i), newvar) != 1
+                   || !poly_univar(ca_get(&integral.Qi, i).u.poly)) {
                     continue;
                }
                printf("Solving:\n");
@@ -276,7 +273,7 @@ void print_integral_LaTeX(Integral integral)
      
      printf("\\int \\! ");
      print_ratfun_LaTeX(integral.integrand);
-     printf("\\, d%c = ", integral.var);
+     printf(" \\, d%c = ", integral.var);
 
      if (ratfun_zero(integral.integrand)) {
           printf("0\n");
