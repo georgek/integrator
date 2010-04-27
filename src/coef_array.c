@@ -38,6 +38,20 @@ CoefPtr ca_push_back(CoefArray *ca, Coefficient nc)
      return ca->head + ca->size++;
 }
 
+Coefficient ca_remove(CoefArray *ca, unsigned index)
+{
+     Coefficient t = *(ca->head+index);
+     unsigned i;
+
+     --ca->size;
+     /* copy down */
+     for (i = index; i < ca->size; ++i) {
+          *(ca->head + i) = *(ca->head + i+1);
+     }
+
+     return t;
+}
+
 CoefPtr ca_poly_push_back(CoefArray *ca, Polynomial np)
 {
      Coefficient nc;

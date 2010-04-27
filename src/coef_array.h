@@ -18,6 +18,8 @@ typedef struct coef_array
 CoefArray new_coef_array();
 /* put a copy of coefficient at end of array */
 CoefPtr ca_push_back(CoefArray *ca, Coefficient nc);
+/* remove coef from array, returning the coef for freeing etc. */
+Coefficient ca_remove(CoefArray *ca, unsigned index);
 /* put a copy of a polynomial or rational at end */
 CoefPtr ca_poly_push_back(CoefArray *ca, Polynomial np);
 CoefPtr ca_rational_push_back(CoefArray *ca, BigRat nr);

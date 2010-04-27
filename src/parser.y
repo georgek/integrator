@@ -76,6 +76,7 @@ statement:      expression
                              print_prefix_lisp(root);
                              printf("\n");
 
+                             printf("Integral:\n");
                              IntegrateRationalFunction(root, main_var, new_var);
                              printf("--------\n");
 

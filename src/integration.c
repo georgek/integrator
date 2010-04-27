@@ -67,10 +67,11 @@
 void IntegrateRationalFunction(node_type *root, char var, char newvar)
 {
      RatFun A, h, content;
-     Coefficient R = {special}, rat_part = {rational};
+     Coefficient R = {special}, rat_part = {rational}, solution = {special};
      Coefficient *Qit = NULL, *Sit = NULL;
+     Coefficient Qit2 = {special}, Sit2 = {special};
      Integral integral;
-     unsigned i, j;
+     unsigned i;
 
      init_ratfun(&A);
      init_ratfun(&h);
@@ -122,12 +123,9 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
      if (!coef_zero(R)) {
           IntRationalLogPart(&integral.Qi, &integral.Si, R, h.den, var, newvar);
           /* make Qi and Si primitive */
-          for (i = 0, j = 0; i < integral.Qi.size; ++i) {
-               if (coef_deg(ca_get(&integral.Qi, i), integral.newvar) == 0) {
-                    continue;
-               }
+          for (i = 0; i < integral.Qi.size; ++i) {
                Qit = ca_get2(&integral.Qi, i);
-               Sit = ca_get2(&integral.Si, j++);
+               Sit = ca_get2(&integral.Si, i);
                
                rat_part.u.rat = coef_rat_part(*Qit);
                mul_coefficients(Qit, *Qit, rat_part);
@@ -138,6 +136,44 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
                free_bigrat(&rat_part.u.rat);
 
                coef_pp(Qit, *Qit, newvar);
+               coef_pp(Sit, *Sit, var);
+          }
+
+          /* solve linear univariate Qis */
+          for (i = 0; i < integral.Qi.size; ++i) {
+               if (ca_get(&integral.Qi, i).type != polynomial
+                   || ca_get(&integral.Qi, i).u.poly.head->next->coeff.type
+                   != rational
+                   || ca_get(&integral.Qi, i).u.poly.head->next->next->coeff.type
+                   != rational) {
+                    continue;
+               }
+               printf("Solving:\n");
+               PRINTC(ca_get(&integral.Qi, i));
+               solve_linear_poly(&solution, ca_get(&integral.Qi, i).u.poly);
+               PRINTC(solution);
+               subst_var_coef(ca_get2(&integral.Si, i), solution, newvar);
+
+               /* move to solved arrays */
+               ca_push_back(&integral.QiS, solution);
+               ca_push_back(&integral.SiS, ca_get(&integral.Si, i));
+
+               /* remove from normal arrays */
+               Qit2 = ca_remove(&integral.Qi, i);
+               Sit2 = ca_remove(&integral.Si, i);
+               free_coefficient(&Qit2);
+               free_coefficient(&Sit2);
+               --i;
+          }
+
+          /* make SiS primitive */
+          for (i = 0; i < integral.SiS.size; ++i) {
+               Sit = ca_get2(&integral.SiS, i);
+               
+               rat_part.u.rat = coef_rat_part(*Sit);
+               mul_coefficients(Sit, *Sit, rat_part);
+               free_bigrat(&rat_part.u.rat);
+
                coef_pp(Sit, *Sit, var);
           }
      }
@@ -160,6 +196,8 @@ void init_integral(Integral *integral)
      integral->poly_part.type = special;
      integral->Qi = new_coef_array();
      integral->Si = new_coef_array();
+     integral->QiS = new_coef_array();
+     integral->SiS = new_coef_array();
 }
 
 void free_integral(Integral *integral)
@@ -174,7 +212,7 @@ void free_integral(Integral *integral)
 void print_integral(Integral integral)
 {
      int plus = 0;
-     unsigned i, j;
+     unsigned i;
      
      if (ratfun_zero(integral.integrand)) {
           printf("0\n");
@@ -194,18 +232,35 @@ void print_integral(Integral integral)
           plus = 1;
      }
 
-     if (integral.Qi.size > 0) {
-          for (i = 0, j = 0; i < integral.Qi.size; ++i) {
-               if (coef_deg(ca_get(&integral.Qi, i), integral.newvar) == 0) {
-                    continue;
+     /* print explicit sums */
+     if (integral.QiS.size > 0) {
+          for (i = 0; i < integral.QiS.size; ++i) {
+               if (plus) {
+                    printf(" + ");
                }
+               if (!coef_one(ca_get(&integral.QiS, i))) {
+                    print_coefficient(ca_get(&integral.QiS, i));
+                    printf("*ln(");
+               }
+               else {
+                    printf("ln(");
+               }
+               print_coefficient(ca_get(&integral.SiS, i));
+               printf(")");
+               plus = 1;
+          }
+     }
+
+     /* print sums over roots */
+     if (integral.Qi.size > 0) {
+          for (i = 0; i < integral.Qi.size; ++i) {
                if (plus) {
                     printf(" + ");
                }
                printf("sum(%c | ", integral.newvar);
                print_coefficient(ca_get(&integral.Qi, i));
                printf(" = 0) %c*ln(", integral.newvar);
-               print_coefficient(ca_get(&integral.Si, j++));
+               print_coefficient(ca_get(&integral.Si, i));
                printf(")");
                plus = 1;
           }
@@ -217,7 +272,7 @@ void print_integral(Integral integral)
 void print_integral_LaTeX(Integral integral)
 {
      int plus = 0;
-     unsigned i, j = 0;
+     unsigned i;
      
      printf("\\int \\! ");
      print_ratfun_LaTeX(integral.integrand);
@@ -241,18 +296,40 @@ void print_integral_LaTeX(Integral integral)
           plus = 1;
      }
 
+     /* print explicit sums */
+     if (integral.QiS.size > 0) {
+          for (i = 0; i < integral.QiS.size; ++i) {
+               if (plus && !coef_neg(ca_get(&integral.QiS, i))) {
+                    printf(" + ");
+               }
+               if (!coef_one2(ca_get(&integral.QiS, i))) {
+                    printf(" - ");
+                    print_coefficient_LaTeX2(ca_get(&integral.QiS, i), 1);
+                    printf("\\ln(");
+               }
+               else if (coef_neg(ca_get(&integral.QiS, i))
+                        && coef_one2(ca_get(&integral.QiS, i))) {
+                    printf("-\\ln(");
+               }
+               else {
+                    printf("\\ln(");
+               }
+               print_coefficient_LaTeX(ca_get(&integral.SiS, i));
+               printf(")");
+               plus = 1;
+          }
+     }
+
+     /* print sums over roots */
      if (integral.Qi.size > 0) {
           for (i = 0; i < integral.Qi.size; ++i) {
-               if (coef_deg(ca_get(&integral.Qi, i), integral.newvar) == 0) {
-                    continue;
-               }
                if (plus) {
                     printf(" + ");
                }
                printf("\\sum_{%c | ", integral.newvar);
                print_coefficient_LaTeX(ca_get(&integral.Qi, i));
                printf(" = 0} %c \\ln(", integral.newvar);
-               print_coefficient_LaTeX(ca_get(&integral.Si, j++));
+               print_coefficient_LaTeX(ca_get(&integral.Si, i));
                printf(")");
                plus = 1;
           }

@@ -12,7 +12,7 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
                         Coefficient A, Coefficient D,
                         char var, char newvar)
 {
-     Coefficient t = {polynomial};
+     Coefficient t = {polynomial}, Qit = {special};
      Coefficient R = {special}, AtDd = {special}, AjQi = {special};
      CoefArray Ri = new_coef_array(), Ai = new_coef_array();
      CoefPtr St = NULL;
@@ -35,7 +35,7 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
 
      /* for i <- 1 to n such that deg(Qi, t) > 0 */
      for (i = 1; i <= Qi->size; ++i) {
-          if (coef_deg(ca_get(Qi, i-1), newvar) <= 0) {
+          if (coef_deg(ca_get(Qi, i-1), newvar) == 0) {
                continue;
           }
 
@@ -61,9 +61,17 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
                /* PRINTC(AjQi); */
                exact_div_coefficients(St, *St, AjQi);
           }
+     }
 
-          /* exact_div_coefficients(St, *St, ca_get(Qi, i-1)); */
-          coef_pp(St, *St, var);
+     /* remove unused Qis */
+     for (i = 0; i < Qi->size; ++i) {
+          if (coef_deg(ca_get(Qi, i), newvar) > 0) {
+               continue;
+          }
+          /* remove */
+          Qit = ca_remove(Qi, i);
+          free_coefficient(&Qit);
+          --i;
      }
 
      free_coefficient(&t);

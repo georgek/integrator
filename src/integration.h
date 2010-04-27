@@ -16,6 +16,8 @@ typedef struct integral {
      Coefficient poly_part;
      CoefArray Qi;
      CoefArray Si;
+     CoefArray QiS;             /* solutions to linear Qis */
+     CoefArray SiS;
 } Integral;
 
 void IntegrateRationalFunction(node_type *root, char var, char newvar);

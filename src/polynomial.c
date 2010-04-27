@@ -1110,6 +1110,19 @@ void coef_integrate(Coefficient *ci, Coefficient c, char var)
      free_coefficient(&old_ci);
 }
 
+void subst_var_coef(Coefficient *c, Coefficient sol, char var)
+{
+     /* only care about polynomial case */
+     switch (c->type) {
+     case polynomial:
+          subst_var_poly(&c->u.poly, sol, var);
+          break;
+     default:
+          break;
+     }
+     coef_const_canonicalise(c);
+}
+
 void coef_content(Coefficient *cont, Coefficient p, char var)
 {
      /* cont(0)==pp(0)==0 by convention */
@@ -2048,6 +2061,65 @@ void poly_integrate(Polynomial *pi, Polynomial p, char var)
           /* increase power by one and divide by new power */
           exact_div_coefficients2(&q->coeff, q->coeff, ++q->degree);
      }
+}
+
+void solve_linear_poly(Coefficient *sol, Polynomial p)
+{
+     Coefficient t = {special};
+     MonoPtr m, c;
+
+     if (poly_deg(p) != 1) {
+          printf("Error! Trying to solve non-linear poly!\n");
+          return;
+     }
+
+     m = p.head->next;
+     c = m->next;
+
+     if (m->coeff.type != rational || c->coeff.type !=rational) {
+          printf("Error! Solve only works for univariate polys!\n");
+     }
+
+     copy_coefficient(&t, c->coeff);
+     negate_coefficient(&t);
+     exact_div_coefficients(&t, t, m->coeff);
+
+     copy_coefficient(sol, t);
+
+     free_coefficient(&t);
+}
+
+void subst_var_poly(Polynomial *p, Coefficient sol, char var)
+{
+     MonoPtr q;
+     Coefficient tsol = {special};
+     Polynomial res;
+
+     if (var_rank(var) < var_rank(p->variable)) {
+          /* nothing to do since var can't exist in this poly */
+          return;
+     }
+     else if (var_rank(var) > var_rank(p->variable)) {
+          /* var might be in the coefficients */
+          for (q = p->head->next; q->coeff.type != special; q = q->next) {
+               subst_var_coef(&q->coeff, sol, var);
+          }
+          return;
+     }
+
+     /* this poly is in same var */
+     res = make_zero_poly(var);
+
+     for (q = p->head->next; q->coeff.type != special; q = q->next) {
+          coef_power(&tsol, sol, q->degree);
+          mul_coefficients(&tsol, tsol, q->coeff);
+          add_monomial(&res, 0, tsol);
+     }
+
+     copy_poly(p, res);
+
+     free_poly(&res);
+     free_coefficient(&tsol);
 }
 
 BigRat poly_rat_part(Polynomial p)
