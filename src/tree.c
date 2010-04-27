@@ -645,6 +645,7 @@ void set_main_var(node_type **root)
 
      if (r->type != op2_type || r->u.op2.operator != ',') {
           /* x by default */
+          set_top_var('x');
           main_var = 'x';
           return;
      }
