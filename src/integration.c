@@ -33,7 +33,7 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
      integral.newvar = newvar;
 
      if (ratfun_zero(integral.integrand)) {
-          return;
+          goto print;
      }
      
      /* make numerator and denominator primitive */
@@ -61,7 +61,7 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
 
      coef_integrate(&integral.poly_part, integral.poly_part, var);
 
-     if (!coef_zero(R)) {
+     if (!coef_zero(R) && coef_deg(h.den, var) > coef_deg(R, var)) {
           IntRationalLogPart(&integral.Qi, &integral.Si, R, h.den, var, newvar);
           /* make Qi and Si primitive */
           for (i = 0; i < integral.Qi.size; ++i) {
@@ -112,7 +112,22 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
                coef_pp(Sit, *Sit, var);
           }
      }
+     else if (coef_deg(h.den, var) == 0 && coef_deg(R, var) == 0) {
+          /* this is actually a constant in var, so integrate it trivially */
+          coef_integrate(&R, R, var);
+          /* move this to the numerator of h */
+          free_coefficient(&h.num);
+          h.num = R;
+          R.type = special;
+          /* add h to the rational part of integral */
+          add_ratfuns(&integral.rational_part, integral.rational_part, h);
+     }
+     else {
+          /* this shouldn't happen */
+          printf("Error!  Invalid ratfun following Hermite reduction!\n");
+     }
 
+print:
      print_integral(integral);
      printf("\nLaTeX format:\n");
      print_integral_LaTeX(integral);
