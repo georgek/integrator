@@ -684,10 +684,14 @@ void add_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           res->u.poly.head = NULL;
           add_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {                     /* rat + poly */
+     else if (left.type == rational && right.type == polynomial) {
           res->type = polynomial;
           res->u.poly.head = NULL;
           add_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
@@ -709,11 +713,15 @@ void sub_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           res->u.poly.head = NULL;
           sub_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {                     /* rat - poly */
+     else if (left.type == rational && right.type == polynomial) {
           res->type = polynomial;
           res->u.poly.head = NULL;
           sub_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
           negate_coefficient(res);
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
@@ -735,10 +743,14 @@ void mul_coefficients(Coefficient *res, Coefficient left, Coefficient right)
           res->u.poly.head = NULL;
           mul_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {                     /* rat * poly */
+     else if (left.type == rational && right.type == polynomial) {
           res->type = polynomial;
           res->u.poly.head = NULL;
           mul_poly_rat(&res->u.poly, right.u.poly, left.u.rat);
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
@@ -761,6 +773,10 @@ void mul_coefficients2(Coefficient *res, Coefficient left, SHORT_INT_T right)
           mul_poly_rat(&res->u.poly, left.u.poly, temp);
           free_bigrat(&temp);
      }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
+     }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
 }
@@ -782,7 +798,7 @@ void exact_div_coefficients(Coefficient *res,
           res->u.poly.head = NULL;
           div_poly_rat(&res->u.poly, left.u.poly, right.u.rat);
      }
-     else {                     /* rat / poly */
+     else if (left.type == rational && right.type == polynomial) {
           if (coef_zero(left)) {
                /* everything divides zero */
                res->type = rational;
@@ -791,6 +807,10 @@ void exact_div_coefficients(Coefficient *res,
           else {
                printf("Error: division was not exact: rat/poly\n");
           }
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
@@ -808,12 +828,16 @@ void exact_div_coefficients2(Coefficient *res,
           res->u.rat.den = NULL;
           div_bigrats2(&res->u.rat, left.u.rat, right);
      }
-     else {
+     else if (left.type == polynomial) {
           t = make_bigrat3(right);
           res->type = polynomial;
           res->u.poly.head = NULL;
           div_poly_rat(&res->u.poly, left.u.poly, t);
           free_bigrat(&t);
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
@@ -846,11 +870,15 @@ void polydiv_coefficients(Coefficient *q, Coefficient *r,
           r->type = rational;
           r->u.rat = make_bigrat3(0);
      }
-     else {                     /* rational / poly */
+     else if (left.type == rational && right.type == polynomial) {
           q->type = rational;
           q->u.rat = make_bigrat3(0);
           r->type = special;
           copy_coefficient(r, left);
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(q);
      coef_const_canonicalise(r);
@@ -890,11 +918,15 @@ void pseudo_div_coefficients(Coefficient *q, Coefficient *r,
           r->type = rational;
           r->u.rat = make_bigrat3(0);
      }
-     else {                     /* rational / poly */
+     else if (left.type == rational && right.type == polynomial) {
           q->type = rational;
           q->u.rat = make_bigrat3(0);
           r->type = special;
           copy_coefficient(r, left);
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(q);
      coef_const_canonicalise(r);
@@ -911,10 +943,14 @@ void coef_power(Coefficient *res, Coefficient coef, SHORT_INT_T power)
           res->u.rat.den = NULL;
           br_power(&res->u.rat, coef.u.rat, power);
      }
-     else {
+     else if (coef.type == polynomial) {
           res->type = polynomial;
           res->u.poly.head = NULL;
           poly_power(&res->u.poly, coef.u.poly, power);
+     }
+     else {
+          printf("Error! Coefficient has type special!\n");
+          exit(1);
      }
      coef_const_canonicalise(res);
      free_coefficient(&old_res);
