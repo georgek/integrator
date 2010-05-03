@@ -49,14 +49,6 @@ UINT 0|[1-9][0-9]*
      return TAN;
 }
 
-"diff" {
-     return DIFF;
-}
-
-"eval" {
-     return EVAL;
-}
-
 "exit"|"quit" {
      return QUIT;
 }

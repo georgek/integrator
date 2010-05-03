@@ -58,7 +58,7 @@ char* input_line = NULL;        /* line of input from readline */
 
 %token <ival> INTEGER
 %token <var> VARIABLE
-%token LN EXP COS SIN TAN EVAL DIFF QUIT
+%token LN EXP COS SIN TAN QUIT
 
 %left ','
 %left '+' '-'
