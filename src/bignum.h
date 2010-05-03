@@ -1,3 +1,9 @@
+/* This file is part of Integrator
+ * (C) 2010 George Kettleborough
+ * All rights reserved (at least until the project is finished)
+ * 2010 Computer science final year project
+ */
+
 /* bignums are arbitrary precision integers */
 /* **TODO**: make sure this works with any system not just mine,
      probably using a configure script to work out which types to use

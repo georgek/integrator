@@ -1,3 +1,8 @@
+dnl This file is part of Integrator
+dnl (C) 2010 George Kettleborough
+dnl All rights reserved (at least until the project is finished)
+dnl 2010 Computer science final year project
+
 # prelude
 AC_INIT([integrator], [1.0], [g.kettleborough@uea.ac.uk])
 AM_INIT_AUTOMAKE([-Wall -Werror])
