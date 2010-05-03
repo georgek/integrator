@@ -17,7 +17,7 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
      CoefArray Ri = new_coef_array(), Ai = new_coef_array();
      CoefPtr St = NULL;
 
-     unsigned i, j, m;
+     unsigned i, m;
 
      t.u.poly = make_mono_poly(newvar, 1);
 
@@ -48,19 +48,23 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
           for (m = 1; m <= Ri.size - 1; ++m) {
                if (coef_deg(ca_get(&Ri, m), var) == i) {
                     St = ca_push_back(Si, ca_get(&Ri, m));
+                    coef_pp(St, *St, var);
                     break;
                }
           }
 
-          Squarefree(&Ai, coef_lc(*St, var), newvar);
+          /* PRINTC(*St); */
+          /* Squarefree(&Ai, coef_lc(*St, var), newvar); */
 
-          for (j = 1; j <= Ai.size; ++j) {
-               coef_gcd(&AjQi, ca_get(&Ai, j-1), ca_get(Qi, i-1));
-               coef_power(&AjQi, AjQi, j);
-               /* PRINTC(*St); */
-               /* PRINTC(AjQi); */
-               exact_div_coefficients(St, *St, AjQi);
-          }
+          /* for (j = 1; j <= Ai.size; ++j) { */
+          /*      /\* PRINTC(ca_get(&Ai, j-1)); *\/ */
+          /*      /\* PRINTC(ca_get(Qi, i-1)); *\/ */
+          /*      coef_gcd(&AjQi, ca_get(&Ai, j-1), ca_get(Qi, i-1)); */
+          /*      coef_power(&AjQi, AjQi, j); */
+          /*      /\* PRINTC(*St); *\/ */
+          /*      /\* PRINTC(AjQi); *\/ */
+          /*      exact_div_coefficients(St, *St, AjQi); */
+          /* } */
      }
 
      /* remove unused Qis */

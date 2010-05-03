@@ -114,5 +114,3 @@ void print_var_tab()
      printf("\n");
 }
 
-
-

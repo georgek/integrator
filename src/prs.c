@@ -156,8 +156,14 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B, char var)
 
      /* printf("*** begin subresultant PRS ***, var: %c\n", var); */
 
-     copy_coefficient(&a, A);
-     copy_coefficient(&b, B);
+     if (coef_deg(A, var) >= coef_deg(B, var)) {
+          copy_coefficient(&a, A);
+          copy_coefficient(&b, B);
+     }
+     else {
+          copy_coefficient(&b, A);
+          copy_coefficient(&a, B);
+     }
 
      /* gamma <-- -1 */
      gamma.type = rational;
@@ -201,6 +207,8 @@ void SubResultantGCD(Coefficient *gcd, Coefficient A, Coefficient B, char var)
           else {
                coef_power(&rt, rt, -delta);
                coef_power(&gammat, gammat, -delta);
+               /* PRINTC(gammat); */
+               /* PRINTC(rt); */
                exact_div_coefficients(&gamma, gammat, rt);
           }
           /* PRINTC(a); */

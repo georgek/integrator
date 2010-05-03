@@ -175,8 +175,9 @@ int main (int argc, char *argv[])
      initialise_readline();
 
      printf("Integrator.\n"
-            "Enter expressions in x (by default).\n"
-            "Type quit, or enter an EOF to quit.\n");
+            "Enter an expression of the form <rational function>,<var>\n"
+            "to integrate <rational function> wrt <var> (x by default).\n"
+            "Type quit, or enter an EOF (Ctrl-D) to quit.\n");
 
      /* user input prompt */
      while (1) {

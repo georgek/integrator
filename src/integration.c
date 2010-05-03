@@ -72,12 +72,12 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
                mul_coefficients(Qit, *Qit, rat_part);
                free_bigrat(&rat_part.u.rat);
                
-               rat_part.u.rat = coef_rat_part(*Sit);
-               mul_coefficients(Sit, *Sit, rat_part);
-               free_bigrat(&rat_part.u.rat);
+               /* rat_part.u.rat = coef_rat_part(*Sit); */
+               /* mul_coefficients(Sit, *Sit, rat_part); */
+               /* free_bigrat(&rat_part.u.rat); */
 
                coef_pp(Qit, *Qit, newvar);
-               coef_pp(Sit, *Sit, var);
+               /* coef_pp(Sit, *Sit, var); */
           }
 
           /* solve linear univariate Qis */
@@ -249,11 +249,15 @@ void print_integral_LaTeX(Integral integral)
      /* print explicit sums */
      if (integral.QiS.size > 0) {
           for (i = 0; i < integral.QiS.size; ++i) {
-               if (plus && !coef_neg(ca_get(&integral.QiS, i))) {
-                    printf(" + ");
+               if (plus) {
+                    if (!coef_neg(ca_get(&integral.QiS, i))) {
+                         printf(" + ");
+                    }
+                    else {
+                         printf(" - ");
+                    }
                }
                if (!coef_one2(ca_get(&integral.QiS, i))) {
-                    printf(" - ");
                     print_coefficient_LaTeX2(ca_get(&integral.QiS, i), 1);
                     printf("\\ln(");
                }
