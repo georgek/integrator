@@ -1604,6 +1604,8 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
           free_poly(&old_R);
      }
 
+     tr.type = special;
+
      /* different variables */
      if (var_rank(A.variable) < var_rank(B.variable)) {
           /* this might divide - divide each coefficient of the LHS by the
@@ -1613,7 +1615,6 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
           copy_poly(&T, A);
           tc.type = polynomial;
           tc.u.poly = B;
-          tr.type = special;
 
           for (t = T.head->next; t->coeff.type != special; t = t->next) {
                polydiv_coefficients(&t->coeff, &tr, t->coeff, tc);
@@ -1657,7 +1658,15 @@ void div_polynomials(Polynomial *Q, Polynomial *R, Polynomial A, Polynomial B)
      copy_poly(R, A);
      while (!poly_zero(*R) && (s_degree = poly_deg(*R)-poly_deg(B)) >= 0) {
           t->degree = s_degree;
-          exact_div_coefficients(&t->coeff, poly_lc(*R, var), poly_lc(B, var));
+          polydiv_coefficients(&t->coeff, &tr, poly_lc(*R, var), poly_lc(B, var));
+          if (!coef_zero(tr)) {
+               /* doesn't divide */
+               free_poly(Q);
+               *Q = make_zero_poly(A.variable);
+               free_poly(&old_Q);
+               copy_poly(R, A);
+               return;
+          }    
           add_monomial(Q, s_degree, T.head->next->coeff);
           mul_polynomials(&BT, B, T);
           sub_polynomials(R, *R, BT);

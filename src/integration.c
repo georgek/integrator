@@ -207,8 +207,9 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar,
                WAIT;
           }
      }
-     else if (coef_deg(h.den, var) == 0 && coef_deg(R, var) == 0) {
-          /* this is actually a constant in var, so integrate it trivially */
+     else if (coef_deg(h.den, var) == 0) {
+          /* this is actually just a poly over a constant,
+           * so integrate it trivially */
           coef_integrate(&R, R, var);
           /* move this to the numerator of h */
           free_coefficient(&h.num);
@@ -220,6 +221,10 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar,
      else {
           /* this shouldn't happen */
           printf("Error!  Invalid ratfun following Hermite reduction!\n");
+          PRINTR(h);
+          printf("\n");
+          PRINTC(R);
+          printf("\n");
      }
 
 print:
