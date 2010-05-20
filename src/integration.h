@@ -26,7 +26,8 @@ typedef struct integral {
      CoefArray SiS;
 } Integral;
 
-void IntegrateRationalFunction(node_type *root, char var, char newvar);
+void IntegrateRationalFunction(node_type *root, char var, char newvar,
+                               int trace);
 /* void IntegrateRationalFunctionLaTeX(node_type *root, char var, char newvar); */
 
 void init_integral(Integral *integral);

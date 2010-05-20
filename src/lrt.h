@@ -16,7 +16,8 @@
 
 void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
                         Coefficient A, Coefficient D,
-                        char var, char newvar);
+                        char var, char newvar,
+                        int trace);
 
 void IntRationalLogPartI(node_type *root, char var, char newvar);
 

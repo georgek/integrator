@@ -10,7 +10,8 @@
 
 void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
                         Coefficient A, Coefficient D,
-                        char var, char newvar)
+                        char var, char newvar,
+                        int trace)
 {
      Coefficient t = {polynomial}, Qit = {special};
      Coefficient R = {special}, AtDd = {special}, AjQi = {special};
@@ -97,7 +98,7 @@ void IntRationalLogPartI(node_type *root, char var, char newvar)
      }
 
      IntRationalLogPart(&Qi, &Si, root->u.ratfun.num, root->u.ratfun.den,
-                        var, newvar);
+                        var, newvar, 0);
 
      for (i = 0; i < Qi.size; ++i) {
           printf("Q_%d: ", i);

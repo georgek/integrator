@@ -5,7 +5,10 @@
 #include "hermite.h"
 #include "lrt.h"
 
-void IntegrateRationalFunction(node_type *root, char var, char newvar)
+#define WAIT while (getchar() != '\n')
+
+void IntegrateRationalFunction(node_type *root, char var, char newvar,
+                               int trace)
 {
      RatFun A, h, content;
      Coefficient R = {special}, rat_part = {rational}, solution = {special};
@@ -35,7 +38,7 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
      if (ratfun_zero(integral.integrand)) {
           goto print;
      }
-     
+
      /* make numerator and denominator primitive */
      coef_content(&content.num, root->u.ratfun.num, var);
      exact_div_coefficients(&root->u.ratfun.num,
@@ -46,10 +49,17 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
                             root->u.ratfun.den,
                             content.den);
 
+     if (trace) {
+          printf("Computing rational part of integral using "
+                 "Hermite reduction...\n");
+          WAIT;
+     }
+
      HermiteReduce(&integral.rational_part,
                    &h,
                    root->u.ratfun,
-                   var);
+                   var,
+                   trace);
 
      /* put contents back on */
      /* PRINTR(content); */
@@ -57,12 +67,54 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
      mul_ratfuns(&h, h, content);
      /* PRINTR(h); */
 
+     if (trace) {
+          printf("Found rational part:\t\t");
+          print_ratfun(integral.rational_part);
+          printf("\n");
+
+          printf("\nHermite reduction leaves:\t");
+          print_ratfun(h);
+          printf("\n");
+          WAIT;
+
+          printf("Remove polynomial part...\n");
+          WAIT;
+     }
+
      polydiv_coefficients(&integral.poly_part, &R, h.num, h.den);
+
+     if (trace) {
+          printf("Polynomial part:\t\t");
+          print_coefficient(integral.poly_part);
+          printf("\n");
+     }
 
      coef_integrate(&integral.poly_part, integral.poly_part, var);
 
+     if (trace) {
+          printf("Integrate it:\t\t\t");
+          print_coefficient(integral.poly_part);
+          printf("\n");
+          WAIT;
+
+          printf("Left over:\t\t\t");
+          print_coefficient(R);
+          printf("/");
+          print_coefficient(h.den);
+          printf("\n");
+     }
+
      if (!coef_zero(R) && coef_deg(h.den, var) > coef_deg(R, var)) {
-          IntRationalLogPart(&integral.Qi, &integral.Si, R, h.den, var, newvar);
+
+          if (trace) {
+               printf("\nComputing logarithmic part using "
+                      "Lazard-Rioboo-Trager algorithm...\n");
+               WAIT;
+          }
+
+          IntRationalLogPart(&integral.Qi, &integral.Si, R, h.den, var, newvar,
+                             trace);
+          
           /* make Qi and Si primitive */
           for (i = 0; i < integral.Qi.size; ++i) {
                Qit = ca_get2(&integral.Qi, i);
@@ -78,6 +130,27 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
 
                coef_pp(Qit, *Qit, newvar);
                /* coef_pp(Sit, *Sit, var); */
+          }
+
+          if (trace) {
+               printf("Found logarithmic part.\n");
+               printf("%d sum(s) over roots:\t\t", integral.Qi.size);
+               if (integral.Qi.size > 0) {
+                    for (i = 0; i < integral.Qi.size; ++i) {
+                         printf("sum(%c | ", integral.newvar);
+                         print_coefficient(ca_get(&integral.Qi, i));
+                         printf(" = 0) %c*ln(", integral.newvar);
+                         print_coefficient(ca_get(&integral.Si, i));
+                         printf(")");
+                         if (i < integral.Qi.size-1) {
+                              printf(" + ");
+                         }
+                    }
+               }
+               printf("\n");
+               WAIT;
+
+               printf("Solve the linear univariate Qis to get explicit sums...\n");
           }
 
           /* solve linear univariate Qis */
@@ -111,6 +184,28 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
 
                coef_pp(Sit, *Sit, var);
           }
+
+          if (trace) {
+               printf("Found %d explicit sum(s):\t", integral.QiS.size);
+               if (integral.QiS.size > 0) {
+                    for (i = 0; i < integral.QiS.size; ++i) {
+                         if (!coef_one(ca_get(&integral.QiS, i))) {
+                              print_coefficient(ca_get(&integral.QiS, i));
+                              printf("*ln(");
+                         }
+                         else {
+                              printf("ln(");
+                         }
+                         print_coefficient(ca_get(&integral.SiS, i));
+                         printf(")");
+                         if (i < integral.QiS.size-1) {
+                              printf(" + ");
+                         }
+                    }
+               }
+               printf("\n");
+               WAIT;
+          }
      }
      else if (coef_deg(h.den, var) == 0 && coef_deg(R, var) == 0) {
           /* this is actually a constant in var, so integrate it trivially */
@@ -128,6 +223,9 @@ void IntegrateRationalFunction(node_type *root, char var, char newvar)
      }
 
 print:
+     if (trace) {
+          printf("\nFinal answer:\n");
+     }
      print_integral(integral);
      printf("\nLaTeX format:\n");
      print_integral_LaTeX(integral);

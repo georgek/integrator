@@ -9,7 +9,10 @@
 #include "euclidean.h"
 #include "hermite.h"
 
-void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var)
+#define WAIT while (getchar() != '\n')
+#define PRINT(S) printf("\t"); printf(S)
+
+void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var, int trace)
 {
      Coefficient A = {special}, D = {special}, Dd = {special}, Dm = {special};
      Coefficient Ds = {special}, Dmd = {special}, Dm2 = {special};
@@ -53,7 +56,29 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var)
 
           /* PRINTC(Dms); */
           /* PRINTC(A); */
+          if (trace) {
+               PRINT("Solving diophantine equation:\t");
+               printf("s*");
+               print_coefficient(mDsDmd);
+               printf(" + t*");
+               print_coefficient(Dms);
+               printf(" = ");
+               print_coefficient(A);
+               printf("\n\n");
+          }
+
           SolveDiophantineEquation(&B, &C, mDsDmd, Dms, A);
+
+          if (trace) {
+               PRINT("Solution:\t\t\t");
+               printf("s = ");
+               print_coefficient(B);
+               printf(", t = ");
+               print_coefficient(C);
+               printf("\n");
+               WAIT;
+          }
+          
           /* PRINTC(B); */
           /* PRINTC(C); */
 
@@ -99,7 +124,7 @@ void HermiteReduceI(node_type *root, char var)
           return;
      }
 
-     HermiteReduce(&g, &h, root->u.ratfun, var);
+     HermiteReduce(&g, &h, root->u.ratfun, var, 0);
 
      printf("\n");
      print_ratfun(g);

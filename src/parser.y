@@ -47,6 +47,8 @@ node_type *root = NULL;         /* root of parse tree */
 char main_var = 'x';
 char new_var = 'a';
 
+int trace = 0;                  /* trace mode on? */
+
 char* input_line = NULL;        /* line of input from readline */
 %}
 
@@ -58,7 +60,7 @@ char* input_line = NULL;        /* line of input from readline */
 
 %token <ival> INTEGER
 %token <var> VARIABLE
-%token LN EXP COS SIN TAN QUIT
+%token LN EXP COS SIN TAN TRACE QUIT
 
 %left ','
 %left '+' '-'
@@ -83,7 +85,8 @@ statement:      expression
                              printf("\n");
 
                              printf("Integral:\n");
-                             IntegrateRationalFunction(root, main_var, new_var);
+                             IntegrateRationalFunction(root, main_var, new_var,
+                                                       trace);
                              printf("--------\n");
 
                              free_tree(root);
@@ -94,6 +97,18 @@ statement:      expression
         |       error
                         {
                              return 2;
+                        }
+        |       TRACE
+                        {
+                             if (trace) {
+                                  trace = 0;
+                                  printf("Trace mode off.\n");
+                             }
+                             else {
+                                  trace = 1;
+                                  printf("Trace mode on.\n");
+                             }
+                             return 0;
                         }
         |       QUIT
                         {

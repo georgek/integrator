@@ -12,7 +12,7 @@
 #include "ratfun.h"
 #include "tree.h"
 
-void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var);
+void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var, int trace);
 
 void HermiteReduceI(node_type *root, char var);
 

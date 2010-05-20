@@ -49,6 +49,10 @@ UINT 0|[1-9][0-9]*
      return TAN;
 }
 
+"trace" {
+     return TRACE;
+}
+
 "exit"|"quit" {
      return QUIT;
 }
