@@ -58,9 +58,9 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var, int trace)
           /* PRINTC(A); */
           if (trace) {
                PRINT("Solving diophantine equation:\t");
-               printf("s*");
+               printf("S * ");
                print_coefficient(mDsDmd);
-               printf(" + t*");
+               printf(" + T * ");
                print_coefficient(Dms);
                printf(" = ");
                print_coefficient(A);
@@ -71,9 +71,9 @@ void HermiteReduce(RatFun *g, RatFun *h, RatFun AD, char var, int trace)
 
           if (trace) {
                PRINT("Solution:\t\t\t");
-               printf("s = ");
+               printf("S = ");
                print_coefficient(B);
-               printf(", t = ");
+               printf(",\tT = ");
                print_coefficient(C);
                printf("\n");
                WAIT;

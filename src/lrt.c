@@ -8,6 +8,9 @@
 #include "squarefree.h"
 #include "ratfun.h"
 
+#define WAIT while (getchar() != '\n')
+#define PRINT(S) printf("\t"); printf(S)
+
 void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
                         Coefficient A, Coefficient D,
                         char var, char newvar,
@@ -27,12 +30,72 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
      coef_differentiate(&AtDd, D, var);
      mul_coefficients(&AtDd, AtDd, t);
      sub_coefficients(&AtDd, A, AtDd);
+
+     if (trace) {
+          PRINT("Calculating resultant and subresultant PRS of:\n");
+          PRINT("D = \t\t\t");
+          print_coefficient(D);
+          printf("\n");
+          PRINT("A - t*(dD/dx) = \t");
+          print_coefficient(AtDd);
+          printf("\n");
+          PRINT("with respect to"); printf(" %c\n", var);
+          PRINT("(Rothstein-Trager resultant)\n");
+
+          WAIT;
+     }
+
      SubResultant(&R, &Ri, D, AtDd, var);
      /* PRINTC(AtDd); */
      /* PRINTC(R); */
 
+     if (trace) {
+          unsigned j;
+          
+          PRINT("Resultant:\t\t");
+          print_coefficient(R);
+          printf("\n");
+          PRINT("Subresultant PRS:\n");
+          for (j = 0; j < Ri.size; ++j) {
+               printf("\t\t\t\t");
+               print_coefficient(ca_get(&Ri, j));
+               printf("\n");
+          }
+
+          WAIT;
+
+          PRINT("Now we take the squarefree factorisation of the resultant.\n");
+
+          WAIT;
+     }
+
      /* (Q_1, ..., Q_n) <- Squarefree(R) */
      Squarefree(Qi, R, newvar);
+
+     if (trace) {
+          unsigned j;
+
+          printf("\t\t");
+          print_coefficient(R);
+          printf(" =\t");
+          for (j = 0; j < Qi->size; ++j) {
+               if (coef_one(ca_get(Qi, j))) {
+                    continue;
+               }
+               print_coefficient(ca_get(Qi, j));
+               if (i > 0) {
+                    printf("^%u", j+1);
+               }
+               if (j != Qi->size-1) {
+                    printf(" * ");
+               }
+               else {
+                    printf("\n");
+               }
+          }
+
+          WAIT;
+     }
 
      /* for i <- 1 to n such that deg(Qi, t) > 0 */
      for (i = 1; i <= Qi->size; ++i) {
