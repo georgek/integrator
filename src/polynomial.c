@@ -1059,7 +1059,7 @@ BigRat coef_rat_part(Coefficient c)
           t1 = coef_rat_part(p->coeff);
           t2 = coef_rat_part(q->coeff);
           gcd(&t.num, t1.num, t2.num);
-          mul_bignums(&r.num, t1.num, t1.num);
+          mul_bignums(&r.num, t1.num, t2.num);
           div_bignums(&r.num, &t.den, r.num, t.num);
           free_bigrat(&t1);
           free_bigrat(&t2);
