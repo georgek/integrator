@@ -83,7 +83,7 @@ void IntRationalLogPart(CoefArray *Qi, CoefArray *Si,
                     continue;
                }
                print_coefficient(ca_get(Qi, j));
-               if (i > 0) {
+               if (j > 0) {
                     printf("^%u", j+1);
                }
                if (j != Qi->size-1) {
