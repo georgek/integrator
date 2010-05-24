@@ -89,7 +89,7 @@ BigNum make_bignum2(SHORT_INT_T n)
 
 BigNum make_zero_bignum(int length)
 {
-     BigNum new = calloc(length+1, sizeof(BigNum));
+     BigNum new = calloc(length+1, sizeof(SHORT_INT_T));
      *new = length;
      return new;
 }
