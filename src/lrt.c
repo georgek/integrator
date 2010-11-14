@@ -1,3 +1,9 @@
+/* This file is part of Integrator
+ * (C) 2010 George Kettleborough
+ * This is free software.  See COPYING file for license.
+ * 2010 Computer science final year project
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 

@@ -1,6 +1,6 @@
 /* This file is part of Integrator
  * (C) 2010 George Kettleborough
- * All rights reserved (at least until the project is finished)
+ * This is free software.  See COPYING file for license.
  * 2010 Computer science final year project
  */
 
